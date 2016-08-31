@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/monitor_drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".monitor.MonitorActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/monitor_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_alignParentTop="true"
+            android:background="@color/bgBar">
+
+            <ImageView
+                android:id="@+id/monitor_img_gps_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_gps_not_fixed_white_24dp"
+                android:contentDescription="@string/desc_gps_status"/>
+
+        </android.support.v7.widget.Toolbar>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_above="@+id/monitor_button_action"
+            android:layout_below="@id/monitor_toolbar"
+            android:background="@color/bgContent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
+
+            <RelativeLayout
+                style="@style/MonitorLayout">
+
+                <TextView
+                    android:id="@+id/monitor_txt_stopwatch"
+                    style="@style/MonitorValue"
+                    android:text="@string/default_stopwatch"
+                    android:textSize="@dimen/monitor_txt_value_main"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                style="@style/MonitorLayout">
+
+                <TextView
+                    android:id="@+id/monitor_txt_distance"
+                    style="@style/MonitorValue"
+                    android:text="@string/default_distance"
+                    android:textSize="@dimen/monitor_txt_value"/>
+
+                <TextView
+                    style="@style/MonitorUnit"
+                    android:layout_below="@id/monitor_txt_distance"
+                    android:text="@string/monitor_label_distance"/>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    style="@style/MonitorLayout">
+
+                    <TextView
+                        android:id="@+id/monitor_txt_speed"
+                        style="@style/MonitorValue"
+                        android:text="@string/default_speed"
+                        android:textSize="@dimen/monitor_txt_value"/>
+
+                    <TextView
+                        style="@style/MonitorUnit"
+                        android:layout_below="@id/monitor_txt_speed"
+                        android:text="@string/monitor_label_speed"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    style="@style/MonitorLayout">
+
+                    <TextView
+                        android:id="@+id/monitor_txt_pace"
+                        style="@style/MonitorValue"
+                        android:text="@string/default_pace"
+                        android:textSize="@dimen/monitor_txt_value"/>
+
+                    <TextView
+                        style="@style/MonitorUnit"
+                        android:layout_below="@id/monitor_txt_pace"
+                        android:text="@string/monitor_label_pace"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@id/monitor_button_action"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/primary"
+            android:onClick="onActionButtonClicked"
+            android:text="@string/action_start"/>
+
+    </RelativeLayout>
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/monitor_navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:menu="@menu/drawer_monitor"/>
+
+</android.support.v4.widget.DrawerLayout>

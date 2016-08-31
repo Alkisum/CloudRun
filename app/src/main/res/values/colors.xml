@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Blue Grey 500 -->
+    <color name="primary">#607d8b</color>
+    <!-- Blue Grey 900 -->
+    <color name="primaryDark">#263238</color>
+    <!-- Blue Grey 800 -->
+    <color name="bgBar">#37474f</color>
+    <!-- Blue Grey 700 -->
+    <color name="bgContent">#455a64</color>
+    <!-- Blue Grey 300 -->
+    <color name="accent">#90a4ae</color>
+</resources>

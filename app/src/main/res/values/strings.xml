@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">ownRun</string>
+
+    <!-- Permissions -->
+    <string name="permission_title">Insufficient permissions</string>
+    <string name="permission_location">Please allow the app to access precise location.</string>
+
+    <!-- Default values -->
+    <string name="default_stopwatch">00:00:00</string>
+    <string name="default_distance">0.00</string>
+    <string name="default_speed">0.0</string>
+    <string name="default_pace">00:00</string>
+    <string name="not_available">-</string>
+
+    <!-- Actions -->
+    <string name="action_lock">Lock</string>
+    <string name="action_unlock">Unlock</string>
+    <string name="action_start">Start</string>
+    <string name="action_stop">Stop</string>
+    <string name="action_upload">Upload</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_fix">Fix</string>
+
+    <!-- Navigation drawer -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="desc_navigation_drawer_logo">Logo</string>
+
+    <!-- Monitor -->
+    <string name="monitor_session_locked">Session locked</string>
+    <string name="desc_gps_status">GPS status</string>
+    <string name="monitor_label_distance">km</string>
+    <string name="monitor_label_speed">km/h (avg)</string>
+    <string name="monitor_label_pace">min/km (avg)</string>
+
+    <!-- History -->
+    <string name="history_title">History</string>
+    <string name="history_delete_title">Delete session</string>
+    <string name="history_delete_msg">Are you sure you want to delete this session?</string>
+    <string name="history_fix_title">Cannot be fixed</string>
+    <string name="history_fix_msg">The session does not contain any data. Do you want to delete it?</string>
+
+    <!-- History List -->
+    <string name="history_list_distance">Distance:</string>
+    <string name="history_list_duration">Duration:</string>
+    <string name="history_list_speed">Speed:</string>
+    <string name="history_list_pace">Pace:</string>
+
+    <!-- ConnectDialog -->
+    <string name="connect_title">Upload to ownCloud</string>
+    <string name="connect_hint_address">Server address</string>
+    <string name="connect_hint_path">Remote path</string>
+    <string name="connect_hint_username">Username</string>
+    <string name="connect_hint_password">Password</string>
+
+    <!-- Upload -->
+    <string name="upload_progress_init_msg">Preparing&#8230; (0%)</string>
+    <string name="upload_writing_failure_title">File creation failed</string>
+    <string name="upload_failure_title">Upload failed</string>
+    <string name="upload_success_toast">Session uploaded</string>
+    <string name="uploading_progress_msg_1">Uploading&#8230; (</string>
+    <string name="uploading_progress_msg_2">%)</string>
+
+</resources>
