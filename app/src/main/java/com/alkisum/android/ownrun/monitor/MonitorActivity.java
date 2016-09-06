@@ -31,7 +31,7 @@ import com.alkisum.android.ownrun.event.DistanceEvent;
 import com.alkisum.android.ownrun.history.HistoryActivity;
 import com.alkisum.android.ownrun.location.LocationHandler;
 import com.alkisum.android.ownrun.location.LocationHelper;
-import com.alkisum.android.ownrun.utils.ErrorDialog;
+import com.alkisum.android.ownrun.dialog.ErrorDialog;
 import com.alkisum.android.ownrun.utils.Format;
 
 import org.greenrobot.eventbus.EventBus;
@@ -48,7 +48,7 @@ import butterknife.ButterKnife;
  * Main activity showing location values.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 public class MonitorActivity extends AppCompatActivity
@@ -154,9 +154,6 @@ public class MonitorActivity extends AppCompatActivity
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // TODO Delete statement
-        //deleteDatabase(Db.NAME);
 
         String[] deniedPermissions = getDeniedPermissions(new String[]{
                         Manifest.permission.ACCESS_FINE_LOCATION,

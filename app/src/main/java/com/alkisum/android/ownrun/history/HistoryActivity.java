@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alkisum.android.ownrun.R;
@@ -24,8 +25,8 @@ import com.alkisum.android.ownrun.data.Uploader;
 import com.alkisum.android.ownrun.model.DataPoint;
 import com.alkisum.android.ownrun.model.Session;
 import com.alkisum.android.ownrun.model.SessionDao;
-import com.alkisum.android.ownrun.utils.ConfirmDialog;
-import com.alkisum.android.ownrun.utils.ErrorDialog;
+import com.alkisum.android.ownrun.dialog.ConfirmDialog;
+import com.alkisum.android.ownrun.dialog.ErrorDialog;
 import com.alkisum.android.ownrun.utils.Pref;
 
 import java.util.Collections;
@@ -38,7 +39,7 @@ import butterknife.ButterKnife;
  * Activity listing the history of sessions.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 public class HistoryActivity extends AppCompatActivity implements
@@ -63,6 +64,12 @@ public class HistoryActivity extends AppCompatActivity implements
      */
     @BindView(R.id.history_list)
     ListView mListView;
+
+    /**
+     * TextView informing the user that no sessions are available.
+     */
+    @BindView(R.id.history_no_session)
+    TextView mNoSessionTextView;
 
     /**
      * List adapter for the list of session.
@@ -147,7 +154,13 @@ public class HistoryActivity extends AppCompatActivity implements
                         return false;
                     }
                 });
-        mListAdapter = new HistoryListAdapter(this, loadSessions(),
+
+        List<Session> sessions = loadSessions();
+        if (sessions.isEmpty()) {
+            mListView.setVisibility(View.GONE);
+            mNoSessionTextView.setVisibility(View.VISIBLE);
+        }
+        mListAdapter = new HistoryListAdapter(this, sessions,
                 mHighlightedSessionId);
         mListView.setAdapter(mListAdapter);
 
@@ -298,7 +311,12 @@ public class HistoryActivity extends AppCompatActivity implements
      * Reload the list of sessions and notify the list adapter.
      */
     private void refreshList() {
-        mListAdapter.setSessions(loadSessions());
+        List<Session> sessions = loadSessions();
+        if (sessions.isEmpty()) {
+            mListView.setVisibility(View.GONE);
+            mNoSessionTextView.setVisibility(View.VISIBLE);
+        }
+        mListAdapter.setSessions(sessions);
         mListAdapter.notifyDataSetChanged();
     }
 

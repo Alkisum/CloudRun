@@ -35,6 +35,7 @@
 
     <!-- History -->
     <string name="history_title">History</string>
+    <string name="history_no_session">No sessions available</string>
     <string name="history_delete_title">Delete session</string>
     <string name="history_delete_msg">Are you sure you want to delete this session?</string>
     <string name="history_fix_title">Cannot be fixed</string>

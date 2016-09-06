@@ -20,4 +20,13 @@
         android:layout_alignParentBottom="true"
         android:layout_below="@id/history_toolbar"/>
 
+    <TextView
+        android:id="@+id/history_no_session"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/history_no_session"
+        android:textStyle="italic"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
 </RelativeLayout>

@@ -1,4 +1,4 @@
-package com.alkisum.android.ownrun.utils;
+package com.alkisum.android.ownrun.dialog;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -8,7 +8,7 @@ import android.content.DialogInterface;
  * Class to build a simple confirmation dialog.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 public final class ConfirmDialog {
