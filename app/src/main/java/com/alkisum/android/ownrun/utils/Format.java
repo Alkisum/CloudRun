@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
  * Utility class to format values.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 public final class Format {
@@ -83,7 +83,10 @@ public final class Format {
      */
     public static String formatSpeedAvg(final long time,
                                         final float distance) {
-        float avgSpeed = (distance / 1000f) / (time / 3600000f);
+        float avgSpeed = 0;
+        if (time != 0 && distance != 0) {
+            avgSpeed = (distance / 1000f) / (time / 3600000f);
+        }
         return String.format(Locale.getDefault(), Format.SPEED, avgSpeed);
     }
 
@@ -95,9 +98,12 @@ public final class Format {
      * @return Formatted pace average. 0 if the pace is higher than an hour
      */
     public static String formatPaceAvg(final long time, final float distance) {
-        long avgPace = Math.round(time / (distance / 1000f));
-        if (distance == 0 || avgPace > 3600000) {
-            avgPace = 0;
+        long avgPace = 0;
+        if (time != 0 && distance != 0) {
+            avgPace = Math.round(time / (distance / 1000f));
+            if (avgPace > 3600000) {
+                avgPace = 0;
+            }
         }
         return formatPace(avgPace);
     }

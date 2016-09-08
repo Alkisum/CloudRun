@@ -13,16 +13,18 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Task to write the session in JSON object into a file.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
-class JsonFileWriter extends AsyncTask<Void, Void, File> {
+public class JsonFileWriter extends AsyncTask<Void, Void,
+        List<JsonFileWriter.Wrapper>> {
 
     /**
      * JSON file version number. Must be incremented when the JSON file
@@ -41,9 +43,9 @@ class JsonFileWriter extends AsyncTask<Void, Void, File> {
     private final JsonFileWriterListener mCallback;
 
     /**
-     * Session to write to file.
+     * List of sessions to write to files.
      */
-    private final Session mSession;
+    private final List<Session> mSessions;
 
     /**
      * Exception that can be set when an exception is caught during the task.
@@ -55,43 +57,48 @@ class JsonFileWriter extends AsyncTask<Void, Void, File> {
      *
      * @param context  Context
      * @param callback Listener of the task
-     * @param session  Session to write to file
+     * @param sessions List of sessions to write to files
      */
     JsonFileWriter(final Context context,
-                          final JsonFileWriterListener callback,
-                          final Session session) {
+                   final JsonFileWriterListener callback,
+                   final List<Session> sessions) {
         mContext = context;
         mCallback = callback;
-        mSession = session;
+        mSessions = sessions;
     }
 
     @Override
-    protected final File doInBackground(final Void... voids) {
+    protected final List<Wrapper> doInBackground(final Void... voids) {
 
-        File file = null;
+        List<Wrapper> wrappers = new ArrayList<>();
 
         try {
-            // Create temporary file, its name does not matter
-            file = File.createTempFile("ownRun_" + mSession.getStart(),
-                    ".json", mContext.getCacheDir());
+            for (Session session : mSessions) {
+                // Create temporary file, its name does not matter
+                File file = File.createTempFile(Uploader.FILE_PREFIX
+                                + session.getStart(), Uploader.FILE_EXT,
+                        mContext.getCacheDir());
 
-            JSONObject jsonObject = buildJsonFromSession();
+                JSONObject jsonObject = buildJsonFromSession(session);
 
-            FileWriter writer = new FileWriter(file);
-            writer.write(jsonObject.toString());
-            writer.flush();
-            writer.close();
+                FileWriter writer = new FileWriter(file);
+                writer.write(jsonObject.toString());
+                writer.flush();
+                writer.close();
+
+                wrappers.add(new Wrapper(session, file));
+            }
         } catch (IOException | JSONException e) {
             mException = e;
         }
 
-        return file;
+        return wrappers;
     }
 
     @Override
-    protected final void onPostExecute(final File file) {
+    protected final void onPostExecute(final List<Wrapper> wrappers) {
         if (mException == null) {
-            mCallback.onJsonFileWritten(file);
+            mCallback.onJsonFileWritten(wrappers);
         } else {
             mCallback.onJsonFileFailed(mException);
         }
@@ -100,20 +107,22 @@ class JsonFileWriter extends AsyncTask<Void, Void, File> {
     /**
      * Build a JSON object from the session data.
      *
+     * @param session Session to build to JSON object from
      * @return JSONObject
      * @throws JSONException An error occurred while building the JSON object
      */
-    private JSONObject buildJsonFromSession() throws JSONException {
+    private JSONObject buildJsonFromSession(final Session session)
+            throws JSONException {
 
         JSONObject jsonSession = new JSONObject();
-        jsonSession.put("id", mSession.getId());
-        jsonSession.put("start", mSession.getStart());
-        jsonSession.put("end", mSession.getEnd());
-        jsonSession.put("distance", mSession.getDistance());
+        jsonSession.put("id", session.getId());
+        jsonSession.put("start", session.getStart());
+        jsonSession.put("end", session.getEnd());
+        jsonSession.put("distance", session.getDistance());
 
         JSONArray jsonArrayDataPoints = new JSONArray();
 
-        List<DataPoint> dataPoints = mSession.getDataPoints();
+        List<DataPoint> dataPoints = session.getDataPoints();
         for (DataPoint dataPoint : dataPoints) {
             JSONObject jsonDataPoint = new JSONObject();
             jsonDataPoint.put("id", dataPoint.getId());
@@ -138,11 +147,12 @@ class JsonFileWriter extends AsyncTask<Void, Void, File> {
     public interface JsonFileWriterListener {
 
         /**
-         * Called when the JSON file is written with the session data in it.
+         * Called when the JSON files are written with the sessions data in it.
          *
-         * @param file File where the data is written
+         * @param wrappers List of wrappers containing the session and the file
+         *                 where the data is written
          */
-        void onJsonFileWritten(File file);
+        void onJsonFileWritten(List<Wrapper> wrappers);
 
         /**
          * Called when an exception has been caught during the task.
@@ -150,5 +160,45 @@ class JsonFileWriter extends AsyncTask<Void, Void, File> {
          * @param exception Exception caught
          */
         void onJsonFileFailed(Exception exception);
+    }
+
+    /**
+     * Wrapper class containing a session and its JSON file.
+     */
+    public class Wrapper {
+
+        /**
+         * Session.
+         */
+        private Session mSession;
+
+        /**
+         * JSON file containing the session's data.
+         */
+        private File mFile;
+
+        /**
+         * Wrapper constructor.
+         * @param session Session
+         * @param file JSON file containing the session's data
+         */
+        public Wrapper(final Session session, final File file) {
+            mFile = file;
+            mSession = session;
+        }
+
+        /**
+         * @return Session
+         */
+        public final Session getSession() {
+            return mSession;
+        }
+
+        /**
+         * @return JSON file containing the session's data
+         */
+        public final File getFile() {
+            return mFile;
+        }
     }
 }

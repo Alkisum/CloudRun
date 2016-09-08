@@ -36,10 +36,8 @@
     <!-- History -->
     <string name="history_title">History</string>
     <string name="history_no_session">No sessions available</string>
-    <string name="history_delete_title">Delete session</string>
-    <string name="history_delete_msg">Are you sure you want to delete this session?</string>
-    <string name="history_fix_title">Cannot be fixed</string>
-    <string name="history_fix_msg">The session does not contain any data. Do you want to delete it?</string>
+    <string name="history_delete_title">Delete sessions</string>
+    <string name="history_delete_msg">Are you sure you want to delete the selected sessions?</string>
 
     <!-- History List -->
     <string name="history_list_distance">Distance:</string>
@@ -58,8 +56,6 @@
     <string name="upload_progress_init_msg">Preparing&#8230; (0%)</string>
     <string name="upload_writing_failure_title">File creation failed</string>
     <string name="upload_failure_title">Upload failed</string>
-    <string name="upload_success_toast">Session uploaded</string>
-    <string name="uploading_progress_msg_1">Uploading&#8230; (</string>
-    <string name="uploading_progress_msg_2">%)</string>
+    <string name="upload_success_toast">Sessions uploaded</string>
 
 </resources>

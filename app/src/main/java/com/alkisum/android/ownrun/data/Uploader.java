@@ -17,14 +17,16 @@ import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.resources.files.FileUtils;
 import com.owncloud.android.lib.resources.files.UploadRemoteFileOperation;
 
-import java.io.File;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * Class uploading JSON file containing a session's data to the ownCloud server.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 public class Uploader implements OnRemoteOperationListener,
@@ -36,9 +38,19 @@ public class Uploader implements OnRemoteOperationListener,
     private static final String TAG = "Uploader";
 
     /**
-     * Session to upload.
+     * JSON file name prefix.
      */
-    private Session mSession;
+    public static final String FILE_PREFIX = "ownRun_";
+
+    /**
+     * JSON file extension.
+     */
+    public static final String FILE_EXT = ".json";
+
+    /**
+     * List of sessions to upload.
+     */
+    private List<Session> mSessions;
 
     /**
      * Context.
@@ -66,12 +78,18 @@ public class Uploader implements OnRemoteOperationListener,
     private Handler mHandler;
 
     /**
+     * Queue of wrappers containing sessions with their JSON files waiting
+     * for being uploaded.
+     */
+    private Queue<JsonFileWriter.Wrapper> mWrappers;
+
+    /**
      * Uploader constructor.
      *
      * @param context Context
-     * @param session Session to upload
+     * @param sessions List of sessions to upload
      */
-    public Uploader(final Context context, final Session session) {
+    public Uploader(final Context context, final List<Session> sessions) {
         mContext = context;
         try {
             mCallback = (UploaderListener) context;
@@ -79,7 +97,7 @@ public class Uploader implements OnRemoteOperationListener,
             throw new ClassCastException(context.getClass().getSimpleName()
                     + " must implement UploaderListener");
         }
-        mSession = session;
+        mSessions = sessions;
         mHandler = new Handler();
     }
 
@@ -109,16 +127,18 @@ public class Uploader implements OnRemoteOperationListener,
     }
 
     /**
-     * Start the process. Execute the JsonFileWriter task to write the
-     * session's data into a temporary JSON file.
+     * Start the process. Execute the JsonFileWriter task to write sessions data
+     * into temporary JSON files.
      */
     public final void start() {
-        new JsonFileWriter(mContext, this, mSession).execute();
+        new JsonFileWriter(mContext, this, mSessions).execute();
     }
 
     @Override
-    public final void onJsonFileWritten(final File file) {
-        upload(file);
+    public final void onJsonFileWritten(
+            final List<JsonFileWriter.Wrapper> wrappers) {
+        mWrappers = new LinkedList<>(wrappers);
+        upload(mWrappers.poll());
     }
 
     @Override
@@ -129,14 +149,16 @@ public class Uploader implements OnRemoteOperationListener,
     /**
      * Upload the file to the ownCloud server.
      *
-     * @param file File to upload
+     * @param wrapper Wrapper containing the session and its JSON file to upload
      */
-    private void upload(final File file) {
-        String remotePath = buildRemotePath();
+    private void upload(final JsonFileWriter.Wrapper wrapper) {
+        mCallback.onUploadStart(wrapper);
+
+        String remotePath = buildRemotePath(wrapper);
         String mimeType = "text/plain";
 
         UploadRemoteFileOperation op = new UploadRemoteFileOperation(
-                file.getAbsolutePath(),
+                wrapper.getFile().getAbsolutePath(),
                 remotePath,
                 mimeType);
         op.addDatatransferProgressListener(this);
@@ -146,9 +168,11 @@ public class Uploader implements OnRemoteOperationListener,
     /**
      * Build a valid remote path from the path given by the user.
      *
+     * @param wrapper Wrapper containing the session and its JSON file
+     *                information
      * @return Valid remote path
      */
-    private String buildRemotePath() {
+    private String buildRemotePath(final JsonFileWriter.Wrapper wrapper) {
         if (mRemotePath == null || mRemotePath.equals("")) {
             mRemotePath = FileUtils.PATH_SEPARATOR;
         }
@@ -159,8 +183,8 @@ public class Uploader implements OnRemoteOperationListener,
             mRemotePath = mRemotePath + FileUtils.PATH_SEPARATOR;
         }
         // Add the file name to the remote path
-        return mRemotePath + "ownRun_" + Format.DATE_TIME_JSON.format(
-                new Date(mSession.getStart())) + ".json";
+        return mRemotePath + FILE_PREFIX + Format.DATE_TIME_JSON.format(
+                new Date(wrapper.getSession().getStart())) + FILE_EXT;
     }
 
     @Override
@@ -188,7 +212,12 @@ public class Uploader implements OnRemoteOperationListener,
             final RemoteOperation operation,
             final RemoteOperationResult result) {
         if (result.isSuccess()) {
-            mCallback.onUploadDone();
+            JsonFileWriter.Wrapper wrapper = mWrappers.poll();
+            if (wrapper != null) {
+                upload(wrapper);
+            } else {
+                mCallback.onAllUploadComplete();
+            }
         } else {
             Log.e(TAG, result.getLogMessage(), result.getException());
             mCallback.onUploadFailed(result.getLogMessage());
@@ -208,6 +237,13 @@ public class Uploader implements OnRemoteOperationListener,
         void onWritingFileFailed(Exception e);
 
         /**
+         * Called when an upload operation starts.
+         * @param wrapper Wrapper containing the session and its JSON file
+         *                that is being uploaded
+         */
+        void onUploadStart(final JsonFileWriter.Wrapper wrapper);
+
+        /**
          * Called when the file is being uploaded.
          *
          * @param percentage Progress of the upload (percentage)
@@ -215,9 +251,9 @@ public class Uploader implements OnRemoteOperationListener,
         void onUploading(int percentage);
 
         /**
-         * Called when the uploaded finished successfully.
+         * Called when all upload operations are completed.
          */
-        void onUploadDone();
+        void onAllUploadComplete();
 
         /**
          * Called when the upload failed.

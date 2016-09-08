@@ -8,6 +8,7 @@ import org.greenrobot.greendao.annotation.ToMany;
 
 import java.util.List;
 import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.annotation.Transient;
 
 @Entity
 public class Session {
@@ -21,6 +22,9 @@ public class Session {
     private Long end;
 
     private Float distance;
+
+    @Transient
+    private boolean selected;
 
     @ToMany(referencedJoinProperty = "sessionId")
     private List<DataPoint> dataPoints;
@@ -127,6 +131,14 @@ public class Session {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean getSelected() {
+        return this.selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     /** called by internal mechanisms, do not call yourself. */
