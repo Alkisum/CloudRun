@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -102,6 +103,11 @@ public class HistoryActivity extends AppCompatActivity implements
      */
     private Long mIgnoreSessionId;
 
+    /**
+     * SharedPreferences for ownCloud information.
+     */
+    private SharedPreferences mSharedPref;
+
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,14 +124,11 @@ public class HistoryActivity extends AppCompatActivity implements
             mIgnoreSessionId = extras.getLong(ARG_IGNORE_SESSION_ID);
         }
 
+        mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
         Sessions.fixSessions(mIgnoreSessionId);
 
         setGui();
-    }
-
-    @Override
-    protected final void onDestroy() {
-        super.onDestroy();
     }
 
     /**
@@ -295,7 +298,9 @@ public class HistoryActivity extends AppCompatActivity implements
             }
         });
 
-        saveConnectInfo(connectInfo);
+        if (mSharedPref.getBoolean(Pref.SAVE_OWNCLOUD_INFO, false)) {
+            saveConnectInfo(connectInfo);
+        }
     }
 
     /**
@@ -305,9 +310,7 @@ public class HistoryActivity extends AppCompatActivity implements
      * @param connectInfo Connection information
      */
     private void saveConnectInfo(final ConnectInfo connectInfo) {
-        SharedPreferences sharedPref = getSharedPreferences(
-                Pref.NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
+        SharedPreferences.Editor editor = mSharedPref.edit();
         editor.putString(Pref.ADDRESS, connectInfo.getAddress());
         editor.putString(Pref.PATH, connectInfo.getPath());
         editor.putString(Pref.USERNAME, connectInfo.getUsername());

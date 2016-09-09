@@ -3,10 +3,12 @@ package com.alkisum.android.ownrun.monitor;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
@@ -18,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,13 +29,15 @@ import android.widget.Toast;
 import com.alkisum.android.ownrun.R;
 import com.alkisum.android.ownrun.data.Db;
 import com.alkisum.android.ownrun.data.Recorder;
+import com.alkisum.android.ownrun.dialog.ErrorDialog;
 import com.alkisum.android.ownrun.event.CoordinateEvent;
 import com.alkisum.android.ownrun.event.DistanceEvent;
 import com.alkisum.android.ownrun.history.HistoryActivity;
 import com.alkisum.android.ownrun.location.LocationHandler;
 import com.alkisum.android.ownrun.location.LocationHelper;
-import com.alkisum.android.ownrun.dialog.ErrorDialog;
+import com.alkisum.android.ownrun.settings.SettingsActivity;
 import com.alkisum.android.ownrun.utils.Format;
+import com.alkisum.android.ownrun.utils.Pref;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -52,7 +57,8 @@ import butterknife.ButterKnife;
  * @since 1.0
  */
 public class MonitorActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     /**
      * Request code for denied permissions.
@@ -167,13 +173,31 @@ public class MonitorActivity extends AppCompatActivity
             initApp();
         }
 
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this);
+
         mEventBus = EventBus.getDefault();
         mEventBus.register(this);
 
         setContentView(R.layout.activity_monitor);
         ButterKnife.bind(this);
 
+        setKeepScreenOn();
+
         setGui();
+    }
+
+    @Override
+    protected final void onDestroy() {
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+        mEventBus.unregister(this);
+
+        if (mLocationHelper != null) {
+            mLocationHelper.stop();
+            mLocationHelper.onDestroy();
+        }
+        super.onDestroy();
     }
 
     /**
@@ -245,29 +269,6 @@ public class MonitorActivity extends AppCompatActivity
         mLocationHelper = new LocationHelper(this);
     }
 
-    /**
-     * Set the lock status and set the view according to the status.
-     *
-     * @param locked True if the session is to be locked, false otherwise
-     */
-    private void setLocked(final boolean locked) {
-        mLocked = locked;
-
-        mButtonAction.setEnabled(!mLocked);
-
-        if (!mLocked) {
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-            mDrawerToggle.setDrawerIndicatorEnabled(true);
-        } else {
-            mDrawerLayout.setDrawerLockMode(
-                    DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            mDrawerToggle.setDrawerIndicatorEnabled(false);
-        }
-        mDrawerToggle.syncState();
-
-        invalidateOptionsMenu();
-    }
-
     @Override
     public final boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.menu_monitor, menu);
@@ -324,17 +325,6 @@ public class MonitorActivity extends AppCompatActivity
     }
 
     @Override
-    protected final void onDestroy() {
-        mEventBus.unregister(this);
-
-        if (mLocationHelper != null) {
-            mLocationHelper.stop();
-            mLocationHelper.onDestroy();
-        }
-        super.onDestroy();
-    }
-
-    @Override
     public final void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -367,6 +357,10 @@ public class MonitorActivity extends AppCompatActivity
                         intent.putExtra(HistoryActivity.ARG_IGNORE_SESSION_ID,
                                 mRecorder.getSession().getId());
                     }
+                    startActivity(intent);
+                } else if (id == R.id.nav_settings) {
+                    Intent intent = new Intent(MonitorActivity.this,
+                            SettingsActivity.class);
                     startActivity(intent);
                 }
             }
@@ -478,6 +472,23 @@ public class MonitorActivity extends AppCompatActivity
     }
 
     /**
+     * Set keep screen on flag according to the preferences.
+     */
+    private void setKeepScreenOn() {
+        SharedPreferences sharedPref = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        boolean keepScreenOn = sharedPref.getBoolean(
+                Pref.KEEP_SCREEN_ON, false);
+        if (keepScreenOn) {
+            getWindow().addFlags(
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        } else {
+            getWindow().clearFlags(
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+    }
+
+    /**
      * Start a session.
      */
     private void startSession() {
@@ -512,6 +523,29 @@ public class MonitorActivity extends AppCompatActivity
     }
 
     /**
+     * Set the lock status and set the view according to the status.
+     *
+     * @param locked True if the session is to be locked, false otherwise
+     */
+    private void setLocked(final boolean locked) {
+        mLocked = locked;
+
+        mButtonAction.setEnabled(!mLocked);
+
+        if (!mLocked) {
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            mDrawerToggle.setDrawerIndicatorEnabled(true);
+        } else {
+            mDrawerLayout.setDrawerLockMode(
+                    DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            mDrawerToggle.setDrawerIndicatorEnabled(false);
+        }
+        mDrawerToggle.syncState();
+
+        invalidateOptionsMenu();
+    }
+
+    /**
      * Reset the views that are updated during a session.
      */
     private void resetViews() {
@@ -519,5 +553,13 @@ public class MonitorActivity extends AppCompatActivity
         mTextDistance.setText(R.string.default_distance);
         mTextSpeed.setText(R.string.default_speed);
         mTextPace.setText(R.string.default_pace);
+    }
+
+    @Override
+    public final void onSharedPreferenceChanged(
+            final SharedPreferences sharedPreferences, final String key) {
+        if (key.equals(Pref.KEEP_SCREEN_ON)) {
+            setKeepScreenOn();
+        }
     }
 }

@@ -19,7 +19,6 @@
     <string name="action_stop">Stop</string>
     <string name="action_upload">Upload</string>
     <string name="action_delete">Delete</string>
-    <string name="action_fix">Fix</string>
 
     <!-- Navigation drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -57,5 +56,8 @@
     <string name="upload_writing_failure_title">File creation failed</string>
     <string name="upload_failure_title">Upload failed</string>
     <string name="upload_success_toast">Sessions uploaded</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
 
 </resources>

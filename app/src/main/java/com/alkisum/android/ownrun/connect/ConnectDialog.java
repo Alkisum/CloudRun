@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.View;
@@ -21,7 +22,7 @@ import butterknife.ButterKnife;
  * Dialog to connect to ownCloud server to upload the session.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 public class ConnectDialog extends DialogFragment {
@@ -69,8 +70,7 @@ public class ConnectDialog extends DialogFragment {
     @Override
     public final void onAttach(final Context context) {
         super.onAttach(context);
-        mSharedPref = context.getSharedPreferences(Pref.NAME,
-                Context.MODE_PRIVATE);
+        mSharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         try {
             mCallback = (ConnectDialogListener) context;
         } catch (ClassCastException e) {

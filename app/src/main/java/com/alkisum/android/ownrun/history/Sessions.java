@@ -19,7 +19,7 @@ import java.util.List;
  * @version 1.1
  * @since 1.1
  */
-public final class Sessions {
+final class Sessions {
 
     /**
      * Sessions constructor.

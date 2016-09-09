@@ -170,12 +170,12 @@ public class JsonFileWriter extends AsyncTask<Void, Void,
         /**
          * Session.
          */
-        private Session mSession;
+        private final Session mSession;
 
         /**
          * JSON file containing the session's data.
          */
-        private File mFile;
+        private final File mFile;
 
         /**
          * Wrapper constructor.
