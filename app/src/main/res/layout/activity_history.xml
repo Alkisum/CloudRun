@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentTop="true"
-        android:background="@color/bgBar"/>
+        android:background="@color/primary"/>
 
     <ListView
         android:id="@+id/history_list"
