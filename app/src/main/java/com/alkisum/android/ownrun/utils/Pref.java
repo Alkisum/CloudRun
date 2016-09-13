@@ -4,7 +4,7 @@ package com.alkisum.android.ownrun.utils;
  * Class defining constants for SharedPreferences.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 public final class Pref {
@@ -33,6 +33,11 @@ public final class Pref {
      * Preference key for keep screen on settings.
      */
     public static final String KEEP_SCREEN_ON = "keepScreenOn";
+
+    /**
+     * Preference key for about entry in Settings.
+     */
+    public static final String ABOUT = "about";
 
     /**
      * Pref constructor.

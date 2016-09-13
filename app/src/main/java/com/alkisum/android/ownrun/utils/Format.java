@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
  * Utility class to format values.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 public final class Format {
@@ -45,6 +45,12 @@ public final class Format {
     public static final SimpleDateFormat DATE_TIME_HISTORY =
             new SimpleDateFormat("MMM. dd, yyyy HH:mm:ss",
                     Locale.getDefault());
+
+    /**
+     * Format for build date.
+     */
+    public static final SimpleDateFormat DATE_BUILD =
+            new SimpleDateFormat("MMM. dd, yyyy", Locale.getDefault());
 
     /**
      * Format duration.

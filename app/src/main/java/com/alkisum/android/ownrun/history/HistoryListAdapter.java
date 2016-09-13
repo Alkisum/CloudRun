@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
  * Adapter for History ListView.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 public class HistoryListAdapter extends BaseAdapter {
@@ -166,7 +166,7 @@ public class HistoryListAdapter extends BaseAdapter {
         final LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = v;
         if (view == null || view.getTag() == null) {
-            view = inflater.inflate(R.layout.history_list_item, viewGroup,
+            view = inflater.inflate(R.layout.list_item_history, viewGroup,
                     false);
             final ViewHolder holder = new ViewHolder(view);
             view.setTag(holder);

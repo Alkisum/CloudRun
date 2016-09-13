@@ -19,4 +19,13 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="About">
+
+        <Preference
+            android:key="about"
+            android:title="About ownRun"/>
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

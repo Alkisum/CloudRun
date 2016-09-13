@@ -1,7 +1,9 @@
 package com.alkisum.android.ownrun.settings;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,7 +18,7 @@ import butterknife.ButterKnife;
  * Activity showing the application settings.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 1.2
  * @since 1.1
  */
 public class SettingsActivity extends AppCompatActivity {
@@ -57,6 +59,19 @@ public class SettingsActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
 
             addPreferencesFromResource(R.xml.preferences);
+
+            // About
+            Preference aboutPreference = findPreference(Pref.ABOUT);
+            aboutPreference.setOnPreferenceClickListener(
+                    new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(
+                                final Preference preference) {
+                            startActivity(new Intent(getActivity(),
+                                    AboutActivity.class));
+                            return false;
+                        }
+                    });
         }
 
         @Override

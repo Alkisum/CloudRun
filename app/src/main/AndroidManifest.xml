@@ -30,6 +30,9 @@
         <activity
             android:name=".settings.SettingsActivity"
             android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name=".settings.AboutActivity"
+            android:configChanges="orientation|screenSize"/>
 
         <service android:name="com.alkisum.android.ownrun.location.LocationUpdateService"/>
 

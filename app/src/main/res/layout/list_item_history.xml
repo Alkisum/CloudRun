@@ -4,8 +4,8 @@
                 android:id="@+id/history_list_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:descendantFocusability="blocksDescendants">
+                android:descendantFocusability="blocksDescendants"
+                android:padding="16dp">
 
     <LinearLayout
         android:id="@+id/history_list_title"
@@ -18,9 +18,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:textColor="@color/accent"
-            android:textStyle="bold"
-            android:layout_weight="1"/>
+            android:textStyle="bold"/>
 
         <android.support.v7.widget.AppCompatCheckBox
             android:id="@+id/history_list_checkbox"
