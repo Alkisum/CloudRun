@@ -20,7 +20,7 @@ import java.util.List;
  * Task to write the session in JSON object into a file.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 1.3
  * @since 1.0
  */
 public class JsonFileWriter extends AsyncTask<Void, Void,
@@ -144,7 +144,7 @@ public class JsonFileWriter extends AsyncTask<Void, Void,
     /**
      * Listener for the JsonFileWriter.
      */
-    public interface JsonFileWriterListener {
+    interface JsonFileWriterListener {
 
         /**
          * Called when the JSON files are written with the sessions data in it.
@@ -179,10 +179,11 @@ public class JsonFileWriter extends AsyncTask<Void, Void,
 
         /**
          * Wrapper constructor.
+         *
          * @param session Session
-         * @param file JSON file containing the session's data
+         * @param file    JSON file containing the session's data
          */
-        public Wrapper(final Session session, final File file) {
+        Wrapper(final Session session, final File file) {
             mFile = file;
             mSession = session;
         }

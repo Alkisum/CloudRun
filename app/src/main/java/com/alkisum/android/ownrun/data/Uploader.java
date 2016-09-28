@@ -26,7 +26,7 @@ import java.util.Queue;
  * Class uploading JSON file containing a session's data to the ownCloud server.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 1.3
  * @since 1.0
  */
 public class Uploader implements OnRemoteOperationListener,
@@ -86,7 +86,7 @@ public class Uploader implements OnRemoteOperationListener,
     /**
      * Uploader constructor.
      *
-     * @param context Context
+     * @param context  Context
      * @param sessions List of sessions to upload
      */
     public Uploader(final Context context, final List<Session> sessions) {
@@ -238,6 +238,7 @@ public class Uploader implements OnRemoteOperationListener,
 
         /**
          * Called when an upload operation starts.
+         *
          * @param wrapper Wrapper containing the session and its JSON file
          *                that is being uploaded
          */

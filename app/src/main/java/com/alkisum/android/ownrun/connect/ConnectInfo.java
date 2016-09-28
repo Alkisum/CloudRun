@@ -4,7 +4,7 @@ package com.alkisum.android.ownrun.connect;
  * Class containing connection information for ownCloud server.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.3
  * @since 1.0
  */
 public class ConnectInfo {
@@ -37,8 +37,8 @@ public class ConnectInfo {
      * @param username Username
      * @param password Password
      */
-    public ConnectInfo(final String address, final String path,
-                       final String username, final String password) {
+    ConnectInfo(final String address, final String path,
+                final String username, final String password) {
         mAddress = address;
         mPath = path;
         mUsername = username;

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="dataTile">
+        <item>Distance</item>
+        <item>Speed</item>
+        <item>Pace</item>
+        <item>Speed average</item>
+        <item>Pace average</item>
+    </string-array>
+</resources>

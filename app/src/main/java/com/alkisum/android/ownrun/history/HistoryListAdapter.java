@@ -26,10 +26,10 @@ import butterknife.ButterKnife;
  * Adapter for History ListView.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 1.3
  * @since 1.0
  */
-public class HistoryListAdapter extends BaseAdapter {
+class HistoryListAdapter extends BaseAdapter {
 
     /**
      * Context.
@@ -72,9 +72,9 @@ public class HistoryListAdapter extends BaseAdapter {
      *                             The ID is null if the user started
      *                             the HistoryActivity manually
      */
-    public HistoryListAdapter(final Context context,
-                              final List<Session> sessions,
-                              final Long highlightedSessionId) {
+    HistoryListAdapter(final Context context,
+                       final List<Session> sessions,
+                       final Long highlightedSessionId) {
         mContext = context;
         mSessions = sessions;
         resetSessionsSelectedStates();
@@ -95,21 +95,21 @@ public class HistoryListAdapter extends BaseAdapter {
      *
      * @param sessions List of sessions to set
      */
-    public final void setSessions(final List<Session> sessions) {
+    final void setSessions(final List<Session> sessions) {
         mSessions = sessions;
     }
 
     /**
      * @return True if the ListView is in edit mode, false otherwise
      */
-    public final boolean isEditMode() {
+    final boolean isEditMode() {
         return mEditMode;
     }
 
     /**
      * Disable the edit mode and reset the sessions' selected states.
      */
-    public final void disableEditMode() {
+    final void disableEditMode() {
         mEditMode = false;
         resetSessionsSelectedStates();
     }
@@ -120,7 +120,7 @@ public class HistoryListAdapter extends BaseAdapter {
      *
      * @param position Position of the item that has been pressed long
      */
-    public final void enableEditMode(final int position) {
+    final void enableEditMode(final int position) {
         mEditMode = true;
         mSessions.get(position).setSelected(true);
     }
@@ -130,7 +130,7 @@ public class HistoryListAdapter extends BaseAdapter {
      *
      * @param position Position of the item that has been pressed
      */
-    public final void changeSessionSelectedState(final int position) {
+    final void changeSessionSelectedState(final int position) {
         Session session = mSessions.get(position);
         session.setSelected(!session.getSelected());
     }

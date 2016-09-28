@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.alkisum.android.ownrun.event.CoordinateEvent;
 import com.alkisum.android.ownrun.event.DistanceEvent;
+import com.alkisum.android.ownrun.event.PaceEvent;
+import com.alkisum.android.ownrun.event.SpeedEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -15,7 +17,7 @@ import org.greenrobot.eventbus.EventBus;
  * through EventBus.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.3
  * @since 1.0
  */
 public class LocationHelper implements LocationHandlerListener {
@@ -77,12 +79,12 @@ public class LocationHelper implements LocationHandlerListener {
 
     @Override
     public final void onNewSpeedValue(final float value) {
-
+        mEventBus.post(new SpeedEvent(value));
     }
 
     @Override
     public final void onNewPaceValue(final long value) {
-
+        mEventBus.post(new PaceEvent(value));
     }
 
     @Override

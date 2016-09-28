@@ -31,7 +31,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
  * Class handling location updates.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.3
  * @since 1.0
  */
 public class LocationHandler implements
@@ -125,8 +125,8 @@ public class LocationHandler implements
      * @param activity Activity instance
      * @param callback LocationHandlerListener instance
      */
-    public LocationHandler(final Activity activity,
-                           final LocationHandlerListener callback) {
+    LocationHandler(final Activity activity,
+                    final LocationHandlerListener callback) {
         mActivity = activity;
         mCallback = callback;
 
@@ -140,7 +140,7 @@ public class LocationHandler implements
     /**
      * Called when the activity attached to the helper is destroyed.
      */
-    public final void onDestroy() {
+    final void onDestroy() {
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -162,7 +162,7 @@ public class LocationHandler implements
      * If it is enabled, start location updates, if it is disabled,
      * show a dialog to enable the location.
      */
-    public final void buildLocationSettingsRequest() {
+    final void buildLocationSettingsRequest() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.
                 Builder().addLocationRequest(mLocationRequest)
                 .setAlwaysShow(true);
@@ -244,7 +244,7 @@ public class LocationHandler implements
     /**
      * Start location updates.
      */
-    public final void startLocationUpdates() {
+    final void startLocationUpdates() {
         Intent intent = new Intent(mActivity, LocationUpdateService.class);
         mPendingIntent = PendingIntent.getService(mActivity,
                 REQUEST_LOCATION, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -267,7 +267,7 @@ public class LocationHandler implements
     /**
      * Stop location updates.
      */
-    public final void stopLocationUpdates() {
+    final void stopLocationUpdates() {
         mLastCoordinate = null;
         if (mLocationUpdatesStarted) {
             mActivity.unregisterReceiver(mLocationReceiver);

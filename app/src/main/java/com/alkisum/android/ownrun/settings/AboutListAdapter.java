@@ -3,6 +3,7 @@ package com.alkisum.android.ownrun.settings;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +20,10 @@ import butterknife.ButterKnife;
  * Adapter for list of application information shown in the AboutActivity.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 1.3
  * @since 1.2
  */
-public class AboutListAdapter extends ArrayAdapter<String[]> {
+class AboutListAdapter extends ArrayAdapter<String[]> {
 
     /**
      * Context.
@@ -46,9 +47,10 @@ public class AboutListAdapter extends ArrayAdapter<String[]> {
         mInfo = info;
     }
 
+    @NonNull
     @Override
     public final View getView(final int position, final View convertView,
-                              final ViewGroup parent) {
+                              @NonNull final ViewGroup parent) {
         final LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = convertView;
         if (view == null || view.getTag() == null) {

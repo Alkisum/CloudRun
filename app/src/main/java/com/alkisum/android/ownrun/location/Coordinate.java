@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Class defining coordinates (latitude, longitude and elevation).
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.3
  * @since 1.0
  */
 public class Coordinate implements Parcelable {
@@ -34,8 +34,8 @@ public class Coordinate implements Parcelable {
      * @param longitude Longitude
      * @param elevation Elevation
      */
-    public Coordinate(final double latitude, final double longitude,
-                      final double elevation) {
+    Coordinate(final double latitude, final double longitude,
+               final double elevation) {
         mLatitude = latitude;
         mLongitude = longitude;
         mElevation = elevation;
@@ -68,7 +68,7 @@ public class Coordinate implements Parcelable {
      * @param dest Destination
      * @return Distance between the current location and the given destination
      */
-    public final float distanceTo(final Coordinate dest) {
+    final float distanceTo(final Coordinate dest) {
         float[] results = new float[2];
         android.location.Location.distanceBetween(
                 mLatitude,
@@ -84,7 +84,7 @@ public class Coordinate implements Parcelable {
      *
      * @param in Parcel to read
      */
-    protected Coordinate(final Parcel in) {
+    private Coordinate(final Parcel in) {
         mLatitude = in.readDouble();
         mLongitude = in.readDouble();
         mElevation = in.readDouble();

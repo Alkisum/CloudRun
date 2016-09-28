@@ -25,101 +25,147 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginEnd="8dp"
-                android:src="@drawable/ic_gps_not_fixed_white_24dp"
-                android:contentDescription="@string/desc_gps_status"/>
+                android:contentDescription="@string/desc_gps_status"
+                android:src="@drawable/ic_gps_not_fixed_white_24dp"/>
 
         </android.support.v7.widget.Toolbar>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_above="@+id/monitor_button_action"
+            android:layout_alignParentBottom="true"
             android:layout_below="@id/monitor_toolbar"
+            android:background="#212121"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin">
+            android:orientation="vertical">
 
             <RelativeLayout
-                style="@style/MonitorLayout">
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/tile">
 
                 <TextView
-                    android:id="@+id/monitor_txt_stopwatch"
-                    style="@style/MonitorValue"
+                    android:id="@+id/monitor_txt_top"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:text="@string/default_stopwatch"
-                    android:textSize="@dimen/monitor_txt_value_main"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                style="@style/MonitorLayout">
-
-                <TextView
-                    android:id="@+id/monitor_txt_distance"
-                    style="@style/MonitorValue"
-                    android:text="@string/default_distance"
-                    android:textSize="@dimen/monitor_txt_value"/>
-
-                <TextView
-                    style="@style/MonitorUnit"
-                    android:layout_below="@id/monitor_txt_distance"
-                    android:text="@string/monitor_label_distance"/>
+                    android:textSize="80sp"/>
 
             </RelativeLayout>
 
             <LinearLayout
+                android:baselineAligned="false"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
                 <RelativeLayout
-                    style="@style/MonitorLayout">
+                    android:id="@+id/monitor_layout_left"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/tile"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center">
 
                     <TextView
-                        android:id="@+id/monitor_txt_speed"
-                        style="@style/MonitorValue"
-                        android:text="@string/default_speed"
-                        android:textSize="@dimen/monitor_txt_value"/>
+                        android:id="@+id/monitor_txt_left_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:textSize="60sp"/>
 
                     <TextView
-                        style="@style/MonitorUnit"
-                        android:layout_below="@id/monitor_txt_speed"
-                        android:text="@string/monitor_label_speed"/>
+                        android:id="@+id/monitor_txt_left_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/monitor_txt_left_value"
+                        android:layout_centerHorizontal="true"
+                        android:textSize="30sp"/>
+
                 </RelativeLayout>
 
-                <RelativeLayout
-                    style="@style/MonitorLayout">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/monitor_txt_pace"
-                        style="@style/MonitorValue"
-                        android:text="@string/default_pace"
-                        android:textSize="@dimen/monitor_txt_value"/>
+                    <RelativeLayout
+                        android:id="@+id/monitor_layout_right_top"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/tile"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center">
 
-                    <TextView
-                        style="@style/MonitorUnit"
-                        android:layout_below="@id/monitor_txt_pace"
-                        android:text="@string/monitor_label_pace"/>
+                        <TextView
+                            android:id="@+id/monitor_txt_right_top_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:textSize="30sp"/>
 
-                </RelativeLayout>
+                        <TextView
+                            android:id="@+id/monitor_txt_right_top_unit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/monitor_txt_right_top_value"
+                            android:layout_centerHorizontal="true"
+                            android:textSize="15sp"/>
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/monitor_layout_right_bottom"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/tile"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/monitor_txt_right_bottom_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:textSize="30sp"/>
+
+                        <TextView
+                            android:id="@+id/monitor_txt_right_bottom_unit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/monitor_txt_right_bottom_value"
+                            android:layout_centerHorizontal="true"
+                            android:textSize="15sp"/>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
-        <Button
-            android:id="@id/monitor_button_action"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_alignParentBottom="true"
-            android:background="@color/primary"
-            android:onClick="onActionButtonClicked"
-            android:text="@string/action_start"/>
+                <ImageButton
+                    android:id="@+id/monitor_button_action"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:src="@drawable/ic_play_arrow_white_48dp"
+                    android:background="@drawable/action_button"
+                    android:contentDescription="@string/desc_action_button"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
 
     </RelativeLayout>
 

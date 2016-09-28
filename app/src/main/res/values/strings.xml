@@ -12,11 +12,16 @@
     <string name="default_pace">00:00</string>
     <string name="not_available">-</string>
 
+    <!-- Units -->
+    <string name="unit_distance">km</string>
+    <string name="unit_speed">km/h</string>
+    <string name="unit_pace">min/km</string>
+    <string name="unit_speed_avg">km/h (avg)</string>
+    <string name="unit_pace_avg">min/km (avg)</string>
+
     <!-- Actions -->
     <string name="action_lock">Lock</string>
     <string name="action_unlock">Unlock</string>
-    <string name="action_start">Start</string>
-    <string name="action_stop">Stop</string>
     <string name="action_upload">Upload</string>
     <string name="action_delete">Delete</string>
 
@@ -28,9 +33,7 @@
     <!-- Monitor -->
     <string name="monitor_session_locked">Session locked</string>
     <string name="desc_gps_status">GPS status</string>
-    <string name="monitor_label_distance">km</string>
-    <string name="monitor_label_speed">km/h (avg)</string>
-    <string name="monitor_label_pace">min/km (avg)</string>
+    <string name="desc_action_button">Start/stop session</string>
 
     <!-- History -->
     <string name="history_title">History</string>

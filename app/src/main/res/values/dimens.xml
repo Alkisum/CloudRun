@@ -1,7 +1,4 @@
 <resources>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="monitor_txt_value_main">80sp</dimen>
-    <dimen name="monitor_txt_value">60sp</dimen>
-    <dimen name="monitor_txt_unit">20sp</dimen>
 </resources>

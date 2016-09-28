@@ -5,7 +5,7 @@ package com.alkisum.android.ownrun.location;
  * http://stackoverflow.com/questions/1134579/smooth-gps-data/15657798#15657798.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.3
  * @since 1.0
  */
 class KalmanFilter {
@@ -50,14 +50,14 @@ class KalmanFilter {
     /**
      * @return Latitude
      */
-    public final double getLatitude() {
+    final double getLatitude() {
         return mLatitude;
     }
 
     /**
      * @return Longitude
      */
-    public final double getLongitude() {
+    final double getLongitude() {
         return mLongitude;
     }
 
@@ -69,8 +69,8 @@ class KalmanFilter {
      * @param newAccuracy Measurement of 1 standard deviation error in meters
      * @param millis      Time of measurement
      */
-    public final void process(final double latitude, final double longitude,
-                              final float newAccuracy, final long millis) {
+    final void process(final double latitude, final double longitude,
+                       final float newAccuracy, final long millis) {
         float accuracy = newAccuracy;
         if (accuracy < 1) {
             accuracy = 1;

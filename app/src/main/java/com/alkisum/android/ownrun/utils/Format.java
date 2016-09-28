@@ -1,5 +1,6 @@
 package com.alkisum.android.ownrun.utils;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -8,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  * Utility class to format values.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 1.3
  * @since 1.0
  */
 public final class Format {
@@ -68,12 +69,33 @@ public final class Format {
     }
 
     /**
+     * Round and format the given distance value.
+     *
+     * @param distance Distance value to format
+     * @return Format distance value
+     */
+    public static String formatDistance(final float distance) {
+        return String.format(Locale.getDefault(),
+                DISTANCE, round(distance / 1000f, 2));
+    }
+
+    /**
+     * Round and format the given speed value.
+     *
+     * @param speed Speed value to format
+     * @return Format speed value
+     */
+    public static String formatSpeed(final float speed) {
+        return String.format(Locale.getDefault(), SPEED, round(speed, 1));
+    }
+
+    /**
      * Format the pace value.
      *
      * @param pace Pace in millis
      * @return Format pace
      */
-    private static String formatPace(final long pace) {
+    public static String formatPace(final long pace) {
         return String.format(Locale.getDefault(), PACE,
                 TimeUnit.MILLISECONDS.toMinutes(pace),
                 TimeUnit.MILLISECONDS.toSeconds(pace)
@@ -112,6 +134,18 @@ public final class Format {
             }
         }
         return formatPace(avgPace);
+    }
+
+    /**
+     * Round the given float according to the given decimal place.
+     *
+     * @param d            Float to round
+     * @param decimalPlace Decimal place
+     * @return Rounded float
+     */
+    private static float round(final float d, final int decimalPlace) {
+        return BigDecimal.valueOf(d).setScale(decimalPlace,
+                BigDecimal.ROUND_HALF_UP).floatValue();
     }
 
     /**

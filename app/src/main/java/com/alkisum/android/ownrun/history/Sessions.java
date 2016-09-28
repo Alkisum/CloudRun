@@ -16,7 +16,7 @@ import java.util.List;
  * Utility class for session operations.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 1.3
  * @since 1.1
  */
 final class Sessions {
@@ -37,7 +37,7 @@ final class Sessions {
      *                        is running.
      * @return List of sessions in the anti-chronological order
      */
-    public static List<Session> loadSessions(final Long ignoreSessionId) {
+    static List<Session> loadSessions(final Long ignoreSessionId) {
         SessionDao dao = Db.getInstance().getDaoSession()
                 .getSessionDao();
         List<Session> sessions = dao.loadAll();
@@ -54,7 +54,7 @@ final class Sessions {
      *
      * @return List of selected sessions.
      */
-    public static List<Session> getSelectedSessions() {
+    static List<Session> getSelectedSessions() {
         SessionDao dao = Db.getInstance().getDaoSession()
                 .getSessionDao();
         List<Session> selectedSessions = new ArrayList<>();
@@ -69,7 +69,7 @@ final class Sessions {
     /**
      * Delete the selected sessions from the database.
      */
-    public static void deleteSelectedSessions() {
+    static void deleteSelectedSessions() {
         DaoSession daoSession = Db.getInstance().getDaoSession();
         List<Session> sessions = Sessions.getSelectedSessions();
         for (Session session : sessions) {
@@ -85,7 +85,7 @@ final class Sessions {
      *                        it is still running. The ID is null if no session
      *                        is running.
      */
-    public static void fixSessions(final Long ignoreSessionId) {
+    static void fixSessions(final Long ignoreSessionId) {
         List<Session> sessions = loadSessions(ignoreSessionId);
 
         for (Session session : sessions) {
@@ -98,6 +98,7 @@ final class Sessions {
     /**
      * Fix the session. Use DataPoints of the session to get the end and to
      * calculate the distance.
+     *
      * @param session Session to fix
      */
     private static void fixSession(final Session session) {

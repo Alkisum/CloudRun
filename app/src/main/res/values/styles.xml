@@ -6,25 +6,4 @@
         <item name="colorAccent">@color/accent</item>
     </style>
 
-    <style name="MonitorLayout">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:gravity">center</item>
-    </style>
-
-    <style name="MonitorValue">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_centerHorizontal">true</item>
-        <item name="android:textColor">@android:color/white</item>
-    </style>
-
-    <style name="MonitorUnit">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">@dimen/monitor_txt_unit</item>
-        <item name="android:layout_centerHorizontal">true</item>
-    </style>
-
 </resources>

@@ -21,8 +21,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +33,8 @@ import com.alkisum.android.ownrun.data.Recorder;
 import com.alkisum.android.ownrun.dialog.ErrorDialog;
 import com.alkisum.android.ownrun.event.CoordinateEvent;
 import com.alkisum.android.ownrun.event.DistanceEvent;
+import com.alkisum.android.ownrun.event.PaceEvent;
+import com.alkisum.android.ownrun.event.SpeedEvent;
 import com.alkisum.android.ownrun.history.HistoryActivity;
 import com.alkisum.android.ownrun.location.LocationHandler;
 import com.alkisum.android.ownrun.location.LocationHelper;
@@ -44,26 +47,32 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Main activity showing location values.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 1.3
  * @since 1.0
  */
 public class MonitorActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        SharedPreferences.OnSharedPreferenceChangeListener,
+        Tile.TileListener {
 
     /**
      * Request code for denied permissions.
      */
     private static final int REQUEST_CODE = 683;
+
+    /**
+     * SharedPreferences instance.
+     */
+    private SharedPreferences mSharedPref;
 
     /**
      * EventBus instance.
@@ -111,28 +120,21 @@ public class MonitorActivity extends AppCompatActivity
     private final Handler mGpsStatusHandler = new Handler();
 
     /**
-     * TextView showing distance value.
+     * List of layout containing GPS data.
      */
-    @BindView(R.id.monitor_txt_distance)
-    TextView mTextDistance;
+    private List<Tile> mTiles;
 
     /**
-     * TextView showing speed value.
+     * Array containing the last values for each data type. The index is based
+     * on the data type constants.
      */
-    @BindView(R.id.monitor_txt_speed)
-    TextView mTextSpeed;
+    private String[] mCurrentValues;
 
     /**
-     * TextView showing pace value.
+     * TextView at the top of the layout.
      */
-    @BindView(R.id.monitor_txt_pace)
-    TextView mTextPace;
-
-    /**
-     * TextView showing the stopwatch.
-     */
-    @BindView(R.id.monitor_txt_stopwatch)
-    TextView mTextStopwatch;
+    @BindView(R.id.monitor_txt_top)
+    TextView mTextTop;
 
     /**
      * Drawer layout.
@@ -155,7 +157,7 @@ public class MonitorActivity extends AppCompatActivity
      * Button starting or stopping the session.
      */
     @BindView(R.id.monitor_button_action)
-    Button mButtonAction;
+    ImageButton mButtonAction;
 
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
@@ -173,11 +175,20 @@ public class MonitorActivity extends AppCompatActivity
             initApp();
         }
 
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .registerOnSharedPreferenceChangeListener(this);
+        mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mSharedPref.registerOnSharedPreferenceChangeListener(this);
 
         mEventBus = EventBus.getDefault();
         mEventBus.register(this);
+
+        mCurrentValues = new String[]{
+                getString(R.string.default_distance),
+                getString(R.string.default_speed),
+                getString(R.string.default_pace),
+                getString(R.string.default_speed),
+                getString(R.string.default_pace),
+        };
 
         setContentView(R.layout.activity_monitor);
         ButterKnife.bind(this);
@@ -189,8 +200,7 @@ public class MonitorActivity extends AppCompatActivity
 
     @Override
     protected final void onDestroy() {
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(this);
+        mSharedPref.unregisterOnSharedPreferenceChangeListener(this);
         mEventBus.unregister(this);
 
         if (mLocationHelper != null) {
@@ -319,9 +329,46 @@ public class MonitorActivity extends AppCompatActivity
         navigationView.addHeaderView(header);
         navigationView.setNavigationItemSelectedListener(this);
 
-        setLocked(false);
         mGpsStatusHandler.postDelayed(mGpsStatusTask,
                 LocationHandler.LOCATION_REQUEST_INTERVAL * 2);
+
+        setTiles();
+
+        setLocked(false);
+    }
+
+    /**
+     * Create and add tiles to the Tile List.
+     */
+    private void setTiles() {
+
+        int leftData = mSharedPref.getInt(Pref.TILE_LEFT, Tile.DISTANCE);
+        int topRightData = mSharedPref.getInt(Pref.TILE_RIGHT_TOP, Tile.SPEED);
+        int bottomRightData = mSharedPref.getInt(
+                Pref.TILE_RIGHT_BOTTOM, Tile.PACE);
+
+        mTiles = new ArrayList<>();
+        mTiles.add(new Tile(this, this, Pref.TILE_LEFT, leftData,
+                (RelativeLayout) ButterKnife.findById(
+                        this, R.id.monitor_layout_left),
+                (TextView) ButterKnife.findById(
+                        this, R.id.monitor_txt_left_value),
+                (TextView) ButterKnife.findById(
+                        this, R.id.monitor_txt_left_unit)));
+        mTiles.add(new Tile(this, this, Pref.TILE_RIGHT_TOP, topRightData,
+                (RelativeLayout) ButterKnife.findById(
+                        this, R.id.monitor_layout_right_top),
+                (TextView) ButterKnife.findById(
+                        this, R.id.monitor_txt_right_top_value),
+                (TextView) ButterKnife.findById(
+                        this, R.id.monitor_txt_right_top_unit)));
+        mTiles.add(new Tile(this, this, Pref.TILE_RIGHT_BOTTOM, bottomRightData,
+                (RelativeLayout) ButterKnife.findById(
+                        this, R.id.monitor_layout_right_bottom),
+                (TextView) ButterKnife.findById(
+                        this, R.id.monitor_txt_right_bottom_value),
+                (TextView) ButterKnife.findById(
+                        this, R.id.monitor_txt_right_bottom_unit)));
     }
 
     @Override
@@ -387,28 +434,6 @@ public class MonitorActivity extends AppCompatActivity
     }
 
     /**
-     * Triggered when a new distance is calculated. Calculate speed and pace
-     * averages from the distance.
-     *
-     * @param event Distance event
-     */
-    @Subscribe
-    public final void onDistanceEvent(final DistanceEvent event) {
-        if (mSessionRunning) {
-            mDistance += event.getValue();
-            mTextDistance.setText(String.format(Locale.getDefault(),
-                    Format.DISTANCE, mDistance / 1000f));
-            long elapsedTime = mRecorder.getCurrentDuration();
-
-            // Speed average
-            mTextSpeed.setText(Format.formatSpeedAvg(elapsedTime, mDistance));
-
-            // Pace average
-            mTextPace.setText(Format.formatPaceAvg(elapsedTime, mDistance));
-        }
-    }
-
-    /**
      * Triggered when new coordinates are received.
      *
      * @param event Coordinate event
@@ -419,6 +444,73 @@ public class MonitorActivity extends AppCompatActivity
     }
 
     /**
+     * Triggered when a new distance is calculated. Calculate speed and pace
+     * averages from the distance.
+     *
+     * @param event Distance event
+     */
+    @Subscribe
+    public final void onDistanceEvent(final DistanceEvent event) {
+        if (mSessionRunning) {
+            mDistance += event.getValue();
+            updateTile(Tile.DISTANCE, Format.formatDistance(mDistance));
+            long elapsedTime = mRecorder.getCurrentDuration();
+
+            // Speed average
+            updateTile(Tile.SPEED_AVG,
+                    Format.formatSpeedAvg(elapsedTime, mDistance));
+
+            // Pace average
+            updateTile(Tile.PACE_AVG,
+                    Format.formatPaceAvg(elapsedTime, mDistance));
+        }
+    }
+
+    /**
+     * Triggered when a new speed is calculated.
+     *
+     * @param event Speed event
+     */
+    @Subscribe
+    public final void onSpeedEvent(final SpeedEvent event) {
+        if (mSessionRunning) {
+            updateTile(Tile.SPEED, Format.formatSpeed(event.getValue()));
+        }
+    }
+
+    /**
+     * Triggered when a new pace is calculated.
+     *
+     * @param event Pace event
+     */
+    @Subscribe
+    public final void onPaceEvent(final PaceEvent event) {
+        if (mSessionRunning) {
+            updateTile(Tile.PACE, Format.formatPace(event.getValue()));
+        }
+    }
+
+    /**
+     * Update the tiles containing the data type with the new value.
+     *
+     * @param data  Data type
+     * @param value New value to set
+     */
+    private void updateTile(final int data, final String value) {
+        for (Tile tile : mTiles) {
+            if (tile.getData() == data) {
+                tile.setValue(value);
+                mCurrentValues[data] = value;
+            }
+        }
+    }
+
+    @Override
+    public final void onTileValueRequested(final Tile tile, final int data) {
+        tile.setValue(mCurrentValues[data]);
+    }
+
+    /**
      * Task updating the stopwatch.
      */
     private final Runnable mStopwatchTask = new Runnable() {
@@ -426,7 +518,7 @@ public class MonitorActivity extends AppCompatActivity
         public void run() {
             mStopwatchHandler.postDelayed(this, 1000);
             long elapsedTime = mRecorder.getCurrentDuration();
-            mTextStopwatch.setText(Format.formatDuration(elapsedTime));
+            mTextTop.setText(Format.formatDuration(elapsedTime));
         }
     };
 
@@ -459,10 +551,9 @@ public class MonitorActivity extends AppCompatActivity
     /**
      * Triggered when the action button is clicked. Start or stop session
      * according to the current session state.
-     *
-     * @param view View
      */
-    public final void onActionButtonClicked(final View view) {
+    @OnClick(R.id.monitor_button_action)
+    public final void onActionButtonClicked() {
         if (!mSessionRunning) {
             startSession();
         } else {
@@ -475,9 +566,7 @@ public class MonitorActivity extends AppCompatActivity
      * Set keep screen on flag according to the preferences.
      */
     private void setKeepScreenOn() {
-        SharedPreferences sharedPref = PreferenceManager
-                .getDefaultSharedPreferences(this);
-        boolean keepScreenOn = sharedPref.getBoolean(
+        boolean keepScreenOn = mSharedPref.getBoolean(
                 Pref.KEEP_SCREEN_ON, false);
         if (keepScreenOn) {
             getWindow().addFlags(
@@ -500,7 +589,7 @@ public class MonitorActivity extends AppCompatActivity
 
         setLocked(true);
         mStopwatchHandler.post(mStopwatchTask);
-        mButtonAction.setText(R.string.action_stop);
+        mButtonAction.setImageResource(R.drawable.ic_stop_white_48dp);
 
         resetViews();
     }
@@ -512,7 +601,7 @@ public class MonitorActivity extends AppCompatActivity
         mRecorder.stop(mDistance);
 
         mStopwatchHandler.removeCallbacks(mStopwatchTask);
-        mButtonAction.setText(R.string.action_start);
+        mButtonAction.setImageResource(R.drawable.ic_play_arrow_white_48dp);
 
         Intent intent = new Intent(this, HistoryActivity.class);
         intent.putExtra(HistoryActivity.ARG_HIGHLIGHTED_SESSION_ID,
@@ -530,16 +619,19 @@ public class MonitorActivity extends AppCompatActivity
     private void setLocked(final boolean locked) {
         mLocked = locked;
 
+        for (Tile tile : mTiles) {
+            tile.setEnabled(!locked);
+        }
+
         mButtonAction.setEnabled(!mLocked);
 
         if (!mLocked) {
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-            mDrawerToggle.setDrawerIndicatorEnabled(true);
         } else {
             mDrawerLayout.setDrawerLockMode(
                     DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            mDrawerToggle.setDrawerIndicatorEnabled(false);
         }
+        mDrawerToggle.setDrawerIndicatorEnabled(!locked);
         mDrawerToggle.syncState();
 
         invalidateOptionsMenu();
@@ -549,10 +641,10 @@ public class MonitorActivity extends AppCompatActivity
      * Reset the views that are updated during a session.
      */
     private void resetViews() {
-        mTextStopwatch.setText(R.string.default_stopwatch);
-        mTextDistance.setText(R.string.default_distance);
-        mTextSpeed.setText(R.string.default_speed);
-        mTextPace.setText(R.string.default_pace);
+        mTextTop.setText(R.string.default_stopwatch);
+        for (Tile tile : mTiles) {
+            tile.resetValues();
+        }
     }
 
     @Override
