@@ -182,13 +182,7 @@ public class MonitorActivity extends AppCompatActivity
         mEventBus = EventBus.getDefault();
         mEventBus.register(this);
 
-        mCurrentValues = new String[]{
-                getString(R.string.default_distance),
-                getString(R.string.default_speed),
-                getString(R.string.default_pace),
-                getString(R.string.default_speed),
-                getString(R.string.default_pace),
-        };
+        initCurrentValues();
 
         setContentView(R.layout.activity_monitor);
         ButterKnife.bind(this);
@@ -590,8 +584,6 @@ public class MonitorActivity extends AppCompatActivity
         setLocked(true);
         mStopwatchHandler.post(mStopwatchTask);
         mButtonAction.setImageResource(R.drawable.ic_stop_white_48dp);
-
-        resetViews();
     }
 
     /**
@@ -609,6 +601,7 @@ public class MonitorActivity extends AppCompatActivity
         startActivity(intent);
 
         resetViews();
+        initCurrentValues();
     }
 
     /**
@@ -645,6 +638,16 @@ public class MonitorActivity extends AppCompatActivity
         for (Tile tile : mTiles) {
             tile.resetValues();
         }
+    }
+
+    private void initCurrentValues() {
+        mCurrentValues = new String[]{
+                getString(R.string.default_distance),
+                getString(R.string.default_speed),
+                getString(R.string.default_pace),
+                getString(R.string.default_speed),
+                getString(R.string.default_pace),
+        };
     }
 
     @Override
