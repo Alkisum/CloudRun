@@ -137,6 +137,16 @@ public final class Format {
     }
 
     /**
+     * Format a distance value to show the GPS accuracy.
+     *
+     * @param distance Distance in meter
+     * @return Formatted GPS accuracy
+     */
+    public static String formatGpsAccuracy(final float distance) {
+        return String.valueOf(Math.round(distance));
+    }
+
+    /**
      * Round the given float according to the given decimal place.
      *
      * @param d            Float to round

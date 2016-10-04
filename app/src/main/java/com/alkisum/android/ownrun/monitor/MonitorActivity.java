@@ -159,6 +159,19 @@ public class MonitorActivity extends AppCompatActivity
     @BindView(R.id.monitor_button_action)
     ImageButton mButtonAction;
 
+    /**
+     * Layout containing the GPS accuracy views. This layout must hidden
+     * according to the session and the GPS states.
+     */
+    @BindView(R.id.monitor_layout_gps_accuracy)
+    RelativeLayout mLayoutGpsAccuracy;
+
+    /**
+     * TextView to show the GPS accuracy (last distance in meters).
+     */
+    @BindView(R.id.monitor_txt_gps_accuracy)
+    TextView mTextGpsAccuracy;
+
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -457,6 +470,9 @@ public class MonitorActivity extends AppCompatActivity
             // Pace average
             updateTile(Tile.PACE_AVG,
                     Format.formatPaceAvg(elapsedTime, mDistance));
+        } else {
+            mTextGpsAccuracy.setText(
+                    Format.formatGpsAccuracy(event.getValue()));
         }
     }
 
@@ -529,14 +545,25 @@ public class MonitorActivity extends AppCompatActivity
                 mImageGpsStatus.setImageDrawable(ContextCompat.getDrawable(
                         MonitorActivity.this,
                         R.drawable.ic_gps_off_white_24dp));
+                if (!mSessionRunning) {
+                    mLayoutGpsAccuracy.setVisibility(View.GONE);
+                    mTextGpsAccuracy.setText("");
+                }
             } else if (mNewGpsDataReceived) {
                 mImageGpsStatus.setImageDrawable(ContextCompat.getDrawable(
                         MonitorActivity.this,
                         R.drawable.ic_gps_fixed_white_24dp));
+                if (!mSessionRunning) {
+                    mLayoutGpsAccuracy.setVisibility(View.VISIBLE);
+                }
             } else {
                 mImageGpsStatus.setImageDrawable(ContextCompat.getDrawable(
                         MonitorActivity.this,
                         R.drawable.ic_gps_not_fixed_white_24dp));
+                if (!mSessionRunning) {
+                    mLayoutGpsAccuracy.setVisibility(View.VISIBLE);
+                    mTextGpsAccuracy.setText("");
+                }
             }
             mNewGpsDataReceived = false;
         }
@@ -584,6 +611,9 @@ public class MonitorActivity extends AppCompatActivity
         setLocked(true);
         mStopwatchHandler.post(mStopwatchTask);
         mButtonAction.setImageResource(R.drawable.ic_stop_white_48dp);
+
+        mLayoutGpsAccuracy.setVisibility(View.GONE);
+        mTextGpsAccuracy.setText("");
     }
 
     /**
@@ -594,6 +624,9 @@ public class MonitorActivity extends AppCompatActivity
 
         mStopwatchHandler.removeCallbacks(mStopwatchTask);
         mButtonAction.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+
+        mLayoutGpsAccuracy.setVisibility(View.VISIBLE);
+        mTextGpsAccuracy.setText("");
 
         Intent intent = new Intent(this, HistoryActivity.class);
         intent.putExtra(HistoryActivity.ARG_HIGHLIGHTED_SESSION_ID,
@@ -640,6 +673,9 @@ public class MonitorActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Initialise the current values strings with their default values.
+     */
     private void initCurrentValues() {
         mCurrentValues = new String[]{
                 getString(R.string.default_distance),

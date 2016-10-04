@@ -34,6 +34,7 @@
     <string name="monitor_session_locked">Session locked</string>
     <string name="desc_gps_status">GPS status</string>
     <string name="desc_action_button">Start/stop session</string>
+    <string name="desc_gps_accuracy">GPS accuracy</string>
 
     <!-- History -->
     <string name="history_title">History</string>
