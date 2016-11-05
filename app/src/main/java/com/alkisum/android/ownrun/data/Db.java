@@ -10,7 +10,7 @@ import com.alkisum.android.ownrun.model.DaoSession;
  * Singleton class handling database.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 2.0
  * @since 1.0
  */
 public final class Db {
@@ -65,7 +65,7 @@ public final class Db {
     /**
      * @return DaoSession instance
      */
-    public DaoSession getDaoSession() {
+    DaoSession getDaoSession() {
         return mDaoSession;
     }
 }

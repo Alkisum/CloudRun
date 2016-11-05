@@ -43,6 +43,7 @@
     <string name="history_no_session">No sessions available</string>
     <string name="history_delete_title">Delete sessions</string>
     <string name="history_delete_msg">Are you sure you want to delete the selected sessions?</string>
+    <string name="delete_sessions">Deleting selected sessions&#8230;</string>
 
     <!-- History List -->
     <string name="history_list_distance">Distance:</string>

@@ -1,9 +1,7 @@
-package com.alkisum.android.ownrun.history;
+package com.alkisum.android.ownrun.data;
 
 import android.location.Location;
 
-import com.alkisum.android.ownrun.data.Db;
-import com.alkisum.android.ownrun.model.DaoSession;
 import com.alkisum.android.ownrun.model.DataPoint;
 import com.alkisum.android.ownrun.model.Session;
 import com.alkisum.android.ownrun.model.SessionDao;
@@ -18,7 +16,7 @@ import java.util.List;
  * @version 2.0
  * @since 1.1
  */
-final class Sessions {
+public final class Sessions {
 
     /**
      * Sessions constructor.
@@ -36,7 +34,7 @@ final class Sessions {
      *                        is running.
      * @return List of sessions in the anti-chronological order
      */
-    static List<Session> loadSessions(final Long ignoreSessionId) {
+    public static List<Session> loadSessions(final Long ignoreSessionId) {
         SessionDao dao = Db.getInstance().getDaoSession()
                 .getSessionDao();
         List<Session> sessions = dao.queryBuilder().orderDesc(
@@ -53,7 +51,7 @@ final class Sessions {
      *
      * @return List of selected sessions.
      */
-    static List<Session> getSelectedSessions() {
+    public static List<Session> getSelectedSessions() {
         SessionDao dao = Db.getInstance().getDaoSession()
                 .getSessionDao();
         List<Session> selectedSessions = new ArrayList<>();
@@ -66,25 +64,13 @@ final class Sessions {
     }
 
     /**
-     * Delete the selected sessions from the database.
-     */
-    static void deleteSelectedSessions() {
-        DaoSession daoSession = Db.getInstance().getDaoSession();
-        List<Session> sessions = Sessions.getSelectedSessions();
-        for (Session session : sessions) {
-            daoSession.getDataPointDao().deleteInTx(session.getDataPoints());
-            session.delete();
-        }
-    }
-
-    /**
      * Fix the sessions if needed.
      *
      * @param ignoreSessionId ID of the session that should be ignored because
      *                        it is still running. The ID is null if no session
      *                        is running.
      */
-    static void fixSessions(final Long ignoreSessionId) {
+    public static void fixSessions(final Long ignoreSessionId) {
         List<Session> sessions = loadSessions(ignoreSessionId);
 
         for (Session session : sessions) {

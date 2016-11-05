@@ -20,8 +20,10 @@ import android.widget.Toast;
 import com.alkisum.android.ownrun.R;
 import com.alkisum.android.ownrun.connect.ConnectDialog;
 import com.alkisum.android.ownrun.connect.ConnectInfo;
+import com.alkisum.android.ownrun.data.Deleter;
 import com.alkisum.android.ownrun.data.Downloader;
 import com.alkisum.android.ownrun.data.JsonFileWriter;
+import com.alkisum.android.ownrun.data.Sessions;
 import com.alkisum.android.ownrun.data.Uploader;
 import com.alkisum.android.ownrun.dialog.ConfirmDialog;
 import com.alkisum.android.ownrun.dialog.ErrorDialog;
@@ -46,7 +48,7 @@ import butterknife.ButterKnife;
  */
 public class HistoryActivity extends AppCompatActivity implements
         ConnectDialog.ConnectDialogListener, Uploader.UploaderListener,
-        Downloader.DownloaderListener {
+        Downloader.DownloaderListener, Deleter.DeleterListener {
 
     /**
      * Argument for the session's ID that has just been stopped. This ID is
@@ -293,10 +295,22 @@ public class HistoryActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(final DialogInterface dialogInterface,
                                         final int i) {
-                        Sessions.deleteSelectedSessions();
-                        refreshList();
+                        deleteSelectedSessions();
                     }
                 }).show();
+    }
+
+    /**
+     * Execute the task to delete the selected sessions.
+     */
+    private void deleteSelectedSessions() {
+        new Deleter(HistoryActivity.this).execute();
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.setProgressNumberFormat(null);
+        mProgressDialog.setMessage(getString(R.string.delete_sessions));
+        mProgressDialog.show();
     }
 
     /**
@@ -559,6 +573,19 @@ public class HistoryActivity extends AppCompatActivity implements
                 }
                 ErrorDialog.build(HistoryActivity.this, getString(
                         R.string.upload_failure_title), message, null).show();
+            }
+        });
+    }
+
+    @Override
+    public final void onSessionsDeleted() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mProgressDialog != null) {
+                    mProgressDialog.dismiss();
+                }
+                refreshList();
             }
         });
     }

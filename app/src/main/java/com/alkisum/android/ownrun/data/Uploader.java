@@ -230,7 +230,7 @@ public class Uploader implements OnRemoteOperationListener,
          * @param wrapper Wrapper containing the session and its JSON file
          *                that is being uploaded
          */
-        void onUploadStart(final JsonFileWriter.Wrapper wrapper);
+        void onUploadStart(JsonFileWriter.Wrapper wrapper);
 
         /**
          * Called when the file is being uploaded.

@@ -4,7 +4,7 @@ package com.alkisum.android.ownrun.location;
  * Listener for LocationHandler.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 2.0
  * @since 1.0
  */
 interface LocationHandlerListener {
@@ -20,26 +20,26 @@ interface LocationHandlerListener {
      *
      * @param value Speed value
      */
-    void onNewSpeedValue(final float value);
+    void onNewSpeedValue(float value);
 
     /**
      * A new pace value has been received.
      *
      * @param value Pace value
      */
-    void onNewPaceValue(final long value);
+    void onNewPaceValue(long value);
 
     /**
      * A new distance value has been received.
      *
      * @param value Distance value
      */
-    void onNewDistanceValue(final float value);
+    void onNewDistanceValue(float value);
 
     /**
      * New Coordinate values have been received.
      *
      * @param coordinate Coordinate values
      */
-    void onNewCoordinate(final Coordinate coordinate);
+    void onNewCoordinate(Coordinate coordinate);
 }

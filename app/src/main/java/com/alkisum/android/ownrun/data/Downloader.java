@@ -311,7 +311,7 @@ public class Downloader implements OnRemoteOperationListener,
          *
          * @param file Remote file being downloaded
          */
-        void onDownloadStart(final RemoteFile file);
+        void onDownloadStart(RemoteFile file);
 
         /**
          * Called when there is no file to download.
