@@ -20,13 +20,16 @@ import android.widget.Toast;
 import com.alkisum.android.ownrun.R;
 import com.alkisum.android.ownrun.connect.ConnectDialog;
 import com.alkisum.android.ownrun.connect.ConnectInfo;
+import com.alkisum.android.ownrun.data.Downloader;
 import com.alkisum.android.ownrun.data.JsonFileWriter;
 import com.alkisum.android.ownrun.data.Uploader;
 import com.alkisum.android.ownrun.dialog.ConfirmDialog;
 import com.alkisum.android.ownrun.dialog.ErrorDialog;
 import com.alkisum.android.ownrun.model.Session;
 import com.alkisum.android.ownrun.utils.Format;
+import com.alkisum.android.ownrun.utils.Json;
 import com.alkisum.android.ownrun.utils.Pref;
+import com.owncloud.android.lib.resources.files.RemoteFile;
 
 import java.util.Date;
 import java.util.List;
@@ -38,11 +41,12 @@ import butterknife.ButterKnife;
  * Activity listing the history of sessions.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 2.0
  * @since 1.0
  */
 public class HistoryActivity extends AppCompatActivity implements
-        ConnectDialog.ConnectDialogListener, Uploader.UploaderListener {
+        ConnectDialog.ConnectDialogListener, Uploader.UploaderListener,
+        Downloader.DownloaderListener {
 
     /**
      * Argument for the session's ID that has just been stopped. This ID is
@@ -57,6 +61,16 @@ public class HistoryActivity extends AppCompatActivity implements
      * still running. When no session is running, this argument is null.
      */
     public static final String ARG_IGNORE_SESSION_ID = "arg_ignore_session_id";
+
+    /**
+     * Operation id for download.
+     */
+    private static final int DOWNLOAD_OPERATION = 1;
+
+    /**
+     * Operation id for upload.
+     */
+    private static final int UPLOAD_OPERATION = 2;
 
     /**
      * Toolbar.
@@ -85,6 +99,12 @@ public class HistoryActivity extends AppCompatActivity implements
      * Progress dialog to show the progress of uploading.
      */
     private ProgressDialog mProgressDialog;
+
+    /**
+     * Downloader instance created when the user presses on the Download item
+     * from the context menu, and initialized when the connect dialog is submit.
+     */
+    private Downloader mDownloader;
 
     /**
      * Uploader instance created when the user presses on the Upload item from
@@ -141,7 +161,11 @@ public class HistoryActivity extends AppCompatActivity implements
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                disableEditMode();
+                if (isEditMode()) {
+                    disableEditMode();
+                } else {
+                    finish();
+                }
             }
         });
 
@@ -188,6 +212,7 @@ public class HistoryActivity extends AppCompatActivity implements
     @Override
     public final boolean onPrepareOptionsMenu(final Menu menu) {
         boolean editMode = mListAdapter.isEditMode();
+        menu.findItem(R.id.action_download).setVisible(!editMode);
         menu.findItem(R.id.action_upload).setVisible(editMode);
         menu.findItem(R.id.action_delete).setVisible(editMode);
         return super.onPrepareOptionsMenu(menu);
@@ -196,11 +221,19 @@ public class HistoryActivity extends AppCompatActivity implements
     @Override
     public final boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_download:
+                DialogFragment connectDialogDownload =
+                        ConnectDialog.newInstance(DOWNLOAD_OPERATION);
+                connectDialogDownload.show(getSupportFragmentManager(),
+                        ConnectDialog.FRAGMENT_TAG);
+                mDownloader = new Downloader(this);
+                return true;
             case R.id.action_upload:
                 List<Session> selectedSessions = Sessions.getSelectedSessions();
                 if (!selectedSessions.isEmpty()) {
-                    DialogFragment connectDialog = new ConnectDialog();
-                    connectDialog.show(getSupportFragmentManager(),
+                    DialogFragment connectDialogUpload =
+                            ConnectDialog.newInstance(UPLOAD_OPERATION);
+                    connectDialogUpload.show(getSupportFragmentManager(),
                             ConnectDialog.FRAGMENT_TAG);
                     mUploader = new Uploader(this, selectedSessions);
                 }
@@ -216,18 +249,23 @@ public class HistoryActivity extends AppCompatActivity implements
     }
 
     /**
+     * Check if the list is in edit mode.
+     *
+     * @return true if the list is in edit mode, false otherwise
+     */
+    private boolean isEditMode() {
+        return mListAdapter != null && mListAdapter.isEditMode();
+    }
+
+    /**
      * Called when the Back button is pressed. If enabled, the edit mode must be
      * disable, otherwise the activity should be finished.
      */
     private void disableEditMode() {
-        if (mListAdapter != null && mListAdapter.isEditMode()) {
-            mListAdapter.disableEditMode();
-            mListAdapter.notifyDataSetInvalidated();
-            mToolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-            invalidateOptionsMenu();
-        } else {
-            finish();
-        }
+        mListAdapter.disableEditMode();
+        mListAdapter.notifyDataSetInvalidated();
+        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        invalidateOptionsMenu();
     }
 
     /**
@@ -265,25 +303,29 @@ public class HistoryActivity extends AppCompatActivity implements
      * Reload the list of sessions and notify the list adapter.
      */
     private void refreshList() {
+        if (isEditMode()) {
+            disableEditMode();
+        }
         List<Session> sessions = Sessions.loadSessions(mIgnoreSessionId);
         if (sessions.isEmpty()) {
             mListView.setVisibility(View.GONE);
             mNoSessionTextView.setVisibility(View.VISIBLE);
+        } else {
+            mListView.setVisibility(View.VISIBLE);
+            mNoSessionTextView.setVisibility(View.GONE);
         }
         mListAdapter.setSessions(sessions);
         mListAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public final void onSubmit(final ConnectInfo connectInfo) {
-        if (mUploader == null) {
-            return;
+    public final void onSubmit(final int operation,
+                               final ConnectInfo connectInfo) {
+        if (operation == DOWNLOAD_OPERATION) {
+            startDownload(connectInfo);
+        } else if (operation == UPLOAD_OPERATION) {
+            startUpload(connectInfo);
         }
-        mUploader.init(
-                connectInfo.getAddress(),
-                connectInfo.getPath(),
-                connectInfo.getUsername(),
-                connectInfo.getPassword()).start();
 
         runOnUiThread(new Runnable() {
             @Override
@@ -292,8 +334,9 @@ public class HistoryActivity extends AppCompatActivity implements
                 mProgressDialog.setIndeterminate(true);
                 mProgressDialog.setProgressStyle(
                         ProgressDialog.STYLE_HORIZONTAL);
+                mProgressDialog.setProgressNumberFormat(null);
                 mProgressDialog.setMessage(getString(
-                        R.string.upload_progress_init_msg));
+                        R.string.operation_progress_init_msg));
                 mProgressDialog.show();
             }
         });
@@ -301,6 +344,38 @@ public class HistoryActivity extends AppCompatActivity implements
         if (mSharedPref.getBoolean(Pref.SAVE_OWNCLOUD_INFO, false)) {
             saveConnectInfo(connectInfo);
         }
+    }
+
+    /**
+     * Start the download operation.
+     *
+     * @param connectInfo Connection information given by user
+     */
+    private void startDownload(final ConnectInfo connectInfo) {
+        if (mDownloader == null) {
+            return;
+        }
+        mDownloader.init(
+                connectInfo.getAddress(),
+                connectInfo.getPath(),
+                connectInfo.getUsername(),
+                connectInfo.getPassword()).start();
+    }
+
+    /**
+     * Start the upload operation.
+     *
+     * @param connectInfo Connection information given by user
+     */
+    private void startUpload(final ConnectInfo connectInfo) {
+        if (mUploader == null) {
+            return;
+        }
+        mUploader.init(
+                connectInfo.getAddress(),
+                connectInfo.getPath(),
+                connectInfo.getUsername(),
+                connectInfo.getPassword()).start();
     }
 
     /**
@@ -315,6 +390,104 @@ public class HistoryActivity extends AppCompatActivity implements
         editor.putString(Pref.PATH, connectInfo.getPath());
         editor.putString(Pref.USERNAME, connectInfo.getUsername());
         editor.apply();
+    }
+
+    @Override
+    public final void onDownloadStart(final RemoteFile file) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mProgressDialog != null) {
+                    mProgressDialog.setMessage("Downloading "
+                            + file.getRemotePath() + " ...");
+                    mProgressDialog.setIndeterminate(false);
+                }
+            }
+        });
+    }
+
+    @Override
+    public final void onNoFileToDownload() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mProgressDialog != null) {
+                    mProgressDialog.dismiss();
+                }
+                Toast.makeText(HistoryActivity.this, getString(R.string.
+                        download_no_file_toast), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    public final void onDownloading(final int percentage) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mProgressDialog != null) {
+                    mProgressDialog.setProgress(percentage);
+                }
+            }
+        });
+    }
+
+    @Override
+    public final void onAllDownloadComplete() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mProgressDialog != null) {
+                    mProgressDialog.setMessage("Processing data ...");
+                    mProgressDialog.setProgressPercentFormat(null);
+                    mProgressDialog.setIndeterminate(true);
+                }
+            }
+        });
+    }
+
+    @Override
+    public final void onDownloadFailed(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mProgressDialog != null) {
+                    mProgressDialog.dismiss();
+                }
+                ErrorDialog.build(HistoryActivity.this, getString(
+                        R.string.download_failure_title), message, null).show();
+            }
+        });
+    }
+
+    @Override
+    public final void onSessionsInserted() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mProgressDialog != null) {
+                    mProgressDialog.dismiss();
+                }
+                refreshList();
+                Toast.makeText(HistoryActivity.this, getString(R.string.
+                        download_success_toast), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    public final void onReadingFileFailed(final Exception e) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mProgressDialog != null) {
+                    mProgressDialog.dismiss();
+                }
+                ErrorDialog.build(HistoryActivity.this,
+                        getString(R.string.download_reading_failure_title),
+                        e.getMessage(), null).show();
+            }
+        });
     }
 
     @Override
@@ -339,10 +512,10 @@ public class HistoryActivity extends AppCompatActivity implements
             public void run() {
                 if (mProgressDialog != null) {
                     mProgressDialog.setMessage("Uploading "
-                            + Uploader.FILE_PREFIX
+                            + Json.FILE_PREFIX
                             + Format.DATE_TIME_JSON.format(new Date(
                             wrapper.getSession().getStart()))
-                            + Uploader.FILE_EXT
+                            + Json.FILE_EXT
                             + " ...");
                     mProgressDialog.setIndeterminate(false);
                 }
@@ -392,6 +565,10 @@ public class HistoryActivity extends AppCompatActivity implements
 
     @Override
     public final void onBackPressed() {
-        disableEditMode();
+        if (isEditMode()) {
+            disableEditMode();
+        } else {
+            finish();
+        }
     }
 }

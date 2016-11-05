@@ -9,14 +9,13 @@ import com.alkisum.android.ownrun.model.Session;
 import com.alkisum.android.ownrun.model.SessionDao;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Utility class for session operations.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 2.0
  * @since 1.1
  */
 final class Sessions {
@@ -40,11 +39,11 @@ final class Sessions {
     static List<Session> loadSessions(final Long ignoreSessionId) {
         SessionDao dao = Db.getInstance().getDaoSession()
                 .getSessionDao();
-        List<Session> sessions = dao.loadAll();
+        List<Session> sessions = dao.queryBuilder().orderDesc(
+                SessionDao.Properties.Start).list();
         if (ignoreSessionId != null) {
             sessions.remove(dao.load(ignoreSessionId));
         }
-        Collections.reverse(sessions);
         return sessions;
     }
 

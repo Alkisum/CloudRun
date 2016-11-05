@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 
 import com.alkisum.android.ownrun.model.DataPoint;
 import com.alkisum.android.ownrun.model.Session;
+import com.alkisum.android.ownrun.utils.Json;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,7 +21,7 @@ import java.util.List;
  * Task to write the session in JSON object into a file.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 2.0
  * @since 1.0
  */
 public class JsonFileWriter extends AsyncTask<Void, Void,
@@ -68,15 +69,15 @@ public class JsonFileWriter extends AsyncTask<Void, Void,
     }
 
     @Override
-    protected final List<Wrapper> doInBackground(final Void... voids) {
+    protected final List<Wrapper> doInBackground(final Void... params) {
 
         List<Wrapper> wrappers = new ArrayList<>();
 
         try {
             for (Session session : mSessions) {
                 // Create temporary file, its name does not matter
-                File file = File.createTempFile(Uploader.FILE_PREFIX
-                                + session.getStart(), Uploader.FILE_EXT,
+                File file = File.createTempFile(Json.FILE_PREFIX
+                                + session.getStart(), Json.FILE_EXT,
                         mContext.getCacheDir());
 
                 JSONObject jsonObject = buildJsonFromSession(session);
@@ -100,7 +101,7 @@ public class JsonFileWriter extends AsyncTask<Void, Void,
         if (mException == null) {
             mCallback.onJsonFileWritten(wrappers);
         } else {
-            mCallback.onJsonFileFailed(mException);
+            mCallback.onWriteJsonFileFailed(mException);
         }
     }
 
@@ -115,28 +116,28 @@ public class JsonFileWriter extends AsyncTask<Void, Void,
             throws JSONException {
 
         JSONObject jsonSession = new JSONObject();
-        jsonSession.put("id", session.getId());
-        jsonSession.put("start", session.getStart());
-        jsonSession.put("end", session.getEnd());
-        jsonSession.put("distance", session.getDistance());
+        jsonSession.put(Json.SESSION_START, session.getStart());
+        jsonSession.put(Json.SESSION_END, session.getEnd());
+        jsonSession.put(Json.SESSION_DISTANCE, session.getDistance());
 
-        JSONArray jsonArrayDataPoints = new JSONArray();
+        JSONArray jsonDataPoints = new JSONArray();
 
         List<DataPoint> dataPoints = session.getDataPoints();
         for (DataPoint dataPoint : dataPoints) {
             JSONObject jsonDataPoint = new JSONObject();
-            jsonDataPoint.put("id", dataPoint.getId());
-            jsonDataPoint.put("time", dataPoint.getTime());
-            jsonDataPoint.put("latitude", dataPoint.getLatitude());
-            jsonDataPoint.put("longitude", dataPoint.getLongitude());
-            jsonDataPoint.put("elevation", dataPoint.getElevation());
-            jsonArrayDataPoints.put(jsonDataPoint);
+            jsonDataPoint.put(Json.DATAPOINT_TIME, dataPoint.getTime());
+            jsonDataPoint.put(Json.DATAPOINT_LATITUDE, dataPoint.getLatitude());
+            jsonDataPoint.put(Json.DATAPOINT_LONGITUDE,
+                    dataPoint.getLongitude());
+            jsonDataPoint.put(Json.DATAPOINT_ELEVATION,
+                    dataPoint.getElevation());
+            jsonDataPoints.put(jsonDataPoint);
         }
 
         JSONObject jsonBase = new JSONObject();
-        jsonBase.put("version", VERSION);
-        jsonBase.put("session", jsonSession);
-        jsonBase.put("dataPoints", jsonArrayDataPoints);
+        jsonBase.put(Json.VERSION, VERSION);
+        jsonBase.put(Json.SESSION, jsonSession);
+        jsonBase.put(Json.DATAPOINTS, jsonDataPoints);
 
         return jsonBase;
     }
@@ -159,7 +160,7 @@ public class JsonFileWriter extends AsyncTask<Void, Void,
          *
          * @param exception Exception caught
          */
-        void onJsonFileFailed(Exception exception);
+        void onWriteJsonFileFailed(Exception exception);
     }
 
     /**

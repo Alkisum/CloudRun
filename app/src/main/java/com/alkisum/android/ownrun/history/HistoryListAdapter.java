@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
  * Adapter for History ListView.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 2.0
  * @since 1.0
  */
 class HistoryListAdapter extends BaseAdapter {
@@ -39,7 +39,7 @@ class HistoryListAdapter extends BaseAdapter {
     /**
      * List of sessions.
      */
-    private List<Session> mSessions;
+    private final List<Session> mSessions;
 
     /**
      * ID of the session to be highlighted, used after a session has been
@@ -96,7 +96,8 @@ class HistoryListAdapter extends BaseAdapter {
      * @param sessions List of sessions to set
      */
     final void setSessions(final List<Session> sessions) {
-        mSessions = sessions;
+        mSessions.clear();
+        mSessions.addAll(sessions);
     }
 
     /**

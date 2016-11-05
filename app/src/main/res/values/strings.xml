@@ -22,6 +22,7 @@
     <!-- Actions -->
     <string name="action_lock">Lock</string>
     <string name="action_unlock">Unlock</string>
+    <string name="action_download">Download</string>
     <string name="action_upload">Upload</string>
     <string name="action_delete">Delete</string>
 
@@ -55,11 +56,15 @@
     <string name="connect_hint_username">Username</string>
     <string name="connect_hint_password">Password</string>
 
-    <!-- Upload -->
-    <string name="upload_progress_init_msg">Preparing&#8230; (0%)</string>
+    <!-- OwnCloud Operations -->
+    <string name="operation_progress_init_msg">Preparing&#8230; (0%)</string>
     <string name="upload_writing_failure_title">File creation failed</string>
     <string name="upload_failure_title">Upload failed</string>
     <string name="upload_success_toast">Sessions uploaded</string>
+    <string name="download_failure_title">Download failed</string>
+    <string name="download_success_toast">Sessions downloaded</string>
+    <string name="download_no_file_toast">No sessions to be downloaded</string>
+    <string name="download_reading_failure_title">File parsing failed</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>

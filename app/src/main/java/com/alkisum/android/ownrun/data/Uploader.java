@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.alkisum.android.ownrun.model.Session;
 import com.alkisum.android.ownrun.utils.Format;
+import com.alkisum.android.ownrun.utils.Json;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.OwnCloudClientFactory;
 import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;
@@ -26,7 +27,7 @@ import java.util.Queue;
  * Class uploading JSON file containing a session's data to the ownCloud server.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 2.0
  * @since 1.0
  */
 public class Uploader implements OnRemoteOperationListener,
@@ -36,16 +37,6 @@ public class Uploader implements OnRemoteOperationListener,
      * Log tag.
      */
     private static final String TAG = "Uploader";
-
-    /**
-     * JSON file name prefix.
-     */
-    public static final String FILE_PREFIX = "ownRun_";
-
-    /**
-     * JSON file extension.
-     */
-    public static final String FILE_EXT = ".json";
 
     /**
      * List of sessions to upload.
@@ -117,11 +108,8 @@ public class Uploader implements OnRemoteOperationListener,
         Uri serverUri = Uri.parse(address);
         mClient = OwnCloudClientFactory.createOwnCloudClient(
                 serverUri, mContext, true);
-        mClient.setCredentials(
-                OwnCloudCredentialsFactory.newBasicCredentials(
-                        username, password
-                )
-        );
+        mClient.setCredentials(OwnCloudCredentialsFactory.newBasicCredentials(
+                username, password));
 
         return this;
     }
@@ -142,7 +130,7 @@ public class Uploader implements OnRemoteOperationListener,
     }
 
     @Override
-    public final void onJsonFileFailed(final Exception exception) {
+    public final void onWriteJsonFileFailed(final Exception exception) {
         mCallback.onWritingFileFailed(exception);
     }
 
@@ -183,8 +171,8 @@ public class Uploader implements OnRemoteOperationListener,
             mRemotePath = mRemotePath + FileUtils.PATH_SEPARATOR;
         }
         // Add the file name to the remote path
-        return mRemotePath + FILE_PREFIX + Format.DATE_TIME_JSON.format(
-                new Date(wrapper.getSession().getStart())) + FILE_EXT;
+        return mRemotePath + Json.FILE_PREFIX + Format.DATE_TIME_JSON.format(
+                new Date(wrapper.getSession().getStart())) + Json.FILE_EXT;
     }
 
     @Override

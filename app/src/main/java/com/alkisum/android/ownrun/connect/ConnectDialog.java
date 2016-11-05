@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
  * Dialog to connect to ownCloud server to upload the session.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 2.0
  * @since 1.0
  */
 public class ConnectDialog extends DialogFragment {
@@ -31,6 +31,11 @@ public class ConnectDialog extends DialogFragment {
      * Fragment tag for FragmentManager.
      */
     public static final String FRAGMENT_TAG = "connect_dialog";
+
+    /**
+     * Argument for operation type.
+     */
+    private static final String ARG_OPERATION = "arg_operation";
 
     /**
      * EditText for server address.
@@ -67,6 +72,20 @@ public class ConnectDialog extends DialogFragment {
      */
     private SharedPreferences mSharedPref;
 
+    /**
+     * Create new instance of ConnectDialog.
+     *
+     * @param operation Operation type
+     * @return Instance of ConnectDialog
+     */
+    public static ConnectDialog newInstance(final int operation) {
+        ConnectDialog connectDialog = new ConnectDialog();
+        Bundle args = new Bundle();
+        args.putInt(ARG_OPERATION, operation);
+        connectDialog.setArguments(args);
+        return connectDialog;
+    }
+
     @Override
     public final void onAttach(final Context context) {
         super.onAttach(context);
@@ -82,6 +101,7 @@ public class ConnectDialog extends DialogFragment {
     @NonNull
     @Override
     public final Dialog onCreateDialog(final Bundle savedInstanceState) {
+        final int operation = getArguments().getInt(ARG_OPERATION);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -99,7 +119,7 @@ public class ConnectDialog extends DialogFragment {
                             @Override
                             public void onClick(final DialogInterface dialog,
                                                 final int id) {
-                                mCallback.onSubmit(new ConnectInfo(
+                                mCallback.onSubmit(operation, new ConnectInfo(
                                         mAddressEditText.getText().toString(),
                                         mPathEditText.getText().toString(),
                                         mUsernameEditText.getText().toString(),
@@ -126,8 +146,9 @@ public class ConnectDialog extends DialogFragment {
         /**
          * Called when the user submit the dialog.
          *
+         * @param operation   Operation type
          * @param connectInfo Connection information entered in the dialog
          */
-        void onSubmit(ConnectInfo connectInfo);
+        void onSubmit(int operation, ConnectInfo connectInfo);
     }
 }
