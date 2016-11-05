@@ -56,7 +56,7 @@ import butterknife.OnClick;
  * Main activity showing location values.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 2.0
  * @since 1.0
  */
 public class MonitorActivity extends AppCompatActivity
@@ -209,6 +209,8 @@ public class MonitorActivity extends AppCompatActivity
     protected final void onDestroy() {
         mSharedPref.unregisterOnSharedPreferenceChangeListener(this);
         mEventBus.unregister(this);
+
+        mGpsStatusHandler.removeCallbacks(mGpsStatusTask);
 
         if (mLocationHelper != null) {
             mLocationHelper.stop();

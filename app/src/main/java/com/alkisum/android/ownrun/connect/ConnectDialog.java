@@ -114,7 +114,7 @@ public class ConnectDialog extends DialogFragment {
 
         builder.setView(view)
                 .setTitle(R.string.connect_title)
-                .setPositiveButton(R.string.action_upload,
+                .setPositiveButton(R.string.action_connect,
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(final DialogInterface dialog,

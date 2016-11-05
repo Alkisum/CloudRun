@@ -25,6 +25,7 @@
     <string name="action_download">Download</string>
     <string name="action_upload">Upload</string>
     <string name="action_delete">Delete</string>
+    <string name="action_connect">Connect</string>
 
     <!-- Navigation drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -50,7 +51,7 @@
     <string name="history_list_pace">Pace:</string>
 
     <!-- ConnectDialog -->
-    <string name="connect_title">Upload to ownCloud</string>
+    <string name="connect_title">Connect to ownCloud</string>
     <string name="connect_hint_address">Server address</string>
     <string name="connect_hint_path">Remote path</string>
     <string name="connect_hint_username">Username</string>
