@@ -21,6 +21,8 @@ public class Session {
 
     private Long end;
 
+    private Long duration;
+
     private Float distance;
 
     @Transient
@@ -141,6 +143,14 @@ public class Session {
         this.selected = selected;
     }
 
+    public Long getDuration() {
+        return this.duration;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
+    }
+
     /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 1458438772)
     public void __setDaoSession(DaoSession daoSession) {
@@ -148,11 +158,12 @@ public class Session {
         myDao = daoSession != null ? daoSession.getSessionDao() : null;
     }
 
-    @Generated(hash = 1369977639)
-    public Session(Long id, long start, Long end, Float distance) {
+    @Generated(hash = 1103544323)
+    public Session(Long id, long start, Long end, Long duration, Float distance) {
         this.id = id;
         this.start = start;
         this.end = end;
+        this.duration = duration;
         this.distance = distance;
     }
 

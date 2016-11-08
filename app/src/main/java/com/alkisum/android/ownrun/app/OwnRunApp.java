@@ -2,6 +2,7 @@ package com.alkisum.android.ownrun.app;
 
 import android.app.Application;
 
+import com.alkisum.android.ownrun.data.Db;
 import com.squareup.leakcanary.LeakCanary;
 
 /**
@@ -20,5 +21,7 @@ public class OwnRunApp extends Application {
             return;
         }
         LeakCanary.install(this);
+
+        Db.getInstance().init(this);
     }
 }

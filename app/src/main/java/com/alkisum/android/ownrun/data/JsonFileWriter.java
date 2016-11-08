@@ -118,6 +118,7 @@ public class JsonFileWriter extends AsyncTask<Void, Void,
         JSONObject jsonSession = new JSONObject();
         jsonSession.put(Json.SESSION_START, session.getStart());
         jsonSession.put(Json.SESSION_END, session.getEnd());
+        jsonSession.put(Json.SESSION_DURATION, session.getDuration());
         jsonSession.put(Json.SESSION_DISTANCE, session.getDistance());
 
         JSONArray jsonDataPoints = new JSONArray();

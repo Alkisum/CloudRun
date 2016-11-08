@@ -134,6 +134,7 @@ class JsonFileReader extends AsyncTask<Void, Void, Void> {
                 Session session = new Session();
                 session.setStart(jsonSession.getLong(Json.SESSION_START));
                 session.setEnd(jsonSession.getLong(Json.SESSION_END));
+                session.setDuration(jsonSession.getLong(Json.SESSION_DURATION));
                 session.setDistance(BigDecimal.valueOf(jsonSession.getDouble(
                         Json.SESSION_DISTANCE)).floatValue());
                 mSessionDao.insert(session);

@@ -21,14 +21,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alkisum.android.ownrun.R;
-import com.alkisum.android.ownrun.data.Db;
 import com.alkisum.android.ownrun.data.Recorder;
 import com.alkisum.android.ownrun.dialog.ErrorDialog;
 import com.alkisum.android.ownrun.event.CoordinateEvent;
@@ -62,12 +59,47 @@ import butterknife.OnClick;
 public class MonitorActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         SharedPreferences.OnSharedPreferenceChangeListener,
-        Tile.TileListener {
+        Tile.TileListener, Recorder.RecorderListener {
 
     /**
      * Request code for denied permissions.
      */
     private static final int REQUEST_CODE = 683;
+
+    /**
+     * Delay between each stopwatch blink when the session is paused.
+     */
+    private static final long BLINK_DELAY = 500;
+
+    /**
+     * Action constant for session start.
+     */
+    private static final int ACTION_START = 1;
+
+    /**
+     * Action constant for session resume.
+     */
+    private static final int ACTION_RESUME = 2;
+
+    /**
+     * Action constant for session pause.
+     */
+    private static final int ACTION_PAUSE = 3;
+
+    /**
+     * Action constant for session stop.
+     */
+    private static final int ACTION_STOP = 4;
+
+    /**
+     * Action constant for session lock.
+     */
+    private static final int ACTION_LOCK = 5;
+
+    /**
+     * Action constant for session unlock.
+     */
+    private static final int ACTION_UNLOCK = 6;
 
     /**
      * SharedPreferences instance.
@@ -95,14 +127,14 @@ public class MonitorActivity extends AppCompatActivity
     private boolean mSessionRunning;
 
     /**
+     * Flag set to true if the session is currently paused, false otherwise.
+     */
+    private boolean mSessionPaused;
+
+    /**
      * Flag set to true if the session is locked, false otherwise.
      */
     private boolean mLocked;
-
-    /**
-     * Cumulative distance during the current session.
-     */
-    private float mDistance;
 
     /**
      * Flag set to true when new GPS data has been received, false otherwise.
@@ -110,14 +142,20 @@ public class MonitorActivity extends AppCompatActivity
     private boolean mNewGpsDataReceived;
 
     /**
-     * Handler for the stopwatch task.
+     * Handler for the task to make the stopwatch blink when the session is
+     * paused.
      */
-    private final Handler mStopwatchHandler = new Handler();
+    private final Handler mStopwatchBlinkHandler = new Handler();
 
     /**
      * Handler for the task checking for the GPS status.
      */
     private final Handler mGpsStatusHandler = new Handler();
+
+    /**
+     * Handler for the lock timeout.
+     */
+    private final Handler mLockTimeoutHandler = new Handler();
 
     /**
      * List of layout containing GPS data.
@@ -129,6 +167,23 @@ public class MonitorActivity extends AppCompatActivity
      * on the data type constants.
      */
     private String[] mCurrentValues;
+
+    /**
+     * Id for current GPS status icon.
+     */
+    private int mGpsStatusIconId = R.drawable.ic_gps_not_fixed_white_24dp;
+
+    /**
+     * Flag set to true if the GPS accuracy must be shown, false otherwise.
+     */
+    private boolean mShowGpsAccuracy;
+
+    /**
+     * TextView showing the GPS accuracy by displaying the distance in meter
+     * between 2 coordinates.
+     */
+    @BindView(R.id.monitor_txt_gps_accuracy)
+    TextView mTextGpsAccuracy;
 
     /**
      * TextView at the top of the layout.
@@ -148,29 +203,28 @@ public class MonitorActivity extends AppCompatActivity
     private ActionBarDrawerToggle mDrawerToggle;
 
     /**
-     * Image showing the GPS status in the Toolbar.
+     * Layout containing the start button.
      */
-    @BindView(R.id.monitor_img_gps_status)
-    ImageView mImageGpsStatus;
+    @BindView(R.id.monitor_layout_start)
+    RelativeLayout mLayoutStart;
 
     /**
-     * Button starting or stopping the session.
+     * Layout containing the lock button.
      */
-    @BindView(R.id.monitor_button_action)
-    ImageButton mButtonAction;
+    @BindView(R.id.monitor_layout_lock)
+    RelativeLayout mLayoutLock;
 
     /**
-     * Layout containing the GPS accuracy views. This layout must hidden
-     * according to the session and the GPS states.
+     * Layout containing the pause button.
      */
-    @BindView(R.id.monitor_layout_gps_accuracy)
-    RelativeLayout mLayoutGpsAccuracy;
+    @BindView(R.id.monitor_layout_pause)
+    RelativeLayout mLayoutPause;
 
     /**
-     * TextView to show the GPS accuracy (last distance in meters).
+     * Layout containing the stop button.
      */
-    @BindView(R.id.monitor_txt_gps_accuracy)
-    TextView mTextGpsAccuracy;
+    @BindView(R.id.monitor_layout_stop)
+    RelativeLayout mLayoutStop;
 
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
@@ -185,7 +239,7 @@ public class MonitorActivity extends AppCompatActivity
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(deniedPermissions, REQUEST_CODE);
         } else {
-            initApp();
+            init();
         }
 
         mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -261,7 +315,7 @@ public class MonitorActivity extends AppCompatActivity
             }
         }
         if (permissionsGranted) {
-            initApp();
+            init();
         } else {
             ErrorDialog.build(this, getString(R.string.permission_title),
                     errorMessage, mExit).show();
@@ -280,14 +334,6 @@ public class MonitorActivity extends AppCompatActivity
                 }
             };
 
-    /**
-     * Initialize the application.
-     */
-    private void initApp() {
-        Db.getInstance().init(this);
-        mLocationHelper = new LocationHelper(this);
-    }
-
     @Override
     public final boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.menu_monitor, menu);
@@ -296,25 +342,26 @@ public class MonitorActivity extends AppCompatActivity
 
     @Override
     public final boolean onPrepareOptionsMenu(final Menu menu) {
-        MenuItem locker = menu.findItem(R.id.action_lock);
-        if (mLocked) {
-            locker.setTitle(R.string.action_unlock);
-            locker.setIcon(R.drawable.ic_lock_outline_white_24dp);
-        } else {
-            locker.setTitle(R.string.action_lock);
-            locker.setIcon(R.drawable.ic_lock_open_white_24dp);
-        }
+        MenuItem gps = menu.findItem(R.id.action_gps);
+        gps.setIcon(mGpsStatusIconId);
         return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public final boolean onOptionsItemSelected(final MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_lock) {
-            setLocked(!mLocked);
-            return true;
+        if (id == R.id.action_gps) {
+            mShowGpsAccuracy = !mShowGpsAccuracy;
+            mTextGpsAccuracy.setText("");
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Initialise activity.
+     */
+    private void init() {
+        mLocationHelper = new LocationHelper(this);
     }
 
     /**
@@ -342,8 +389,6 @@ public class MonitorActivity extends AppCompatActivity
                 LocationHandler.LOCATION_REQUEST_INTERVAL * 2);
 
         setTiles();
-
-        setLocked(false);
     }
 
     /**
@@ -442,6 +487,25 @@ public class MonitorActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public final void onDurationUpdated(final long duration) {
+        mTextTop.setText(Format.formatDuration(duration));
+    }
+
+    @Override
+    public final void onDistanceUpdated(final float distance) {
+        updateTile(Tile.DISTANCE, Format.formatDistance(distance));
+        long elapsedTime = mRecorder.getCurrentDuration();
+
+        // Speed average
+        updateTile(Tile.SPEED_AVG,
+                Format.formatSpeedAvg(elapsedTime, distance));
+
+        // Pace average
+        updateTile(Tile.PACE_AVG,
+                Format.formatPaceAvg(elapsedTime, distance));
+    }
+
     /**
      * Triggered when new coordinates are received.
      *
@@ -453,28 +517,15 @@ public class MonitorActivity extends AppCompatActivity
     }
 
     /**
-     * Triggered when a new distance is calculated. Calculate speed and pace
-     * averages from the distance.
+     * Triggered when a new distance is calculated.
      *
      * @param event Distance event
      */
     @Subscribe
     public final void onDistanceEvent(final DistanceEvent event) {
-        if (mSessionRunning) {
-            mDistance += event.getValue();
-            updateTile(Tile.DISTANCE, Format.formatDistance(mDistance));
-            long elapsedTime = mRecorder.getCurrentDuration();
-
-            // Speed average
-            updateTile(Tile.SPEED_AVG,
-                    Format.formatSpeedAvg(elapsedTime, mDistance));
-
-            // Pace average
-            updateTile(Tile.PACE_AVG,
-                    Format.formatPaceAvg(elapsedTime, mDistance));
-        } else {
-            mTextGpsAccuracy.setText(
-                    Format.formatGpsAccuracy(event.getValue()));
+        if ((!mSessionRunning || mSessionPaused) && mShowGpsAccuracy) {
+            mTextGpsAccuracy.setText(Format.formatGpsAccuracy(
+                    event.getValue()));
         }
     }
 
@@ -485,7 +536,7 @@ public class MonitorActivity extends AppCompatActivity
      */
     @Subscribe
     public final void onSpeedEvent(final SpeedEvent event) {
-        if (mSessionRunning) {
+        if (mSessionRunning && !mSessionPaused) {
             updateTile(Tile.SPEED, Format.formatSpeed(event.getValue()));
         }
     }
@@ -497,7 +548,7 @@ public class MonitorActivity extends AppCompatActivity
      */
     @Subscribe
     public final void onPaceEvent(final PaceEvent event) {
-        if (mSessionRunning) {
+        if (mSessionRunning && !mSessionPaused) {
             updateTile(Tile.PACE, Format.formatPace(event.getValue()));
         }
     }
@@ -509,10 +560,10 @@ public class MonitorActivity extends AppCompatActivity
      * @param value New value to set
      */
     private void updateTile(final int data, final String value) {
+        mCurrentValues[data] = value;
         for (Tile tile : mTiles) {
             if (tile.getData() == data) {
                 tile.setValue(value);
-                mCurrentValues[data] = value;
             }
         }
     }
@@ -523,14 +574,71 @@ public class MonitorActivity extends AppCompatActivity
     }
 
     /**
-     * Task updating the stopwatch.
+     * Triggered when the start button is clicked.
      */
-    private final Runnable mStopwatchTask = new Runnable() {
+    @OnClick(R.id.monitor_button_start)
+    public final void onStartButtonClicked() {
+        if (!mSessionRunning) {
+            startSession();
+        } else {
+            resumeSession();
+        }
+    }
+
+    /**
+     * Triggered when the pause button is clicked.
+     */
+    @OnClick(R.id.monitor_button_pause)
+    public final void onPauseButtonClicked() {
+        if (mSessionRunning) {
+            pauseSession();
+        }
+    }
+
+    /**
+     * Triggered when the stop button is clicked.
+     */
+    @OnClick(R.id.monitor_button_stop)
+    public final void onStopButtonClicked() {
+        if (mSessionRunning) {
+            stopSession();
+        }
+    }
+
+    /**
+     * Triggered when the lock button is clicked.
+     */
+    @OnClick(R.id.monitor_button_lock)
+    public final void onLockButtonClicked() {
+        if (mSessionRunning) {
+            setLocked(false);
+            mLockTimeoutHandler.postDelayed(mLockTimeoutTask, 5000);
+        }
+    }
+
+    /**
+     * Task to make the stopwatch blink when the session is paused.
+     */
+    private final Runnable mStopwatchBlinkTask = new Runnable() {
         @Override
         public void run() {
-            mStopwatchHandler.postDelayed(this, 1000);
-            long elapsedTime = mRecorder.getCurrentDuration();
-            mTextTop.setText(Format.formatDuration(elapsedTime));
+            mStopwatchBlinkHandler.postDelayed(this, BLINK_DELAY);
+            int currentVisibility = mTextTop.getVisibility();
+            if (currentVisibility == View.VISIBLE) {
+                mTextTop.setVisibility(View.GONE);
+            } else {
+                mTextTop.setVisibility(View.VISIBLE);
+            }
+        }
+    };
+
+    /**
+     * Task to lock the screen again after timeout.
+     */
+    private final Runnable mLockTimeoutTask = new Runnable() {
+        @Override
+        public void run() {
+            setLocked(true);
         }
     };
 
@@ -544,46 +652,18 @@ public class MonitorActivity extends AppCompatActivity
             mGpsStatusHandler.postDelayed(this,
                     LocationHandler.LOCATION_REQUEST_INTERVAL * 2);
             if (!LocationHelper.isLocationEnabled(MonitorActivity.this)) {
-                mImageGpsStatus.setImageDrawable(ContextCompat.getDrawable(
-                        MonitorActivity.this,
-                        R.drawable.ic_gps_off_white_24dp));
-                if (!mSessionRunning) {
-                    mLayoutGpsAccuracy.setVisibility(View.GONE);
-                    mTextGpsAccuracy.setText("");
-                }
+                mGpsStatusIconId = R.drawable.ic_gps_off_white_24dp;
+                mTextGpsAccuracy.setText("");
             } else if (mNewGpsDataReceived) {
-                mImageGpsStatus.setImageDrawable(ContextCompat.getDrawable(
-                        MonitorActivity.this,
-                        R.drawable.ic_gps_fixed_white_24dp));
-                if (!mSessionRunning) {
-                    mLayoutGpsAccuracy.setVisibility(View.VISIBLE);
-                }
+                mGpsStatusIconId = R.drawable.ic_gps_fixed_white_24dp;
             } else {
-                mImageGpsStatus.setImageDrawable(ContextCompat.getDrawable(
-                        MonitorActivity.this,
-                        R.drawable.ic_gps_not_fixed_white_24dp));
-                if (!mSessionRunning) {
-                    mLayoutGpsAccuracy.setVisibility(View.VISIBLE);
-                    mTextGpsAccuracy.setText("");
-                }
+                mGpsStatusIconId = R.drawable.ic_gps_not_fixed_white_24dp;
+                mTextGpsAccuracy.setText("");
             }
             mNewGpsDataReceived = false;
+            invalidateOptionsMenu();
         }
     };
-
-    /**
-     * Triggered when the action button is clicked. Start or stop session
-     * according to the current session state.
-     */
-    @OnClick(R.id.monitor_button_action)
-    public final void onActionButtonClicked() {
-        if (!mSessionRunning) {
-            startSession();
-        } else {
-            stopSession();
-        }
-        mSessionRunning = !mSessionRunning;
-    }
 
     /**
      * Set keep screen on flag according to the preferences.
@@ -604,31 +684,50 @@ public class MonitorActivity extends AppCompatActivity
      * Start a session.
      */
     private void startSession() {
-        // Reset distance (do not increment from last session)
-        mDistance = 0;
-
-        mRecorder = new Recorder();
+        mRecorder = new Recorder(this);
         mRecorder.start();
-
         setLocked(true);
-        mStopwatchHandler.post(mStopwatchTask);
-        mButtonAction.setImageResource(R.drawable.ic_stop_white_48dp);
-
-        mLayoutGpsAccuracy.setVisibility(View.GONE);
+        updateActionButton(ACTION_START);
         mTextGpsAccuracy.setText("");
+        mSessionRunning = true;
+    }
+
+    /**
+     * Resume the session, called only when the session was paused.
+     */
+    private void resumeSession() {
+        setLocked(true);
+        mStopwatchBlinkHandler.removeCallbacks(mStopwatchBlinkTask);
+        mTextTop.setVisibility(View.VISIBLE);
+        updateActionButton(ACTION_RESUME);
+        mTextGpsAccuracy.setText("");
+        mSessionPaused = false;
+        mRecorder.resume();
+    }
+
+    /**
+     * Set the session on pause.
+     */
+    private void pauseSession() {
+        mLockTimeoutHandler.removeCallbacks(mLockTimeoutTask);
+        mStopwatchBlinkHandler.post(mStopwatchBlinkTask);
+        updateActionButton(ACTION_PAUSE);
+        mSessionPaused = true;
+        mRecorder.pause();
     }
 
     /**
      * Stop the current session.
      */
     private void stopSession() {
-        mRecorder.stop(mDistance);
+        mRecorder.stop();
 
-        mStopwatchHandler.removeCallbacks(mStopwatchTask);
-        mButtonAction.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+        mLockTimeoutHandler.removeCallbacks(mLockTimeoutTask);
+        if (mSessionPaused) {
+            mStopwatchBlinkHandler.removeCallbacks(mStopwatchBlinkTask);
+        }
 
-        mLayoutGpsAccuracy.setVisibility(View.VISIBLE);
-        mTextGpsAccuracy.setText("");
+        updateActionButton(ACTION_STOP);
 
         Intent intent = new Intent(this, HistoryActivity.class);
         intent.putExtra(HistoryActivity.ARG_HIGHLIGHTED_SESSION_ID,
@@ -637,6 +736,8 @@ public class MonitorActivity extends AppCompatActivity
 
         resetViews();
         initCurrentValues();
+
+        mSessionRunning = false;
     }
 
     /**
@@ -651,13 +752,13 @@ public class MonitorActivity extends AppCompatActivity
             tile.setEnabled(!locked);
         }
 
-        mButtonAction.setEnabled(!mLocked);
-
-        if (!mLocked) {
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-        } else {
+        if (mLocked) {
+            updateActionButton(ACTION_LOCK);
             mDrawerLayout.setDrawerLockMode(
                     DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        } else {
+            updateActionButton(ACTION_UNLOCK);
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
         mDrawerToggle.setDrawerIndicatorEnabled(!locked);
         mDrawerToggle.syncState();
@@ -686,6 +787,54 @@ public class MonitorActivity extends AppCompatActivity
                 getString(R.string.default_speed),
                 getString(R.string.default_pace),
         };
+    }
+
+    /**
+     * Update the action buttons according to the given action.
+     *
+     * @param action Action triggered.
+     */
+    private void updateActionButton(final int action) {
+        switch (action) {
+            case ACTION_START:
+                mLayoutStart.setVisibility(View.GONE);
+                mLayoutLock.setVisibility(View.VISIBLE);
+                mLayoutPause.setVisibility(View.GONE);
+                mLayoutStop.setVisibility(View.GONE);
+                break;
+            case ACTION_RESUME:
+                mLayoutStart.setVisibility(View.GONE);
+                mLayoutLock.setVisibility(View.VISIBLE);
+                mLayoutPause.setVisibility(View.GONE);
+                mLayoutStop.setVisibility(View.GONE);
+                break;
+            case ACTION_PAUSE:
+                mLayoutStart.setVisibility(View.VISIBLE);
+                mLayoutLock.setVisibility(View.GONE);
+                mLayoutPause.setVisibility(View.GONE);
+                mLayoutStop.setVisibility(View.VISIBLE);
+                break;
+            case ACTION_STOP:
+                mLayoutStart.setVisibility(View.VISIBLE);
+                mLayoutLock.setVisibility(View.GONE);
+                mLayoutPause.setVisibility(View.GONE);
+                mLayoutStop.setVisibility(View.GONE);
+                break;
+            case ACTION_LOCK:
+                mLayoutStart.setVisibility(View.GONE);
+                mLayoutLock.setVisibility(View.VISIBLE);
+                mLayoutPause.setVisibility(View.GONE);
+                mLayoutStop.setVisibility(View.GONE);
+                break;
+            case ACTION_UNLOCK:
+                mLayoutStart.setVisibility(View.GONE);
+                mLayoutLock.setVisibility(View.GONE);
+                mLayoutPause.setVisibility(View.VISIBLE);
+                mLayoutStop.setVisibility(View.VISIBLE);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override

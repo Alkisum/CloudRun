@@ -6,5 +6,4 @@
     <color name="accent_inactive">#808bc34a</color>
     <color name="bgTile">#303030</color>
     <color name="bgOut">#212121</color>
-    <color name="gpsAccuracy">#424242</color>
 </resources>

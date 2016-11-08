@@ -20,12 +20,11 @@
     <string name="unit_pace_avg">min/km (avg)</string>
 
     <!-- Actions -->
-    <string name="action_lock">Lock</string>
-    <string name="action_unlock">Unlock</string>
     <string name="action_download">Download</string>
     <string name="action_upload">Upload</string>
     <string name="action_delete">Delete</string>
     <string name="action_connect">Connect</string>
+    <string name="action_gps">Show or hide GPS accuracy</string>
 
     <!-- Navigation drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -34,9 +33,10 @@
 
     <!-- Monitor -->
     <string name="monitor_session_locked">Session locked</string>
-    <string name="desc_gps_status">GPS status</string>
-    <string name="desc_action_button">Start/stop session</string>
-    <string name="desc_gps_accuracy">GPS accuracy</string>
+    <string name="desc_action_start">Start / resume session</string>
+    <string name="desc_action_stop">Stop session</string>
+    <string name="desc_action_pause">Pause session</string>
+    <string name="desc_action_lock">Unlock screen</string>
 
     <!-- History -->
     <string name="history_title">History</string>

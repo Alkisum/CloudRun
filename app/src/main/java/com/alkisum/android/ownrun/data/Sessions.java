@@ -1,7 +1,5 @@
 package com.alkisum.android.ownrun.data;
 
-import android.location.Location;
-
 import com.alkisum.android.ownrun.model.DataPoint;
 import com.alkisum.android.ownrun.model.Session;
 import com.alkisum.android.ownrun.model.SessionDao;
@@ -91,58 +89,14 @@ public final class Sessions {
 
         // Initialize end time and total distance
         Long end = session.getStart();
-        float distance = 0;
 
         if (!dataPoints.isEmpty()) {
             // Get end from the last datapoint recorded during the session
             end = dataPoints.get(dataPoints.size() - 1).getTime();
-
-            // Calculate distance between each datapoint's location
-            Location src = null;
-            Location dst;
-
-            int i = 0;
-            while (i < dataPoints.size()) {
-
-                DataPoint dataPoint = dataPoints.get(i);
-
-                if (src == null) {
-                    if (isDataPointValid(dataPoint)) {
-                        src = new Location("src");
-                        src.setLatitude(dataPoint.getLatitude());
-                        src.setLongitude(dataPoint.getLongitude());
-                    }
-                } else {
-                    if (isDataPointValid(dataPoint)) {
-                        dst = new Location("dst");
-                        dst.setLatitude(dataPoint.getLatitude());
-                        dst.setLongitude(dataPoint.getLongitude());
-
-                        distance += src.distanceTo(dst);
-
-                        src = dst;
-                    }
-                }
-                i++;
-            }
         }
 
         // Update database with the new session's information
         session.setEnd(end);
-        session.setDistance(distance);
         session.update();
-    }
-
-    /**
-     * Check if the given DataPoint is valid.
-     *
-     * @param dataPoint DataPoint to check
-     * @return True if the DataPoint is valid, false otherwise
-     */
-    private static boolean isDataPointValid(final DataPoint dataPoint) {
-        return dataPoint.getLatitude() != null
-                && dataPoint.getLongitude() != null
-                && dataPoint.getLatitude() != 0
-                && dataPoint.getLongitude() != 0;
     }
 }

@@ -182,7 +182,8 @@ class HistoryListAdapter extends BaseAdapter {
             long duration = session.getEnd() - session.getStart();
             holder.distance.setText(String.format(Locale.getDefault(),
                     Format.DISTANCE + " km", session.getDistance() / 1000f));
-            holder.duration.setText(Format.formatDuration(duration));
+            holder.duration.setText(
+                    Format.formatDuration(session.getDuration()));
             holder.speed.setText(String.format("%s km/h",
                     Format.formatSpeedAvg(duration, session.getDistance())));
             holder.pace.setText(String.format("%s min/km",

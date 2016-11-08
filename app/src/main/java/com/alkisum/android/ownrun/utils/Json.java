@@ -47,6 +47,11 @@ public final class Json {
     public static final String SESSION_END = "end";
 
     /**
+     * JSON name for session duration.
+     */
+    public static final String SESSION_DURATION = "duration";
+
+    /**
      * JSON name for session distance.
      */
     public static final String SESSION_DISTANCE = "distance";
