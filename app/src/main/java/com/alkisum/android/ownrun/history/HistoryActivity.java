@@ -217,6 +217,7 @@ public class HistoryActivity extends AppCompatActivity implements
         menu.findItem(R.id.action_download).setVisible(!editMode);
         menu.findItem(R.id.action_upload).setVisible(editMode);
         menu.findItem(R.id.action_delete).setVisible(editMode);
+        menu.findItem(R.id.action_select_all).setVisible(editMode);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -244,6 +245,14 @@ public class HistoryActivity extends AppCompatActivity implements
                 if (!Sessions.getSelectedSessions().isEmpty()) {
                     showDeleteConfirmation();
                 }
+                return true;
+            case R.id.action_select_all:
+                List<Session> sessions = Sessions.loadSessions(
+                        mIgnoreSessionId);
+                for (Session session : sessions) {
+                    session.setSelected(true);
+                }
+                mListAdapter.notifyDataSetChanged();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
