@@ -18,8 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alkisum.android.ownrun.R;
-import com.alkisum.android.ownrun.connect.ConnectDialog;
-import com.alkisum.android.ownrun.connect.ConnectInfo;
+import com.alkisum.android.ownrun.dialog.ConnectDialog;
 import com.alkisum.android.ownrun.data.Deleter;
 import com.alkisum.android.ownrun.data.Downloader;
 import com.alkisum.android.ownrun.data.JsonFileWriter;

@@ -1,4 +1,4 @@
-package com.alkisum.android.ownrun.connect;
+package com.alkisum.android.ownrun.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.alkisum.android.ownrun.R;
+import com.alkisum.android.ownrun.history.ConnectInfo;
 import com.alkisum.android.ownrun.utils.Pref;
 
 import butterknife.BindView;

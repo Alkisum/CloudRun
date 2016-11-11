@@ -31,7 +31,7 @@ public class JsonFileWriter extends AsyncTask<Void, Void,
      * JSON file version number. Must be incremented when the JSON file
      * structure is changed.
      */
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
 
     /**
      * Context.

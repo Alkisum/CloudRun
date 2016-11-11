@@ -130,34 +130,84 @@ class JsonFileReader extends AsyncTask<Void, Void, Void> {
         int version = jsonBase.getInt(Json.VERSION);
         switch (version) {
             case 1:
-                JSONObject jsonSession = jsonBase.getJSONObject(Json.SESSION);
-                Session session = new Session();
-                session.setStart(jsonSession.getLong(Json.SESSION_START));
-                session.setEnd(jsonSession.getLong(Json.SESSION_END));
-                session.setDuration(jsonSession.getLong(Json.SESSION_DURATION));
-                session.setDistance(BigDecimal.valueOf(jsonSession.getDouble(
-                        Json.SESSION_DISTANCE)).floatValue());
-                mSessionDao.insert(session);
-
-                JSONArray jsonDataPoints = jsonBase.getJSONArray(
-                        Json.DATAPOINTS);
-                for (int i = 0; i < jsonDataPoints.length(); i++) {
-                    JSONObject jsonDataPoint = jsonDataPoints.getJSONObject(i);
-                    DataPoint dataPoint = new DataPoint();
-                    dataPoint.setTime(jsonDataPoint.getLong(
-                            Json.DATAPOINT_TIME));
-                    dataPoint.setLatitude(jsonDataPoint.getDouble(
-                            Json.DATAPOINT_LATITUDE));
-                    dataPoint.setLongitude(jsonDataPoint.getDouble(
-                            Json.DATAPOINT_LONGITUDE));
-                    dataPoint.setElevation(jsonDataPoint.getDouble(
-                            Json.DATAPOINT_ELEVATION));
-                    dataPoint.setSession(session);
-                    mDataPoints.add(dataPoint);
-                }
+                fromVersion1(jsonBase);
+                break;
+            case 2:
+                fromVersion2(jsonBase);
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * Build session from Json file version 1.
+     *
+     * @param jsonBase JSONObject the structure is based on
+     * @throws JSONException An error occurred while parsing the JSON object
+     */
+    private void fromVersion1(final JSONObject jsonBase) throws JSONException {
+        JSONObject jsonSession = jsonBase.getJSONObject(Json.SESSION);
+        Session session = new Session();
+        long start = jsonSession.getLong(Json.SESSION_START);
+        long end = jsonSession.getLong(Json.SESSION_END);
+        session.setStart(start);
+        session.setEnd(end);
+        session.setDuration(end - start);
+        session.setDistance(BigDecimal.valueOf(jsonSession.getDouble(
+                Json.SESSION_DISTANCE)).floatValue());
+        mSessionDao.insert(session);
+
+        JSONArray jsonDataPoints = jsonBase.getJSONArray(
+                Json.DATAPOINTS);
+        for (int i = 0; i < jsonDataPoints.length(); i++) {
+            JSONObject jsonDataPoint = jsonDataPoints.getJSONObject(i);
+            DataPoint dataPoint = new DataPoint();
+            dataPoint.setTime(jsonDataPoint.getLong(
+                    Json.DATAPOINT_TIME));
+            dataPoint.setLatitude(jsonDataPoint.getDouble(
+                    Json.DATAPOINT_LATITUDE));
+            dataPoint.setLongitude(jsonDataPoint.getDouble(
+                    Json.DATAPOINT_LONGITUDE));
+            dataPoint.setElevation(jsonDataPoint.getDouble(
+                    Json.DATAPOINT_ELEVATION));
+            dataPoint.setSession(session);
+            mDataPoints.add(dataPoint);
+        }
+    }
+
+    /**
+     * Build session from Json file version 2. Changes:
+     * - The duration is written in the session object
+     *
+     * @param jsonBase JSONObject the structure is based on
+     * @throws JSONException An error occurred while parsing the JSON object
+     */
+    private void fromVersion2(final JSONObject jsonBase) throws JSONException {
+        JSONObject jsonSession = jsonBase.getJSONObject(Json.SESSION);
+        Session session = new Session();
+        session.setStart(jsonSession.getLong(Json.SESSION_START));
+        session.setEnd(jsonSession.getLong(Json.SESSION_END));
+        session.setDuration(jsonSession.getLong(Json.SESSION_DURATION));
+        session.setDistance(BigDecimal.valueOf(jsonSession.getDouble(
+                Json.SESSION_DISTANCE)).floatValue());
+        mSessionDao.insert(session);
+
+        JSONArray jsonDataPoints = jsonBase.getJSONArray(
+                Json.DATAPOINTS);
+        for (int i = 0; i < jsonDataPoints.length(); i++) {
+            JSONObject jsonDataPoint = jsonDataPoints.getJSONObject(i);
+            DataPoint dataPoint = new DataPoint();
+            dataPoint.setTime(jsonDataPoint.getLong(
+                    Json.DATAPOINT_TIME));
+            dataPoint.setLatitude(jsonDataPoint.getDouble(
+                    Json.DATAPOINT_LATITUDE));
+            dataPoint.setLongitude(jsonDataPoint.getDouble(
+                    Json.DATAPOINT_LONGITUDE));
+            dataPoint.setElevation(jsonDataPoint.getDouble(
+                    Json.DATAPOINT_ELEVATION));
+            dataPoint.setSession(session);
+            mDataPoints.add(dataPoint);
         }
     }
 

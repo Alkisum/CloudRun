@@ -1,4 +1,4 @@
-package com.alkisum.android.ownrun.connect;
+package com.alkisum.android.ownrun.history;
 
 /**
  * Class containing connection information for ownCloud server.
@@ -37,7 +37,7 @@ public class ConnectInfo {
      * @param username Username
      * @param password Password
      */
-    ConnectInfo(final String address, final String path,
+    public ConnectInfo(final String address, final String path,
                 final String username, final String password) {
         mAddress = address;
         mPath = path;
@@ -69,7 +69,7 @@ public class ConnectInfo {
     /**
      * @return Password
      */
-    public final String getPassword() {
+    final String getPassword() {
         return mPassword;
     }
 }
