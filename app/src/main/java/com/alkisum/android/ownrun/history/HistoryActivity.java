@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,13 +19,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alkisum.android.ownrun.R;
-import com.alkisum.android.ownrun.dialog.ConnectDialog;
 import com.alkisum.android.ownrun.data.Deleter;
 import com.alkisum.android.ownrun.data.Downloader;
 import com.alkisum.android.ownrun.data.JsonFileWriter;
 import com.alkisum.android.ownrun.data.Sessions;
 import com.alkisum.android.ownrun.data.Uploader;
 import com.alkisum.android.ownrun.dialog.ConfirmDialog;
+import com.alkisum.android.ownrun.dialog.ConnectDialog;
 import com.alkisum.android.ownrun.dialog.ErrorDialog;
 import com.alkisum.android.ownrun.model.Session;
 import com.alkisum.android.ownrun.utils.Format;
@@ -39,6 +38,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Activity listing the history of sessions.
@@ -85,6 +85,12 @@ public class HistoryActivity extends AppCompatActivity implements
      * SessionActivity.
      */
     public static final int SESSION_DELETED = 627;
+
+    /**
+     * Result returned by AddSessionActivity when the session has been inserted
+     * into the database.
+     */
+    public static final int SESSION_ADDED = 861;
 
     /**
      * Toolbar.
@@ -169,11 +175,10 @@ public class HistoryActivity extends AppCompatActivity implements
     protected final void onActivityResult(final int requestCode,
                                           final int resultCode,
                                           final Intent data) {
-        Log.e("HistoryActivity", "onActivityResult");
         if (requestCode == SESSION_REQUEST_CODE) {
-            Log.e("HistoryActivity", "SESSION_REQUEST_CODE");
             if (resultCode == SESSION_DELETED) {
-                Log.e("HistoryActivity", "SESSION_DELETED");
+                refreshList();
+            } else if (resultCode == SESSION_ADDED) {
                 refreshList();
             }
         }
@@ -638,5 +643,14 @@ public class HistoryActivity extends AppCompatActivity implements
         } else {
             finish();
         }
+    }
+
+    /**
+     * Called when the Add session button is clicked.
+     */
+    @OnClick(R.id.history_fab_add)
+    public final void onAddSessionClicked() {
+        Intent intent = new Intent(this, AddSessionActivity.class);
+        startActivityForResult(intent, SESSION_REQUEST_CODE);
     }
 }

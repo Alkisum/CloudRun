@@ -56,7 +56,7 @@ import butterknife.ButterKnife;
  * @since 2.0
  */
 
-public class SessionActivity extends AppCompatActivity  implements
+public class SessionActivity extends AppCompatActivity implements
         ConnectDialog.ConnectDialogListener, Uploader.UploaderListener,
         Deleter.DeleterListener {
 
@@ -91,6 +91,12 @@ public class SessionActivity extends AppCompatActivity  implements
      */
     @BindView(R.id.session_map)
     MapView mMapView;
+
+    /**
+     * TextView informing the user that there no data available to show the map.
+     */
+    @BindView(R.id.session_txt_no_data)
+    TextView mTextViewNoData;
 
     /**
      * Progress dialog to show the progress of uploading.
@@ -165,7 +171,12 @@ public class SessionActivity extends AppCompatActivity  implements
 
         initTiles();
 
-        initMap();
+        if (!mSession.getDataPoints().isEmpty()) {
+            initMap();
+        } else {
+            mMapView.setVisibility(View.GONE);
+            mTextViewNoData.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -214,14 +225,15 @@ public class SessionActivity extends AppCompatActivity  implements
         ViewTreeObserver vto = layout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                // Will be called when the layout is ready
-                mMapView.zoomToBoundingBox(boundingBox, false);
-                mMapView.invalidate();
-                layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-            }
-        });
+                    @Override
+                    public void onGlobalLayout() {
+                        // Will be called when the layout is ready
+                        mMapView.zoomToBoundingBox(boundingBox, false);
+                        mMapView.invalidate();
+                        layout.getViewTreeObserver()
+                                .removeOnGlobalLayoutListener(this);
+                    }
+                });
         IMapController mapController = mMapView.getController();
         // Set zoom to max
         mapController.setZoom(19);

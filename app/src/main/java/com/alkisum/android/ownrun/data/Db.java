@@ -77,7 +77,7 @@ public final class Db {
     /**
      * @return DaoSession instance
      */
-    DaoSession getDaoSession() {
+    public DaoSession getDaoSession() {
         return mDaoSession;
     }
 

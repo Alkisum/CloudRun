@@ -32,6 +32,9 @@
             android:name=".history.SessionActivity"
             android:configChanges="orientation|screenSize"/>
         <activity
+            android:name=".history.AddSessionActivity"
+            android:configChanges="orientation|screenSize"/>
+        <activity
             android:name=".settings.SettingsActivity"
             android:configChanges="orientation|screenSize"/>
         <activity

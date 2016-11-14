@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
-apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 25
@@ -37,8 +36,9 @@ dependencies {
     compile 'org.greenrobot:greendao:3.2.0'
     compile 'com.github.owncloud:android-library:oc-android-library-0.9.14'
     compile 'com.jakewharton:butterknife:8.4.0'
-    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
     compile 'org.osmdroid:osmdroid-android:5.5:release@aar'
     compile 'com.github.MKergall:osmbonuspack:6.0'
+    compile 'com.wdullaer:materialdatetimepicker:2.5.0'
 }

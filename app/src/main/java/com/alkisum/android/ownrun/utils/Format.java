@@ -22,7 +22,7 @@ public final class Format {
     /**
      * Format for Distance.
      */
-    public static final String DISTANCE = "%.2f";
+    private static final String DISTANCE = "%.2f";
 
     /**
      * Format for Duration.
@@ -47,6 +47,18 @@ public final class Format {
             new SimpleDateFormat("EEE. MMM. dd, yyyy", Locale.getDefault());
 
     /**
+     * Format for date when adding a session.
+     */
+    public static final SimpleDateFormat DATE_ADD_SESSION =
+            new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+    /**
+     * Format for time when adding a session.
+     */
+    public static final SimpleDateFormat TIME_ADD_SESSION =
+            new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+
+    /**
      * Format for build date.
      */
     public static final SimpleDateFormat DATE_BUILD =
@@ -60,11 +72,9 @@ public final class Format {
      */
     public static String formatDuration(final long duration) {
         return String.format(Locale.getDefault(), DURATION,
-                TimeUnit.MILLISECONDS.toHours(duration),
-                TimeUnit.MILLISECONDS.toMinutes(duration)
-                        % TimeUnit.HOURS.toMinutes(1),
-                TimeUnit.MILLISECONDS.toSeconds(duration)
-                        % TimeUnit.MINUTES.toSeconds(1));
+                getHourFromMillis(duration),
+                getMinuteFromMillis(duration),
+                getSecondFromMillis(duration));
     }
 
     /**
@@ -143,6 +153,54 @@ public final class Format {
      */
     public static String formatGpsAccuracy(final float distance) {
         return String.valueOf(Math.round(distance));
+    }
+
+    /**
+     * Get the number of hours from time in milliseconds.
+     *
+     * @param millis Time in milliseconds
+     * @return Number of hours
+     */
+    public static int getHourFromMillis(final long millis) {
+        return (int) TimeUnit.MILLISECONDS.toHours(millis);
+    }
+
+    /**
+     * Get the number of minutes from time in milliseconds.
+     *
+     * @param millis Time in milliseconds
+     * @return Number of minutes
+     */
+    public static int getMinuteFromMillis(final long millis) {
+        return (int) (TimeUnit.MILLISECONDS.toMinutes(millis)
+                % TimeUnit.HOURS.toMinutes(1));
+    }
+
+    /**
+     * Get the number of seconds from time in milliseconds.
+     *
+     * @param millis Time in milliseconds
+     * @return Number of seconds
+     */
+    public static int getSecondFromMillis(final long millis) {
+        return (int) (TimeUnit.MILLISECONDS.toSeconds(millis)
+                % TimeUnit.MINUTES.toSeconds(1));
+    }
+
+    /**
+     * Get the number of milliseconds from the time given in hours, minutes and
+     * seconds.
+     *
+     * @param hour   Number of hours
+     * @param minute Number of minutes
+     * @param second Number of seconds
+     * @return Time in milliseconds
+     */
+    public static long getMillisFromTime(final int hour, final int minute,
+                                         final int second) {
+        return TimeUnit.HOURS.toMillis(hour)
+                + TimeUnit.MINUTES.toMillis(minute)
+                + TimeUnit.SECONDS.toMillis(second);
     }
 
     /**

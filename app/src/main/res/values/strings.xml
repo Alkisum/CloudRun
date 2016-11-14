@@ -18,6 +18,9 @@
     <string name="unit_pace">min/km</string>
     <string name="unit_speed_avg">km/h (avg)</string>
     <string name="unit_pace_avg">min/km (avg)</string>
+    <string name="unit_hour">h</string>
+    <string name="unit_minute">min</string>
+    <string name="unit_second">s</string>
 
     <!-- Actions -->
     <string name="action_download">Download</string>
@@ -26,6 +29,7 @@
     <string name="action_connect">Connect</string>
     <string name="action_select_all">Select all</string>
     <string name="action_gps">Show or hide GPS accuracy</string>
+    <string name="action_save">Save</string>
 
     <!-- Navigation drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -62,6 +66,7 @@
     <string name="session_label_distance">distance (km)</string>
     <string name="session_label_speed">speed (km/h)</string>
     <string name="session_label_pace">pace (min/km)</string>
+    <string name="session_no_data_available">No data available</string>
 
     <!-- General OwnCloud Operations -->
     <string name="operation_progress_init_msg">Preparing&#8230; (0%)</string>
@@ -78,6 +83,21 @@
     <string name="connect_hint_path">Remote path</string>
     <string name="connect_hint_username">Username</string>
     <string name="connect_hint_password">Password</string>
+
+    <!-- Add Session -->
+    <string name="add_session_title">Add session</string>
+    <string name="add_session_date">Date</string>
+    <string name="add_session_time">Time</string>
+    <string name="add_session_duration">Duration</string>
+    <string name="add_session_distance">Distance</string>
+    <string name="add_session_desc_icon">Icon</string>
+
+    <!-- Duration dialog -->
+    <string name="duration_title">Duration</string>
+
+    <!-- Distance dialog -->
+    <string name="distance_title">Distance</string>
+    <string name="distance_separator">,</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>

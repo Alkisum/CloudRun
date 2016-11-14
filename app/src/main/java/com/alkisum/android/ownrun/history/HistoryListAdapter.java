@@ -17,7 +17,6 @@ import com.alkisum.android.ownrun.utils.Format;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -180,8 +179,8 @@ class HistoryListAdapter extends BaseAdapter {
                 new Date(session.getStart())));
         if (session.getEnd() != null) {
             long duration = session.getEnd() - session.getStart();
-            holder.distance.setText(String.format(Locale.getDefault(),
-                    Format.DISTANCE + " km", session.getDistance() / 1000f));
+            holder.distance.setText(String.format("%s km",
+                    Format.formatDistance(session.getDistance())));
             holder.duration.setText(
                     Format.formatDuration(session.getDuration()));
             holder.speed.setText(String.format("%s km/h",
