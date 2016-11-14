@@ -2,12 +2,14 @@ package com.alkisum.android.ownrun.history;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -72,6 +74,17 @@ public class HistoryActivity extends AppCompatActivity implements
      * Operation id for upload.
      */
     private static final int UPLOAD_OPERATION = 2;
+
+    /**
+     * Request code for SessionActivity result.
+     */
+    private static final int SESSION_REQUEST_CODE = 286;
+
+    /**
+     * Result returned by SessionActivity when the session was deleted from the
+     * SessionActivity.
+     */
+    public static final int SESSION_DELETED = 627;
 
     /**
      * Toolbar.
@@ -152,6 +165,20 @@ public class HistoryActivity extends AppCompatActivity implements
         setGui();
     }
 
+    @Override
+    protected final void onActivityResult(final int requestCode,
+                                          final int resultCode,
+                                          final Intent data) {
+        Log.e("HistoryActivity", "onActivityResult");
+        if (requestCode == SESSION_REQUEST_CODE) {
+            Log.e("HistoryActivity", "SESSION_REQUEST_CODE");
+            if (resultCode == SESSION_DELETED) {
+                Log.e("HistoryActivity", "SESSION_DELETED");
+                refreshList();
+            }
+        }
+    }
+
     /**
      * Set the GUI.
      */
@@ -173,11 +200,16 @@ public class HistoryActivity extends AppCompatActivity implements
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> adapterView,
-                                    final View view, final int i,
-                                    final long l) {
+                                    final View view, final int position,
+                                    final long id) {
                 if (mListAdapter.isEditMode()) {
-                    mListAdapter.changeSessionSelectedState(i);
+                    mListAdapter.changeSessionSelectedState(position);
                     mListAdapter.notifyDataSetInvalidated();
+                } else {
+                    Intent intent = new Intent(HistoryActivity.this,
+                            SessionActivity.class);
+                    intent.putExtra(SessionActivity.ARG_SESSION_ID, id);
+                    startActivityForResult(intent, SESSION_REQUEST_CODE);
                 }
             }
         });
@@ -312,12 +344,12 @@ public class HistoryActivity extends AppCompatActivity implements
      * Execute the task to delete the selected sessions.
      */
     private void deleteSelectedSessions() {
-        new Deleter(HistoryActivity.this).execute();
+        new Deleter(this).execute();
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         mProgressDialog.setProgressNumberFormat(null);
-        mProgressDialog.setMessage(getString(R.string.delete_sessions));
+        mProgressDialog.setMessage(getString(R.string.history_delete_progress));
         mProgressDialog.show();
     }
 
@@ -565,8 +597,9 @@ public class HistoryActivity extends AppCompatActivity implements
                 if (mProgressDialog != null) {
                     mProgressDialog.dismiss();
                 }
-                Toast.makeText(HistoryActivity.this, getString(R.string.
-                        upload_success_toast), Toast.LENGTH_LONG).show();
+                Toast.makeText(HistoryActivity.this,
+                        getString(R.string.history_upload_success_toast),
+                        Toast.LENGTH_LONG).show();
             }
         });
     }

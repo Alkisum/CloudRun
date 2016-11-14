@@ -44,8 +44,7 @@ public final class Format {
      * Format for date time in history list.
      */
     public static final SimpleDateFormat DATE_TIME_HISTORY =
-            new SimpleDateFormat("MMM. dd, yyyy HH:mm:ss",
-                    Locale.getDefault());
+            new SimpleDateFormat("EEE. MMM. dd, yyyy", Locale.getDefault());
 
     /**
      * Format for build date.

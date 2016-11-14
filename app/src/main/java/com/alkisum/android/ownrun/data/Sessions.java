@@ -79,6 +79,18 @@ public final class Sessions {
     }
 
     /**
+     * Load the session from the database according to the given ID.
+     *
+     * @param sessionId Session id
+     * @return Session
+     */
+    public static Session getSessionById(final long sessionId) {
+        SessionDao dao = Db.getInstance().getDaoSession()
+                .getSessionDao();
+        return dao.load(sessionId);
+    }
+
+    /**
      * Fix the session. Use DataPoints of the session to get the end and to
      * calculate the distance.
      *

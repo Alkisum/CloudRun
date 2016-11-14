@@ -152,30 +152,6 @@
                 android:layout_weight="1"
                 android:baselineAligned="false">
 
-                <!--<RelativeLayout
-                    android:id="@+id/monitor_layout_gps_accuracy"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:contentDescription="@string/desc_gps_accuracy"
-                        android:src="@drawable/ic_gps_not_fixed_grey_130dp"/>
-
-                    <TextView
-                        android:id="@+id/monitor_txt_gps_accuracy"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:textColor="@color/gpsAccuracy"
-                        android:textSize="30sp"
-                        android:textStyle="bold"/>
-
-                </RelativeLayout>-->
-
                 <RelativeLayout
                     android:id="@+id/monitor_layout_start"
                     android:layout_width="0dp"
