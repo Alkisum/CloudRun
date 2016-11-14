@@ -1,9 +1,19 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="colorAccent">@color/accent</item>
+    </style>
+
+    <style name="toolbar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:background">@color/primary</item>
+        <item name="android:minHeight">?attr/actionBarSize</item>
+        <item name="android:paddingTop">24dp</item>
     </style>
 
 </resources>
