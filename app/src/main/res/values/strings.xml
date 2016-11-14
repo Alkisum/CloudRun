@@ -104,5 +104,6 @@
 
     <!-- About -->
     <string name="about_title">About ownRun</string>
+    <string name="about_github">https://github.com/Alkisum/ownRun/</string>
 
 </resources>

@@ -18,7 +18,7 @@ import butterknife.ButterKnife;
  * Activity showing the application settings.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 2.0
  * @since 1.1
  */
 public class SettingsActivity extends AppCompatActivity {
@@ -31,18 +31,16 @@ public class SettingsActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Toolbar toolbar = ButterKnife.findById(this, R.id.settings_toolbar);
-        if (toolbar != null) {
-            toolbar.setTitle(getString(R.string.settings_title));
-            setSupportActionBar(toolbar);
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-            toolbar.setNavigationOnClickListener(
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(final View v) {
-                            onBackPressed();
-                        }
-                    });
-        }
+        toolbar.setTitle(getString(R.string.settings_title));
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        toolbar.setNavigationOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        onBackPressed();
+                    }
+                });
 
         getFragmentManager().beginTransaction().replace(
                 R.id.settings_frame_content, new SettingsFragment()).commit();

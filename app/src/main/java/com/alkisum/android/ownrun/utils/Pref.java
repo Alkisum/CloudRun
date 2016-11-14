@@ -4,7 +4,7 @@ package com.alkisum.android.ownrun.utils;
  * Class defining constants for SharedPreferences.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 2.0
  * @since 1.0
  */
 public final class Pref {
@@ -38,6 +38,21 @@ public final class Pref {
      * Preference key for about entry in Settings.
      */
     public static final String ABOUT = "about";
+
+    /**
+     * Preference key for build version entry in About.
+     */
+    public static final String BUILD_VERSION = "buildVersion";
+
+    /**
+     * Preference key for build date entry in About.
+     */
+    public static final String BUILD_DATE = "buildDate";
+
+    /**
+     * Preference key for github entry in About.
+     */
+    public static final String GITHUB = "github";
 
     /**
      * Preference key for left tile.

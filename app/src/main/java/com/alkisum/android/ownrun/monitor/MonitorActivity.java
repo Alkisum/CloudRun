@@ -725,6 +725,7 @@ public class MonitorActivity extends AppCompatActivity
         mLockTimeoutHandler.removeCallbacks(mLockTimeoutTask);
         if (mSessionPaused) {
             mStopwatchBlinkHandler.removeCallbacks(mStopwatchBlinkTask);
+            mTextTop.setVisibility(View.VISIBLE);
         }
 
         updateActionButton(ACTION_STOP);

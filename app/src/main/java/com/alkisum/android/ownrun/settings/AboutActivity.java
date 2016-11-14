@@ -1,14 +1,18 @@
 package com.alkisum.android.ownrun.settings;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ListView;
 
 import com.alkisum.android.ownrun.BuildConfig;
 import com.alkisum.android.ownrun.R;
 import com.alkisum.android.ownrun.utils.Format;
+import com.alkisum.android.ownrun.utils.Pref;
 
 import java.util.Date;
 
@@ -18,16 +22,10 @@ import butterknife.ButterKnife;
  * Activity listing information about the application.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 2.0
  * @since 1.2
  */
 public class AboutActivity extends AppCompatActivity {
-
-    /**
-     * Github address.
-     */
-    public static final String GITHUB_ADDRESS =
-            "https://github.com/Alkisum/ownRun/";
 
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
@@ -36,35 +34,57 @@ public class AboutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_about);
         ButterKnife.bind(this);
 
-        setGui();
+
+        Toolbar toolbar = ButterKnife.findById(this, R.id.about_toolbar);
+        toolbar.setTitle(getString(R.string.about_title));
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        toolbar.setNavigationOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        onBackPressed();
+                    }
+                });
+
+        getFragmentManager().beginTransaction().replace(
+                R.id.about_frame_content, new AboutFragment()).commit();
     }
 
     /**
-     * Set GUI.
+     * AboutFragment extending PreferenceFragment.
      */
-    private void setGui() {
+    public static class AboutFragment extends PreferenceFragment {
 
-        Toolbar toolbar = ButterKnife.findById(this, R.id.about_toolbar);
-        if (toolbar != null) {
-            toolbar.setTitle(getString(R.string.about_title));
-            setSupportActionBar(toolbar);
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-            toolbar.setNavigationOnClickListener(
-                    new View.OnClickListener() {
+        @Override
+        public final void onCreate(final Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            addPreferencesFromResource(R.xml.about_preferences);
+
+            // Build version
+            Preference versionPreference = findPreference(Pref.BUILD_VERSION);
+            versionPreference.setSummary(BuildConfig.VERSION_NAME);
+
+            // Build date
+            Preference datePreference = findPreference(Pref.BUILD_DATE);
+            datePreference.setSummary(Format.DATE_BUILD.format(
+                    new Date(BuildConfig.TIMESTAMP)));
+
+            // Github
+            Preference githubPreference = findPreference(Pref.GITHUB);
+            githubPreference.setOnPreferenceClickListener(
+                    new Preference.OnPreferenceClickListener() {
                         @Override
-                        public void onClick(final View v) {
-                            onBackPressed();
+                        public boolean onPreferenceClick(
+                                final Preference preference) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse(getString(
+                                            R.string.about_github)));
+                            startActivity(intent);
+                            return false;
                         }
                     });
         }
-
-        ListView listView = ButterKnife.findById(this, R.id.about_list);
-        String[][] info = new String[][]{
-                new String[]{"Build version", BuildConfig.VERSION_NAME},
-                new String[]{"Build date", Format.DATE_BUILD.format(
-                        new Date(BuildConfig.TIMESTAMP))},
-                new String[]{"Github", GITHUB_ADDRESS}
-        };
-        listView.setAdapter(new AboutListAdapter(this, info));
     }
 }
