@@ -53,7 +53,7 @@ import butterknife.OnClick;
  * Main activity showing location values.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 2.1
  * @since 1.0
  */
 public class MonitorActivity extends AppCompatActivity
@@ -232,7 +232,7 @@ public class MonitorActivity extends AppCompatActivity
 
         String[] deniedPermissions = getDeniedPermissions(new String[]{
                         Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.INTERNET
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
                 }
         );
         if (deniedPermissions.length > 0
@@ -308,6 +308,15 @@ public class MonitorActivity extends AppCompatActivity
                         }
                         permissionsGranted = false;
                         errorMessage += getString(R.string.permission_location);
+                    }
+                    break;
+                case Manifest.permission.WRITE_EXTERNAL_STORAGE:
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                        if (!permissionsGranted) {
+                            errorMessage += "\n\n";
+                        }
+                        permissionsGranted = false;
+                        errorMessage += getString(R.string.permission_storage);
                     }
                     break;
                 default:

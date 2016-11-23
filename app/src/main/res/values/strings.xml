@@ -4,6 +4,7 @@
     <!-- Permissions -->
     <string name="permission_title">Insufficient permissions</string>
     <string name="permission_location">Please allow the app to access precise location.</string>
+    <string name="permission_storage">Please allow the app to write to external storage.</string>
 
     <!-- Default values -->
     <string name="default_stopwatch">00:00:00</string>

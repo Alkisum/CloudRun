@@ -17,7 +17,7 @@ import org.greenrobot.eventbus.Subscribe;
  * Class recording GPS data.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 2.1
  * @since 1.0
  */
 public class Recorder {
@@ -104,8 +104,7 @@ public class Recorder {
         @Override
         public void run() {
             mDurationHandler.postDelayed(this, 1000);
-            Long currentDuration = mSession.getDuration();
-            long newDuration = currentDuration + 1000;
+            long newDuration = System.currentTimeMillis() - mSession.getStart();
             mSession.setDuration(newDuration);
             mSession.update();
             mCallback.onDurationUpdated(newDuration);

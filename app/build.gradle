@@ -9,8 +9,8 @@ android {
         applicationId "com.alkisum.android.ownrun"
         minSdkVersion 18
         targetSdkVersion 25
-        versionCode 5
-        versionName "2.0"
+        versionCode 6
+        versionName "2.1"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
     }
     buildTypes {

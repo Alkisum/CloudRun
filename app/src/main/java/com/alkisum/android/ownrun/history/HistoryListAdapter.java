@@ -25,7 +25,7 @@ import butterknife.ButterKnife;
  * Adapter for History ListView.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 2.1
  * @since 1.0
  */
 class HistoryListAdapter extends BaseAdapter {
@@ -178,11 +178,10 @@ class HistoryListAdapter extends BaseAdapter {
         holder.dateTime.setText(Format.DATE_TIME_HISTORY.format(
                 new Date(session.getStart())));
         if (session.getEnd() != null) {
-            long duration = session.getEnd() - session.getStart();
+            long duration = session.getDuration();
             holder.distance.setText(String.format("%s km",
                     Format.formatDistance(session.getDistance())));
-            holder.duration.setText(
-                    Format.formatDuration(session.getDuration()));
+            holder.duration.setText(Format.formatDuration(duration));
             holder.speed.setText(String.format("%s km/h",
                     Format.formatSpeedAvg(duration, session.getDistance())));
             holder.pace.setText(String.format("%s min/km",
