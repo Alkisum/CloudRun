@@ -53,7 +53,7 @@ import butterknife.OnClick;
  * Main activity showing location values.
  *
  * @author Alkisum
- * @version 2.1
+ * @version 2.2
  * @since 1.0
  */
 public class MonitorActivity extends AppCompatActivity
@@ -484,13 +484,19 @@ public class MonitorActivity extends AppCompatActivity
                                           final int resultCode,
                                           final Intent data) {
         switch (requestCode) {
-            case LocationHandler.REQUEST_CHECK_SETTINGS:
+            case LocationHandler.REQUEST_LOCATION_AUTO:
                 if (resultCode == RESULT_OK) {
                     if (mLocationHelper != null) {
                         mLocationHelper.start();
                     }
                 }
                 break;
+            case LocationHelper.REQUEST_LOCATION_MANUAL:
+                if (LocationHelper.isLocationEnabled(this)) {
+                    if (mLocationHelper != null) {
+                        mLocationHelper.start();
+                    }
+                }
             default:
                 break;
         }

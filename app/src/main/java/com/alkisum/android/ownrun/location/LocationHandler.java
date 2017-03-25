@@ -31,7 +31,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
  * Class handling location updates.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 2.2
  * @since 1.0
  */
 public class LocationHandler implements
@@ -44,9 +44,9 @@ public class LocationHandler implements
     private static final String TAG = "LocationHandler";
 
     /**
-     * Request check settings.
+     * Request location automatically.
      */
-    public static final int REQUEST_CHECK_SETTINGS = 481;
+    public static final int REQUEST_LOCATION_AUTO = 481;
 
     /**
      * Location update interval.
@@ -175,18 +175,28 @@ public class LocationHandler implements
                 final Status status = result.getStatus();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
+                        // Location on: start location updates
                         startLocationUpdates();
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         try {
+                            // Location off: show dialog
                             status.startResolutionForResult(mActivity,
-                                    REQUEST_CHECK_SETTINGS);
+                                    REQUEST_LOCATION_AUTO);
                         } catch (IntentSender.SendIntentException e) {
                             Log.e(TAG, e.getMessage());
                         }
                         break;
                     case LocationSettingsStatusCodes.
                             SETTINGS_CHANGE_UNAVAILABLE:
+                        // There is no way to fix the settings
+                        if (LocationHelper.isLocationEnabled(mActivity)) {
+                            // Location on: start location updates
+                            startLocationUpdates();
+                        } else {
+                            // Location off: user must change settings manually
+                            mCallback.onLocationSettingsChangeUnavailable();
+                        }
                         break;
                     default:
                         break;

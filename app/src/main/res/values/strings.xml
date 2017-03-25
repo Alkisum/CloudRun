@@ -6,6 +6,10 @@
     <string name="permission_location">Please allow the app to access precise location.</string>
     <string name="permission_storage">Please allow the app to write to external storage.</string>
 
+    <!-- Location settings -->
+    <string name="location_required_title">Location service required</string>
+    <string name="location_required_message">Please turn the location service on.</string>
+
     <!-- Default values -->
     <string name="default_stopwatch">00:00:00</string>
     <string name="default_distance">0.00</string>
