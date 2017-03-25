@@ -18,6 +18,7 @@ import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.resources.files.FileUtils;
 import com.owncloud.android.lib.resources.files.UploadRemoteFileOperation;
 
+import java.io.File;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.Queue;
  * Class uploading JSON file containing a session's data to the ownCloud server.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 2.2
  * @since 1.0
  */
 public class Uploader implements OnRemoteOperationListener,
@@ -142,13 +143,17 @@ public class Uploader implements OnRemoteOperationListener,
     private void upload(final JsonFileWriter.Wrapper wrapper) {
         mCallback.onUploadStart(wrapper);
 
+        File fileToUpload = wrapper.getFile();
         String remotePath = buildRemotePath(wrapper);
         String mimeType = "text/plain";
+        Long timeStampLong = fileToUpload.lastModified() / 1000;
+        String timeStamp = timeStampLong.toString();
 
         UploadRemoteFileOperation op = new UploadRemoteFileOperation(
-                wrapper.getFile().getAbsolutePath(),
+                fileToUpload.getAbsolutePath(),
                 remotePath,
-                mimeType);
+                mimeType,
+                timeStamp);
         op.addDatatransferProgressListener(this);
         op.execute(mClient, this, mHandler);
     }

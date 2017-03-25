@@ -18,7 +18,6 @@ import com.alkisum.android.ownrun.model.Session;
 import com.alkisum.android.ownrun.model.SessionDao;
 import com.alkisum.android.ownrun.utils.Format;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
-import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.Calendar;
@@ -30,7 +29,7 @@ import butterknife.ButterKnife;
  * Activity to add a session manually to the database.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 2.2
  * @since 2.0
  */
 public class AddSessionActivity extends AppCompatActivity implements
@@ -224,7 +223,7 @@ public class AddSessionActivity extends AppCompatActivity implements
     }
 
     @Override
-    public final void onTimeSet(final RadialPickerLayout view,
+    public final void onTimeSet(final TimePickerDialog view,
                                 final int hourOfDay, final int minute,
                                 final int second) {
         Calendar calendar = Calendar.getInstance();
