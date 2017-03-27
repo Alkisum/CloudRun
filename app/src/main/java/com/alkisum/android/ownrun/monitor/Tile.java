@@ -16,7 +16,7 @@ import com.alkisum.android.ownrun.dialog.TileDialog;
  * Layout containing a value and a unit TextView.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 2.2
  * @since 1.3
  */
 class Tile {
@@ -104,6 +104,7 @@ class Tile {
         mLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(final View v) {
+                mCallback.onTileLongClicked();
                 // Dialog's checked item is set according to the data constant
                 TileDialog.build(mContext, mData,
                         new DialogInterface.OnClickListener() {
@@ -252,6 +253,11 @@ class Tile {
      * Interface to listen to actions performed by the user on the tile.
      */
     interface TileListener {
+
+        /**
+         * Called when the user clicks long a the tile.
+         */
+        void onTileLongClicked();
 
         /**
          * Called when the user changed the tile's data type. The last chosen

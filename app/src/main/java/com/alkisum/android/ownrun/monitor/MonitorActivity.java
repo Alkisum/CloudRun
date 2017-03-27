@@ -67,6 +67,11 @@ public class MonitorActivity extends AppCompatActivity
     private static final int REQUEST_CODE = 683;
 
     /**
+     * Delay before the screen get locked.
+     */
+    private static final long LOCK_DELAY = 5000;
+
+    /**
      * Delay between each stopwatch blink when the session is paused.
      */
     private static final long BLINK_DELAY = 500;
@@ -156,6 +161,11 @@ public class MonitorActivity extends AppCompatActivity
      * Handler for the lock timeout.
      */
     private final Handler mLockTimeoutHandler = new Handler();
+
+    /**
+     * Flag set to true when the lock timeout task delay is on, false otherwise.
+     */
+    private boolean mLockTimeoutOn;
 
     /**
      * List of layout containing GPS data.
@@ -584,6 +594,18 @@ public class MonitorActivity extends AppCompatActivity
     }
 
     @Override
+    public final void onTileLongClicked() {
+        if (mSessionRunning && !mLocked) {
+            if (mLockTimeoutOn) {
+                mLockTimeoutHandler.removeCallbacks(mLockTimeoutTask);
+                mLockTimeoutOn = false;
+            }
+            mLockTimeoutHandler.postDelayed(mLockTimeoutTask, LOCK_DELAY);
+            mLockTimeoutOn = true;
+        }
+    }
+
+    @Override
     public final void onTileValueRequested(final Tile tile, final int data) {
         tile.setValue(mCurrentValues[data]);
     }
@@ -625,10 +647,11 @@ public class MonitorActivity extends AppCompatActivity
      */
     @OnClick(R.id.monitor_button_lock)
     public final void onLockButtonClicked() {
-        if (mSessionRunning) {
+        //if (mSessionRunning) {
             setLocked(false);
-            mLockTimeoutHandler.postDelayed(mLockTimeoutTask, 5000);
-        }
+            mLockTimeoutHandler.postDelayed(mLockTimeoutTask, LOCK_DELAY);
+        mLockTimeoutOn = true;
+        //}
     }
 
     /**
@@ -653,6 +676,7 @@ public class MonitorActivity extends AppCompatActivity
     private final Runnable mLockTimeoutTask = new Runnable() {
         @Override
         public void run() {
+            mLockTimeoutOn = false;
             setLocked(true);
         }
     };
@@ -724,7 +748,10 @@ public class MonitorActivity extends AppCompatActivity
      * Set the session on pause.
      */
     private void pauseSession() {
-        mLockTimeoutHandler.removeCallbacks(mLockTimeoutTask);
+        if (mLockTimeoutOn) {
+            mLockTimeoutHandler.removeCallbacks(mLockTimeoutTask);
+            mLockTimeoutOn = false;
+        }
         mStopwatchBlinkHandler.post(mStopwatchBlinkTask);
         updateActionButton(ACTION_PAUSE);
         mSessionPaused = true;
@@ -737,7 +764,10 @@ public class MonitorActivity extends AppCompatActivity
     private void stopSession() {
         mRecorder.stop();
 
-        mLockTimeoutHandler.removeCallbacks(mLockTimeoutTask);
+        if (mLockTimeoutOn) {
+            mLockTimeoutHandler.removeCallbacks(mLockTimeoutTask);
+            mLockTimeoutOn = false;
+        }
         if (mSessionPaused) {
             mStopwatchBlinkHandler.removeCallbacks(mStopwatchBlinkTask);
             mTextTop.setVisibility(View.VISIBLE);
