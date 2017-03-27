@@ -27,6 +27,9 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * Class handling location updates.
  *
@@ -75,6 +78,18 @@ public class LocationHandler implements
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 535;
 
     /**
+     * Number of distance values stored in the queue. The higher the value,
+     * the smoother the speed or pace calculated.
+     */
+    private static final int DISTANCE_CNT = 4;
+
+    /**
+     * Queue storing the last distance values with the time passed to travel
+     * each distance.
+     */
+    private Queue<DistanceWrapper> mDistanceQueue = new LinkedList<>();
+
+    /**
      * Pending Intent to get data from {@link LocationUpdateService}.
      */
     private PendingIntent mPendingIntent;
@@ -93,11 +108,6 @@ public class LocationHandler implements
      * Time of the last location received.
      */
     private long mLastLocationMillis;
-
-    /**
-     * Kalman filter instance.
-     */
-    private KalmanFilter mKalmanFilter;
 
     /**
      * Activity instance.
@@ -270,8 +280,6 @@ public class LocationHandler implements
         mActivity.registerReceiver(mLocationReceiver, new IntentFilter(
                 LocationUpdateService.LOCATION_NOTIFICATION));
         mLocationUpdatesStarted = true;
-
-        mKalmanFilter = new KalmanFilter(3f);
     }
 
     /**
@@ -299,13 +307,9 @@ public class LocationHandler implements
 
             long locationMillis = location.getTime();
 
-            // Apply Kalman filter
-            mKalmanFilter.process(location.getLatitude(),
-                    location.getLongitude(), location.getAccuracy(),
-                    locationMillis);
-            // Store calculated location
-            Coordinate coordinate = new Coordinate(mKalmanFilter.getLatitude(),
-                    mKalmanFilter.getLongitude(), location.getAltitude());
+            // Coordinate
+            Coordinate coordinate = new Coordinate(location.getLatitude(),
+                    location.getLongitude(), location.getAltitude());
             mCallback.onNewCoordinate(coordinate);
 
             if (mLastCoordinate != null) {
@@ -314,30 +318,21 @@ public class LocationHandler implements
                 float distance = coordinate.distanceTo(mLastCoordinate);
                 mCallback.onNewDistanceValue(distance);
 
-                // Speed / Pace
-                if (!location.hasSpeed()) {
-                    long interval = locationMillis - mLastLocationMillis;
-                    // Calculate speed
-                    float speed = (distance / 1000f) / (interval / 3600000f);
-                    if (speed > 1) {
-                        mCallback.onNewSpeedValue(speed);
-                        mCallback.onNewPaceValue(
-                                Math.round(interval / (distance / 1000f)));
-                    } else {
-                        mCallback.onNewSpeedValue(0);
-                        mCallback.onNewPaceValue(0);
-                    }
+                // Add distance and time to the queue
+                long time = locationMillis - mLastLocationMillis;
+                mDistanceQueue.add(new DistanceWrapper(distance, time));
+                if (mDistanceQueue.size() > DISTANCE_CNT) {
+                    mDistanceQueue.poll();
+                }
+
+                // Speed and pace
+                float speed = (distance / 1000f) / (time / 3600000f);
+                if (speed > 1) {
+                    mCallback.onNewSpeedValue(calculateSpeed());
+                    mCallback.onNewPaceValue(calculatePace());
                 } else {
-                    // Get speed from GPS
-                    float speed = location.getSpeed() * 3.6f;
-                    if (speed > 1) {
-                        mCallback.onNewSpeedValue(speed);
-                        mCallback.onNewPaceValue(
-                                Math.round((60 / speed) * 60000));
-                    } else {
-                        mCallback.onNewSpeedValue(0);
-                        mCallback.onNewPaceValue(0);
-                    }
+                    mCallback.onNewSpeedValue(0);
+                    mCallback.onNewPaceValue(0);
                 }
             }
             mLastCoordinate = coordinate;
@@ -364,4 +359,75 @@ public class LocationHandler implements
                     }
                 }
             };
+
+    /**
+     * Calculate the speed from the distance stored in the queue.
+     *
+     * @return Speed in km/h
+     */
+    private float calculateSpeed() {
+        float totalDistance = 0;
+        long totalTime = 0;
+        for (DistanceWrapper distanceWrapper : mDistanceQueue) {
+            totalDistance += distanceWrapper.getDistance();
+            totalTime += distanceWrapper.getTime();
+        }
+        return (totalDistance / 1000f) / (totalTime / 3600000f);
+    }
+
+    /**
+     * Calculate the pace from the distance stored in the queue.
+     *
+     * @return Pace in milliseconds
+     */
+    private long calculatePace() {
+        float totalDistance = 0;
+        long totalTime = 0;
+        for (DistanceWrapper distanceWrapper : mDistanceQueue) {
+            totalDistance += distanceWrapper.getDistance();
+            totalTime += distanceWrapper.getTime();
+        }
+        return Math.round(totalTime / (totalDistance / 1000f));
+    }
+
+    /**
+     * Class to wrap a distance with the time passed to travel this distance.
+     */
+    private class DistanceWrapper {
+
+        /**
+         * Distance travelled.
+         */
+        private float mDistance;
+
+        /**
+         * Time passed to travel the distance.
+         */
+        private long mTime;
+
+        /**
+         * DistanceWrapper constructor.
+         *
+         * @param distance Distance travelled
+         * @param time     Time passed to travel the distance
+         */
+        DistanceWrapper(final float distance, final long time) {
+            mDistance = distance;
+            mTime = time;
+        }
+
+        /**
+         * @return Distance travelled
+         */
+        final float getDistance() {
+            return mDistance;
+        }
+
+        /**
+         * @return Time passed to travel the distance
+         */
+        final long getTime() {
+            return mTime;
+        }
+    }
 }

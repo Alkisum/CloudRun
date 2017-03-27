@@ -647,11 +647,9 @@ public class MonitorActivity extends AppCompatActivity
      */
     @OnClick(R.id.monitor_button_lock)
     public final void onLockButtonClicked() {
-        //if (mSessionRunning) {
-            setLocked(false);
-            mLockTimeoutHandler.postDelayed(mLockTimeoutTask, LOCK_DELAY);
+        setLocked(false);
+        mLockTimeoutHandler.postDelayed(mLockTimeoutTask, LOCK_DELAY);
         mLockTimeoutOn = true;
-        //}
     }
 
     /**
