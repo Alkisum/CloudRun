@@ -11,10 +11,12 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import com.alkisum.android.ownrun.utils.Pref;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -81,7 +83,7 @@ public class LocationHandler implements
      * Number of distance values stored in the queue. The higher the value,
      * the smoother the speed or pace calculated.
      */
-    private static final int DISTANCE_CNT = 4;
+    public static final int DISTANCE_CNT_DEFAULT = 10;
 
     /**
      * Queue storing the last distance values with the time passed to travel
@@ -321,15 +323,16 @@ public class LocationHandler implements
                 // Add distance and time to the queue
                 long time = locationMillis - mLastLocationMillis;
                 mDistanceQueue.add(new DistanceWrapper(distance, time));
-                if (mDistanceQueue.size() > DISTANCE_CNT) {
+                while (mDistanceQueue.size() > getDistanceCnt()) {
                     mDistanceQueue.poll();
                 }
 
                 // Speed and pace
-                float speed = (distance / 1000f) / (time / 3600000f);
+                float speed = calculateSpeed();
+                long pace = calculatePace();
                 if (speed > 1) {
-                    mCallback.onNewSpeedValue(calculateSpeed());
-                    mCallback.onNewPaceValue(calculatePace());
+                    mCallback.onNewSpeedValue(speed);
+                    mCallback.onNewPaceValue(pace);
                 } else {
                     mCallback.onNewSpeedValue(0);
                     mCallback.onNewPaceValue(0);
@@ -359,6 +362,14 @@ public class LocationHandler implements
                     }
                 }
             };
+
+    /**
+     * @return Distance count from the SharedPreferences
+     */
+    private int getDistanceCnt() {
+        return PreferenceManager.getDefaultSharedPreferences(mActivity).getInt(
+                Pref.DISTANCE_CNT, DISTANCE_CNT_DEFAULT);
+    }
 
     /**
      * Calculate the speed from the distance stored in the queue.

@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.alkisum.android.ownrun.R;
+import com.alkisum.android.ownrun.location.LocationHandler;
 import com.alkisum.android.ownrun.utils.Pref;
 
 import butterknife.ButterKnife;
@@ -18,7 +19,7 @@ import butterknife.ButterKnife;
  * Activity showing the application settings.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 2.2
  * @since 1.1
  */
 public class SettingsActivity extends AppCompatActivity {
@@ -52,11 +53,22 @@ public class SettingsActivity extends AppCompatActivity {
     public static class SettingsFragment extends PreferenceFragment
             implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+        /**
+         * NumberPicker for the distance count.
+         */
+        private NumberPickerPreference mNpDistanceCnt;
+
         @Override
         public final void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
             addPreferencesFromResource(R.xml.preferences);
+
+            // Distance count
+            mNpDistanceCnt = (NumberPickerPreference) findPreference(
+                    Pref.DISTANCE_CNT);
+            mNpDistanceCnt.setSummary(mNpDistanceCnt.getValue()
+                    + getString(R.string.distance_cnt_summary));
 
             // About
             Preference aboutPreference = findPreference(Pref.ABOUT);
@@ -90,6 +102,12 @@ public class SettingsActivity extends AppCompatActivity {
         public final void onSharedPreferenceChanged(
                 final SharedPreferences sharedPreferences, final String key) {
             switch (key) {
+                case Pref.DISTANCE_CNT:
+                    int value = sharedPreferences.getInt(Pref.DISTANCE_CNT,
+                            LocationHandler.DISTANCE_CNT_DEFAULT);
+                    mNpDistanceCnt.setSummary(value + getString(
+                            R.string.distance_cnt_summary));
+                    break;
                 case Pref.SAVE_OWNCLOUD_INFO:
                     if (!sharedPreferences.getBoolean(
                             Pref.SAVE_OWNCLOUD_INFO, false)) {

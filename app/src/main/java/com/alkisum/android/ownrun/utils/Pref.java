@@ -4,7 +4,7 @@ package com.alkisum.android.ownrun.utils;
  * Class defining constants for SharedPreferences.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 2.2
  * @since 1.0
  */
 public final class Pref {
@@ -68,6 +68,11 @@ public final class Pref {
      * Preference key for bottom right tile.
      */
     public static final String TILE_RIGHT_BOTTOM = "bottomRightTile";
+
+    /**
+     * Preference key for distance count.
+     */
+    public static final String DISTANCE_CNT = "distanceCnt";
 
     /**
      * Pref constructor.

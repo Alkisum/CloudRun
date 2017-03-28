@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
         android:title="ownCloud">
@@ -16,6 +17,13 @@
         <SwitchPreference
             android:key="keepScreenOn"
             android:title="Keep screen on"/>
+
+        <com.alkisum.android.ownrun.settings.NumberPickerPreference
+            android:key="distanceCnt"
+            android:title="Speed calculation"
+            app:minValue="1"
+            app:maxValue="100"
+            app:wrapSelectorWheel="false"/>
 
     </PreferenceCategory>
 
