@@ -17,7 +17,7 @@ import org.greenrobot.eventbus.Subscribe;
  * Class recording GPS data.
  *
  * @author Alkisum
- * @version 2.1
+ * @version 2.2
  * @since 1.0
  */
 public class Recorder {
@@ -41,6 +41,16 @@ public class Recorder {
      * Handler for duration task.
      */
     private final Handler mDurationHandler = new Handler();
+
+    /**
+     * Time when the pause started.
+     */
+    private long mPauseStart;
+
+    /**
+     * Total duration when the session was on paysed?
+     */
+    private long mPauseDuration;
 
     /**
      * Recorder constructor.
@@ -73,6 +83,7 @@ public class Recorder {
      * Resume the recorder.
      */
     public final void resume() {
+        mPauseDuration += System.currentTimeMillis() - mPauseStart;
         mDurationHandler.postDelayed(mDurationTask, 1000);
         mEventBus.register(this);
     }
@@ -83,6 +94,7 @@ public class Recorder {
     public final void pause() {
         mEventBus.unregister(this);
         mDurationHandler.removeCallbacks(mDurationTask);
+        mPauseStart = System.currentTimeMillis();
     }
 
     /**
@@ -104,7 +116,8 @@ public class Recorder {
         @Override
         public void run() {
             mDurationHandler.postDelayed(this, 1000);
-            long newDuration = System.currentTimeMillis() - mSession.getStart();
+            long newDuration = System.currentTimeMillis() - mSession.getStart()
+                    - mPauseDuration;
             mSession.setDuration(newDuration);
             mSession.update();
             mCallback.onDurationUpdated(newDuration);

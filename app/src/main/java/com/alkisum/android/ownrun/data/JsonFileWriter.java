@@ -21,7 +21,7 @@ import java.util.List;
  * Task to write the session in JSON object into a file.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 2.2
  * @since 1.0
  */
 public class JsonFileWriter extends AsyncTask<Void, Void,
@@ -83,7 +83,7 @@ public class JsonFileWriter extends AsyncTask<Void, Void,
                 JSONObject jsonObject = buildJsonFromSession(session);
 
                 FileWriter writer = new FileWriter(file);
-                writer.write(jsonObject.toString());
+                writer.write(jsonObject.toString(4));
                 writer.flush();
                 writer.close();
 
