@@ -89,7 +89,7 @@ public class LocationHandler implements
      * Queue storing the last distance values with the time passed to travel
      * each distance.
      */
-    private Queue<DistanceWrapper> mDistanceQueue = new LinkedList<>();
+    private final Queue<DistanceWrapper> mDistanceQueue = new LinkedList<>();
 
     /**
      * Pending Intent to get data from {@link LocationUpdateService}.
@@ -409,12 +409,12 @@ public class LocationHandler implements
         /**
          * Distance travelled.
          */
-        private float mDistance;
+        private final float mDistance;
 
         /**
          * Time passed to travel the distance.
          */
-        private long mTime;
+        private final long mTime;
 
         /**
          * DistanceWrapper constructor.

@@ -3,6 +3,7 @@ package com.alkisum.android.ownrun.history;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.CompoundButtonCompat;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,7 @@ import butterknife.ButterKnife;
  * Adapter for History ListView.
  *
  * @author Alkisum
- * @version 2.1
+ * @version 2.2
  * @since 1.0
  */
 class HistoryListAdapter extends BaseAdapter {
@@ -201,14 +202,16 @@ class HistoryListAdapter extends BaseAdapter {
                     mContext, R.color.primary));
             holder.dateTime.setTextColor(ContextCompat.getColor(
                     mContext, android.R.color.white));
-            holder.checkBox.setSupportButtonTintList(mHighlightedCheckBoxColor);
+            CompoundButtonCompat.setButtonTintList(holder.checkBox,
+                    mHighlightedCheckBoxColor);
         } else {
             // Default item
             holder.layout.setBackgroundColor(ContextCompat.getColor(
                     mContext, android.R.color.transparent));
             holder.dateTime.setTextColor(ContextCompat.getColor(
                     mContext, R.color.accent));
-            holder.checkBox.setSupportButtonTintList(mCheckBoxColor);
+            CompoundButtonCompat.setButtonTintList(holder.checkBox,
+                    mCheckBoxColor);
         }
 
         // Handle checkboxes according to the mode

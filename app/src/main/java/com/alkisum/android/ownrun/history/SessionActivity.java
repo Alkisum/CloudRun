@@ -34,7 +34,7 @@ import com.alkisum.android.ownrun.utils.Json;
 import com.alkisum.android.ownrun.utils.Pref;
 
 import org.osmdroid.api.IMapController;
-import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
@@ -52,7 +52,7 @@ import butterknife.ButterKnife;
  * Activity showing session information.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 2.2
  * @since 2.0
  */
 
@@ -203,7 +203,7 @@ public class SessionActivity extends AppCompatActivity implements
      * Initialize the map.
      */
     private void initMap() {
-        OpenStreetMapTileProviderConstants.setUserAgentValue(
+        Configuration.getInstance().setUserAgentValue(
                 BuildConfig.APPLICATION_ID);
         mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
         mMapView.setMultiTouchControls(true);
