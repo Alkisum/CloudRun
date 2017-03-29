@@ -1,10 +1,16 @@
 package com.alkisum.android.ownrun.utils;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import com.alkisum.android.ownrun.location.LocationHandler;
+
 /**
  * Class defining constants for SharedPreferences.
  *
  * @author Alkisum
- * @version 2.2
+ * @version 2.3
  * @since 1.0
  */
 public final class Pref {
@@ -79,5 +85,26 @@ public final class Pref {
      */
     private Pref() {
 
+    }
+
+    /**
+     * Initialize the preferences with their default values.
+     *
+     * @param context Context
+     */
+    public static void init(final Context context) {
+        SharedPreferences sharedPref = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        if (!sharedPref.contains(SAVE_OWNCLOUD_INFO)) {
+            editor.putBoolean(SAVE_OWNCLOUD_INFO, true);
+        }
+        if (!sharedPref.contains(KEEP_SCREEN_ON)) {
+            editor.putBoolean(KEEP_SCREEN_ON, true);
+        }
+        if (!sharedPref.contains(DISTANCE_CNT)) {
+            editor.putInt(DISTANCE_CNT, LocationHandler.DISTANCE_CNT_DEFAULT);
+        }
+        editor.apply();
     }
 }
