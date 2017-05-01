@@ -1,6 +1,6 @@
 package com.alkisum.android.ownrun.utils;
 
-import com.alkisum.android.jsoncloud.file.json.JsonFile;
+import com.alkisum.android.cloudops.file.json.JsonFile;
 import com.alkisum.android.ownrun.data.Db;
 import com.alkisum.android.ownrun.model.DataPoint;
 import com.alkisum.android.ownrun.model.Session;

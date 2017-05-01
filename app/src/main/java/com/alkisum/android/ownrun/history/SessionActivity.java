@@ -16,10 +16,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alkisum.android.jsoncloud.file.json.JsonFile;
-import com.alkisum.android.jsoncloud.net.ConnectDialog;
-import com.alkisum.android.jsoncloud.net.ConnectInfo;
-import com.alkisum.android.jsoncloud.net.owncloud.OcUploader;
+import com.alkisum.android.cloudops.file.json.JsonFile;
+import com.alkisum.android.cloudops.net.ConnectDialog;
+import com.alkisum.android.cloudops.net.ConnectInfo;
+import com.alkisum.android.cloudops.net.owncloud.OcUploader;
 import com.alkisum.android.ownrun.BuildConfig;
 import com.alkisum.android.ownrun.R;
 import com.alkisum.android.ownrun.data.Deleter;

@@ -9,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.alkisum.android.jsoncloud.utils.CloudPref;
+import com.alkisum.android.cloudops.utils.CloudPref;
 import com.alkisum.android.ownrun.R;
 import com.alkisum.android.ownrun.location.LocationHandler;
 import com.alkisum.android.ownrun.utils.Pref;
