@@ -2,9 +2,7 @@ package com.alkisum.android.ownrun.history;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -18,21 +16,22 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alkisum.android.jsoncloud.file.json.JsonFile;
+import com.alkisum.android.jsoncloud.net.ConnectDialog;
+import com.alkisum.android.jsoncloud.net.ConnectInfo;
+import com.alkisum.android.jsoncloud.net.owncloud.OcUploader;
 import com.alkisum.android.ownrun.BuildConfig;
 import com.alkisum.android.ownrun.R;
 import com.alkisum.android.ownrun.data.Deleter;
-import com.alkisum.android.ownrun.data.JsonFileWriter;
 import com.alkisum.android.ownrun.data.Sessions;
-import com.alkisum.android.ownrun.data.Uploader;
 import com.alkisum.android.ownrun.dialog.ConfirmDialog;
-import com.alkisum.android.ownrun.dialog.ConnectDialog;
 import com.alkisum.android.ownrun.dialog.ErrorDialog;
 import com.alkisum.android.ownrun.model.DataPoint;
 import com.alkisum.android.ownrun.model.Session;
 import com.alkisum.android.ownrun.utils.Format;
 import com.alkisum.android.ownrun.utils.Json;
-import com.alkisum.android.ownrun.utils.Pref;
 
+import org.json.JSONException;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -42,7 +41,6 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -52,12 +50,11 @@ import butterknife.ButterKnife;
  * Activity showing session information.
  *
  * @author Alkisum
- * @version 2.2
+ * @version 2.4
  * @since 2.0
  */
-
 public class SessionActivity extends AppCompatActivity implements
-        ConnectDialog.ConnectDialogListener, Uploader.UploaderListener,
+        ConnectDialog.ConnectDialogListener, OcUploader.UploaderListener,
         Deleter.DeleterListener {
 
     /**
@@ -71,20 +68,15 @@ public class SessionActivity extends AppCompatActivity implements
     private static final int UPLOAD_OPERATION = 1;
 
     /**
-     * SharedPreferences for ownCloud information.
-     */
-    private SharedPreferences mSharedPref;
-
-    /**
      * Instance of the current session.
      */
     private Session mSession;
 
     /**
-     * Uploader instance created when the user presses on the Upload item from
+     * OcUploader instance created when the user presses on the Upload item from
      * the context menu, and initialized when the connect dialog is submit.
      */
-    private Uploader mUploader;
+    private OcUploader mUploader;
 
     /**
      * View containing the OSM.
@@ -117,8 +109,6 @@ public class SessionActivity extends AppCompatActivity implements
             mSession = Sessions.getSessionById(sessionId);
         }
 
-        mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-
         setGui();
     }
 
@@ -133,14 +123,19 @@ public class SessionActivity extends AppCompatActivity implements
     public final boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_upload:
-                mSession.setSelected(true);
-                List<Session> selectedSessions = Sessions.getSelectedSessions();
-                if (!selectedSessions.isEmpty()) {
-                    DialogFragment connectDialogUpload =
-                            ConnectDialog.newInstance(UPLOAD_OPERATION);
-                    connectDialogUpload.show(getSupportFragmentManager(),
-                            ConnectDialog.FRAGMENT_TAG);
-                    mUploader = new Uploader(this, selectedSessions);
+                List<Session> sessions = new ArrayList<>();
+                sessions.add(mSession);
+                DialogFragment connectDialogUpload =
+                        ConnectDialog.newInstance(UPLOAD_OPERATION);
+                connectDialogUpload.show(getSupportFragmentManager(),
+                        ConnectDialog.FRAGMENT_TAG);
+                try {
+                    mUploader = new OcUploader(this,
+                            Json.buildJsonFilesFromSessions(sessions));
+                } catch (JSONException e) {
+                    ErrorDialog.build(this,
+                            getString(R.string.upload_failure_title),
+                            e.getMessage(), null).show();
                 }
                 return true;
             case R.id.action_delete:
@@ -262,20 +257,6 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     /**
-     * Save the connection information (server address, remote path and
-     * username) into the SharedPreferences to pre-fill the connect dialog.
-     *
-     * @param connectInfo Connection information
-     */
-    private void saveConnectInfo(final ConnectInfo connectInfo) {
-        SharedPreferences.Editor editor = mSharedPref.edit();
-        editor.putString(Pref.ADDRESS, connectInfo.getAddress());
-        editor.putString(Pref.PATH, connectInfo.getPath());
-        editor.putString(Pref.USERNAME, connectInfo.getUsername());
-        editor.apply();
-    }
-
-    /**
      * Show dialog to confirm the deletion of the selected sessions.
      */
     private void showDeleteConfirmation() {
@@ -324,10 +305,6 @@ public class SessionActivity extends AppCompatActivity implements
                 mProgressDialog.show();
             }
         });
-
-        if (mSharedPref.getBoolean(Pref.SAVE_OWNCLOUD_INFO, false)) {
-            saveConnectInfo(connectInfo);
-        }
     }
 
     @Override
@@ -346,17 +323,13 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     @Override
-    public final void onUploadStart(final JsonFileWriter.Wrapper wrapper) {
+    public final void onUploadStart(final JsonFile jsonFile) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (mProgressDialog != null) {
                     mProgressDialog.setMessage("Uploading "
-                            + Json.FILE_PREFIX
-                            + Format.DATE_TIME_JSON.format(new Date(
-                            wrapper.getSession().getStart()))
-                            + Json.FILE_EXT
-                            + " ...");
+                            + jsonFile.getName() + Json.FILE_EXT + " ...");
                     mProgressDialog.setIndeterminate(false);
                 }
             }

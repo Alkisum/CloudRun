@@ -3,9 +3,7 @@ package com.alkisum.android.ownrun.history;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,22 +16,25 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alkisum.android.jsoncloud.file.json.JsonFile;
+import com.alkisum.android.jsoncloud.net.ConnectDialog;
+import com.alkisum.android.jsoncloud.net.ConnectInfo;
+import com.alkisum.android.jsoncloud.net.owncloud.OcDownloader;
+import com.alkisum.android.jsoncloud.net.owncloud.OcUploader;
 import com.alkisum.android.ownrun.R;
 import com.alkisum.android.ownrun.data.Deleter;
-import com.alkisum.android.ownrun.data.Downloader;
-import com.alkisum.android.ownrun.data.JsonFileWriter;
+import com.alkisum.android.ownrun.data.Inserter;
 import com.alkisum.android.ownrun.data.Sessions;
-import com.alkisum.android.ownrun.data.Uploader;
 import com.alkisum.android.ownrun.dialog.ConfirmDialog;
-import com.alkisum.android.ownrun.dialog.ConnectDialog;
 import com.alkisum.android.ownrun.dialog.ErrorDialog;
 import com.alkisum.android.ownrun.model.Session;
-import com.alkisum.android.ownrun.utils.Format;
 import com.alkisum.android.ownrun.utils.Json;
-import com.alkisum.android.ownrun.utils.Pref;
 import com.owncloud.android.lib.resources.files.RemoteFile;
 
-import java.util.Date;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -44,12 +45,13 @@ import butterknife.OnClick;
  * Activity listing the history of sessions.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 2.4
  * @since 1.0
  */
 public class HistoryActivity extends AppCompatActivity implements
-        ConnectDialog.ConnectDialogListener, Uploader.UploaderListener,
-        Downloader.DownloaderListener, Deleter.DeleterListener {
+        ConnectDialog.ConnectDialogListener, OcUploader.UploaderListener,
+        OcDownloader.OcDownloaderListener, Deleter.DeleterListener,
+        Inserter.InserterListener {
 
     /**
      * Argument for the session's ID that has just been stopped. This ID is
@@ -121,16 +123,16 @@ public class HistoryActivity extends AppCompatActivity implements
     private ProgressDialog mProgressDialog;
 
     /**
-     * Downloader instance created when the user presses on the Download item
+     * OcDownloader instance created when the user presses on the Download item
      * from the context menu, and initialized when the connect dialog is submit.
      */
-    private Downloader mDownloader;
+    private OcDownloader mDownloader;
 
     /**
-     * Uploader instance created when the user presses on the Upload item from
+     * OcUploader instance created when the user presses on the Upload item from
      * the context menu, and initialized when the connect dialog is submit.
      */
-    private Uploader mUploader;
+    private OcUploader mUploader;
 
     /**
      * ID of the session that should be highlighted.
@@ -142,11 +144,6 @@ public class HistoryActivity extends AppCompatActivity implements
      * ID is null if no session is running.
      */
     private Long mIgnoreSessionId;
-
-    /**
-     * SharedPreferences for ownCloud information.
-     */
-    private SharedPreferences mSharedPref;
 
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
@@ -163,8 +160,6 @@ public class HistoryActivity extends AppCompatActivity implements
             mHighlightedSessionId = extras.getLong(ARG_HIGHLIGHTED_SESSION_ID);
             mIgnoreSessionId = extras.getLong(ARG_IGNORE_SESSION_ID);
         }
-
-        mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
         Sessions.fixSessions(mIgnoreSessionId);
 
@@ -265,7 +260,7 @@ public class HistoryActivity extends AppCompatActivity implements
                         ConnectDialog.newInstance(DOWNLOAD_OPERATION);
                 connectDialogDownload.show(getSupportFragmentManager(),
                         ConnectDialog.FRAGMENT_TAG);
-                mDownloader = new Downloader(this);
+                mDownloader = new OcDownloader(this);
                 return true;
             case R.id.action_upload:
                 List<Session> selectedSessions = Sessions.getSelectedSessions();
@@ -274,7 +269,15 @@ public class HistoryActivity extends AppCompatActivity implements
                             ConnectDialog.newInstance(UPLOAD_OPERATION);
                     connectDialogUpload.show(getSupportFragmentManager(),
                             ConnectDialog.FRAGMENT_TAG);
-                    mUploader = new Uploader(this, selectedSessions);
+                    try {
+                        mUploader = new OcUploader(this,
+                                Json.buildJsonFilesFromSessions(
+                                        selectedSessions));
+                    } catch (JSONException e) {
+                        ErrorDialog.build(this,
+                                getString(R.string.upload_failure_title),
+                                e.getMessage(), null).show();
+                    }
                 }
                 return true;
             case R.id.action_delete:
@@ -399,10 +402,6 @@ public class HistoryActivity extends AppCompatActivity implements
                 mProgressDialog.show();
             }
         });
-
-        if (mSharedPref.getBoolean(Pref.SAVE_OWNCLOUD_INFO, false)) {
-            saveConnectInfo(connectInfo);
-        }
     }
 
     /**
@@ -435,20 +434,6 @@ public class HistoryActivity extends AppCompatActivity implements
                 connectInfo.getPath(),
                 connectInfo.getUsername(),
                 connectInfo.getPassword()).start();
-    }
-
-    /**
-     * Save the connection information (server address, remote path and
-     * username) into the SharedPreferences to pre-fill the connect dialog.
-     *
-     * @param connectInfo Connection information
-     */
-    private void saveConnectInfo(final ConnectInfo connectInfo) {
-        SharedPreferences.Editor editor = mSharedPref.edit();
-        editor.putString(Pref.ADDRESS, connectInfo.getAddress());
-        editor.putString(Pref.PATH, connectInfo.getPath());
-        editor.putString(Pref.USERNAME, connectInfo.getUsername());
-        editor.apply();
     }
 
     @Override
@@ -497,7 +482,8 @@ public class HistoryActivity extends AppCompatActivity implements
             @Override
             public void run() {
                 if (mProgressDialog != null) {
-                    mProgressDialog.setMessage("Processing data ...");
+                    mProgressDialog.setMessage(
+                            getString(R.string.download_reading_msg));
                     mProgressDialog.setProgressPercentFormat(null);
                     mProgressDialog.setIndeterminate(true);
                 }
@@ -520,7 +506,60 @@ public class HistoryActivity extends AppCompatActivity implements
     }
 
     @Override
-    public final void onSessionsInserted() {
+    public final void onJsonFilesRead(final List<JsonFile> jsonFiles) {
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        for (JsonFile jsonFile : jsonFiles) {
+            if (Json.isFileNameValid(jsonFile)
+                    && !Json.isSessionAlreadyInDb(jsonFile)) {
+                jsonObjects.add(jsonFile.getJsonObject());
+            }
+        }
+
+        if (jsonObjects.isEmpty()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mProgressDialog != null) {
+                        mProgressDialog.dismiss();
+                    }
+                    Toast.makeText(HistoryActivity.this, getString(R.string.
+                            download_no_file_toast),
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+        } else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mProgressDialog != null) {
+                        mProgressDialog.setMessage(
+                                getString(R.string.download_inserting_msg));
+                        mProgressDialog.setProgressPercentFormat(null);
+                        mProgressDialog.setIndeterminate(true);
+                    }
+                }
+            });
+            new Inserter(this, jsonObjects).execute();
+        }
+    }
+
+    @Override
+    public final void onReadingFileFailed(final Exception e) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mProgressDialog != null) {
+                    mProgressDialog.dismiss();
+                }
+                ErrorDialog.build(HistoryActivity.this,
+                        getString(R.string.download_reading_failure_title),
+                        e.getMessage(), null).show();
+            }
+        });
+    }
+
+    @Override
+    public final void onDataInserted() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -535,7 +574,7 @@ public class HistoryActivity extends AppCompatActivity implements
     }
 
     @Override
-    public final void onReadingFileFailed(final Exception e) {
+    public final void onInsertDataFailed(final Exception e) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -543,7 +582,7 @@ public class HistoryActivity extends AppCompatActivity implements
                     mProgressDialog.dismiss();
                 }
                 ErrorDialog.build(HistoryActivity.this,
-                        getString(R.string.download_reading_failure_title),
+                        getString(R.string.download_insert_failure_title),
                         e.getMessage(), null).show();
             }
         });
@@ -565,17 +604,13 @@ public class HistoryActivity extends AppCompatActivity implements
     }
 
     @Override
-    public final void onUploadStart(final JsonFileWriter.Wrapper wrapper) {
+    public final void onUploadStart(final JsonFile jsonFile) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (mProgressDialog != null) {
                     mProgressDialog.setMessage("Uploading "
-                            + Json.FILE_PREFIX
-                            + Format.DATE_TIME_JSON.format(new Date(
-                            wrapper.getSession().getStart()))
-                            + Json.FILE_EXT
-                            + " ...");
+                            + jsonFile.getName() + Json.FILE_EXT + " ...");
                     mProgressDialog.setIndeterminate(false);
                 }
             }

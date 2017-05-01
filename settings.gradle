@@ -1,1 +1,2 @@
-include ':app'
+include ':jsoncloud', ':app'
+project(':jsoncloud').projectDir = new File(settingsDir, '../jsonCloud/jsoncloud')

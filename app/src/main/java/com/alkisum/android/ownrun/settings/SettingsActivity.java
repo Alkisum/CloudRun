@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.alkisum.android.jsoncloud.utils.CloudPref;
 import com.alkisum.android.ownrun.R;
 import com.alkisum.android.ownrun.location.LocationHandler;
 import com.alkisum.android.ownrun.utils.Pref;
@@ -19,7 +20,7 @@ import butterknife.ButterKnife;
  * Activity showing the application settings.
  *
  * @author Alkisum
- * @version 2.2
+ * @version 2.4
  * @since 1.1
  */
 public class SettingsActivity extends AppCompatActivity {
@@ -108,9 +109,9 @@ public class SettingsActivity extends AppCompatActivity {
                     mNpDistanceCnt.setSummary(value + getString(
                             R.string.distance_cnt_summary));
                     break;
-                case Pref.SAVE_OWNCLOUD_INFO:
+                case CloudPref.SAVE_OWNCLOUD_INFO:
                     if (!sharedPreferences.getBoolean(
-                            Pref.SAVE_OWNCLOUD_INFO, false)) {
+                            CloudPref.SAVE_OWNCLOUD_INFO, false)) {
                         discardOwnCloudInfo(sharedPreferences);
                     }
                     break;
@@ -127,9 +128,9 @@ public class SettingsActivity extends AppCompatActivity {
          */
         private void discardOwnCloudInfo(final SharedPreferences sharedPref) {
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString(Pref.ADDRESS, "");
-            editor.putString(Pref.PATH, "");
-            editor.putString(Pref.USERNAME, "");
+            editor.putString(CloudPref.ADDRESS, "");
+            editor.putString(CloudPref.PATH, "");
+            editor.putString(CloudPref.USERNAME, "");
             editor.apply();
         }
     }
