@@ -1,10 +1,9 @@
 package com.alkisum.android.ownrun.history;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -13,28 +12,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alkisum.android.cloudops.file.json.JsonFile;
+import com.alkisum.android.cloudops.events.DownloadEvent;
+import com.alkisum.android.cloudops.events.JsonFileReaderEvent;
+import com.alkisum.android.cloudops.events.JsonFileWriterEvent;
+import com.alkisum.android.cloudops.events.UploadEvent;
 import com.alkisum.android.cloudops.net.ConnectDialog;
 import com.alkisum.android.cloudops.net.ConnectInfo;
-import com.alkisum.android.cloudops.net.owncloud.OcDownloader;
-import com.alkisum.android.cloudops.net.owncloud.OcUploader;
 import com.alkisum.android.ownrun.R;
 import com.alkisum.android.ownrun.data.Deleter;
-import com.alkisum.android.ownrun.data.Inserter;
 import com.alkisum.android.ownrun.data.Sessions;
 import com.alkisum.android.ownrun.dialog.ConfirmDialog;
 import com.alkisum.android.ownrun.dialog.ErrorDialog;
+import com.alkisum.android.ownrun.event.DeleteEvent;
+import com.alkisum.android.ownrun.event.InsertEvent;
+import com.alkisum.android.ownrun.net.Downloader;
 import com.alkisum.android.ownrun.model.Session;
-import com.alkisum.android.ownrun.utils.Json;
-import com.owncloud.android.lib.resources.files.RemoteFile;
+import com.alkisum.android.ownrun.net.Uploader;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -45,13 +48,15 @@ import butterknife.OnClick;
  * Activity listing the history of sessions.
  *
  * @author Alkisum
- * @version 2.4
+ * @version 3.0
  * @since 1.0
  */
 public class HistoryActivity extends AppCompatActivity implements
-        ConnectDialog.ConnectDialogListener, OcUploader.UploaderListener,
-        OcDownloader.OcDownloaderListener, Deleter.DeleterListener,
-        Inserter.InserterListener {
+        ConnectDialog.ConnectDialogListener {
+    /**
+     * Subscriber id to use when receiving event.
+     */
+    private static final int SUBSCRIBER_ID = 627;
 
     /**
      * Argument for the session's ID that has just been stopped. This ID is
@@ -101,6 +106,12 @@ public class HistoryActivity extends AppCompatActivity implements
     Toolbar mToolbar;
 
     /**
+     * SwipeRefreshLayout for list view.
+     */
+    @BindView(R.id.history_swipe_refresh_layout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+
+    /**
      * ListView containing the sessions.
      */
     @BindView(R.id.history_list)
@@ -113,26 +124,15 @@ public class HistoryActivity extends AppCompatActivity implements
     TextView mNoSessionTextView;
 
     /**
+     * Progress bar to show the progress of operations.
+     */
+    @BindView(R.id.history_progressbar)
+    ProgressBar mProgressBar;
+
+    /**
      * List adapter for the list of session.
      */
     private HistoryListAdapter mListAdapter;
-
-    /**
-     * Progress dialog to show the progress of uploading.
-     */
-    private ProgressDialog mProgressDialog;
-
-    /**
-     * OcDownloader instance created when the user presses on the Download item
-     * from the context menu, and initialized when the connect dialog is submit.
-     */
-    private OcDownloader mDownloader;
-
-    /**
-     * OcUploader instance created when the user presses on the Upload item from
-     * the context menu, and initialized when the connect dialog is submit.
-     */
-    private OcUploader mUploader;
 
     /**
      * ID of the session that should be highlighted.
@@ -164,6 +164,9 @@ public class HistoryActivity extends AppCompatActivity implements
         Sessions.fixSessions(mIgnoreSessionId);
 
         setGui();
+
+        // Register onCreate to receive events even when SessionActivity is open
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -177,6 +180,12 @@ public class HistoryActivity extends AppCompatActivity implements
                 refreshList();
             }
         }
+    }
+
+    @Override
+    public final void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
     /**
@@ -233,6 +242,16 @@ public class HistoryActivity extends AppCompatActivity implements
         mListAdapter = new HistoryListAdapter(this, sessions,
                 mHighlightedSessionId);
         mListView.setAdapter(mListAdapter);
+
+        mSwipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        refreshList();
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+        );
     }
 
     @Override
@@ -256,28 +275,19 @@ public class HistoryActivity extends AppCompatActivity implements
     public final boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_download:
-                DialogFragment connectDialogDownload =
+                ConnectDialog connectDialogDownload =
                         ConnectDialog.newInstance(DOWNLOAD_OPERATION);
+                connectDialogDownload.setCallback(this);
                 connectDialogDownload.show(getSupportFragmentManager(),
                         ConnectDialog.FRAGMENT_TAG);
-                mDownloader = new OcDownloader(this);
                 return true;
             case R.id.action_upload:
-                List<Session> selectedSessions = Sessions.getSelectedSessions();
-                if (!selectedSessions.isEmpty()) {
-                    DialogFragment connectDialogUpload =
+                if (!Sessions.getSelectedSessions().isEmpty()) {
+                    ConnectDialog connectDialogUpload =
                             ConnectDialog.newInstance(UPLOAD_OPERATION);
+                    connectDialogUpload.setCallback(this);
                     connectDialogUpload.show(getSupportFragmentManager(),
                             ConnectDialog.FRAGMENT_TAG);
-                    try {
-                        mUploader = new OcUploader(this,
-                                Json.buildJsonFilesFromSessions(
-                                        selectedSessions));
-                    } catch (JSONException e) {
-                        ErrorDialog.build(this,
-                                getString(R.string.upload_failure_title),
-                                e.getMessage(), null).show();
-                    }
                 }
                 return true;
             case R.id.action_delete:
@@ -352,13 +362,9 @@ public class HistoryActivity extends AppCompatActivity implements
      * Execute the task to delete the selected sessions.
      */
     private void deleteSelectedSessions() {
-        new Deleter(this).execute();
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        mProgressDialog.setProgressNumberFormat(null);
-        mProgressDialog.setMessage(getString(R.string.history_delete_progress));
-        mProgressDialog.show();
+        new Deleter(new Integer[]{SUBSCRIBER_ID}).execute();
+        mProgressBar.setIndeterminate(true);
+        mProgressBar.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -384,291 +390,180 @@ public class HistoryActivity extends AppCompatActivity implements
     public final void onSubmit(final int operation,
                                final ConnectInfo connectInfo) {
         if (operation == DOWNLOAD_OPERATION) {
-            startDownload(connectInfo);
+            new Downloader(getApplicationContext(), connectInfo,
+                    new Intent(this, HistoryActivity.class), SUBSCRIBER_ID);
         } else if (operation == UPLOAD_OPERATION) {
-            startUpload(connectInfo);
+            try {
+                new Uploader(getApplicationContext(), connectInfo,
+                        new Intent(this, HistoryActivity.class),
+                        Sessions.getSelectedSessions(), SUBSCRIBER_ID);
+            } catch (JSONException e) {
+                ErrorDialog.build(this,
+                        getString(R.string.upload_failure_title),
+                        e.getMessage(), null).show();
+            }
         }
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mProgressDialog = new ProgressDialog(HistoryActivity.this);
-                mProgressDialog.setIndeterminate(true);
-                mProgressDialog.setProgressStyle(
-                        ProgressDialog.STYLE_HORIZONTAL);
-                mProgressDialog.setProgressNumberFormat(null);
-                mProgressDialog.setMessage(getString(
-                        R.string.operation_progress_init_msg));
-                mProgressDialog.show();
+                mProgressBar.setIndeterminate(true);
+                mProgressBar.setVisibility(View.VISIBLE);
             }
         });
     }
 
     /**
-     * Start the download operation.
+     * Triggered on download event.
      *
-     * @param connectInfo Connection information given by user
+     * @param event Download event
      */
-    private void startDownload(final ConnectInfo connectInfo) {
-        if (mDownloader == null) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final void onDownloadEvent(final DownloadEvent event) {
+        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
-        mDownloader.init(
-                connectInfo.getAddress(),
-                connectInfo.getPath(),
-                connectInfo.getUsername(),
-                connectInfo.getPassword()).start();
+        switch (event.getResult()) {
+            case DownloadEvent.DOWNLOADING:
+                mProgressBar.setVisibility(View.VISIBLE);
+                break;
+            case DownloadEvent.OK:
+                mProgressBar.setVisibility(View.VISIBLE);
+                break;
+            case DownloadEvent.NO_FILE:
+                Toast.makeText(this, getString(R.string.download_no_file_toast),
+                        Toast.LENGTH_LONG).show();
+                mProgressBar.setVisibility(View.GONE);
+                break;
+            case DownloadEvent.ERROR:
+                ErrorDialog.build(this,
+                        getString(R.string.download_failure_title),
+                        event.getMessage(), null).show();
+                mProgressBar.setVisibility(View.GONE);
+                break;
+            default:
+                break;
+        }
     }
 
     /**
-     * Start the upload operation.
+     * Triggered on JSON file reader event.
      *
-     * @param connectInfo Connection information given by user
+     * @param event JSON file reader event
      */
-    private void startUpload(final ConnectInfo connectInfo) {
-        if (mUploader == null) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final void onJsonFileReaderEvent(final JsonFileReaderEvent event) {
+        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
-        mUploader.init(
-                connectInfo.getAddress(),
-                connectInfo.getPath(),
-                connectInfo.getUsername(),
-                connectInfo.getPassword()).start();
-    }
-
-    @Override
-    public final void onDownloadStart(final RemoteFile file) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.setMessage("Downloading "
-                            + file.getRemotePath() + " ...");
-                    mProgressDialog.setIndeterminate(false);
-                }
-            }
-        });
-    }
-
-    @Override
-    public final void onNoFileToDownload() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
-                Toast.makeText(HistoryActivity.this, getString(R.string.
-                        download_no_file_toast), Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    @Override
-    public final void onDownloading(final int percentage) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.setProgress(percentage);
-                }
-            }
-        });
-    }
-
-    @Override
-    public final void onAllDownloadComplete() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.setMessage(
-                            getString(R.string.download_reading_msg));
-                    mProgressDialog.setProgressPercentFormat(null);
-                    mProgressDialog.setIndeterminate(true);
-                }
-            }
-        });
-    }
-
-    @Override
-    public final void onDownloadFailed(final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
-                ErrorDialog.build(HistoryActivity.this, getString(
-                        R.string.download_failure_title), message, null).show();
-            }
-        });
-    }
-
-    @Override
-    public final void onJsonFilesRead(final List<JsonFile> jsonFiles) {
-        List<JSONObject> jsonObjects = new ArrayList<>();
-        for (JsonFile jsonFile : jsonFiles) {
-            if (Json.isFileNameValid(jsonFile)
-                    && !Json.isSessionAlreadyInDb(jsonFile)) {
-                jsonObjects.add(jsonFile.getJsonObject());
-            }
-        }
-
-        if (jsonObjects.isEmpty()) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (mProgressDialog != null) {
-                        mProgressDialog.dismiss();
-                    }
-                    Toast.makeText(HistoryActivity.this, getString(R.string.
-                            download_no_file_toast),
-                            Toast.LENGTH_LONG).show();
-                }
-            });
-        } else {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (mProgressDialog != null) {
-                        mProgressDialog.setMessage(
-                                getString(R.string.download_inserting_msg));
-                        mProgressDialog.setProgressPercentFormat(null);
-                        mProgressDialog.setIndeterminate(true);
-                    }
-                }
-            });
-            new Inserter(this, jsonObjects).execute();
-        }
-    }
-
-    @Override
-    public final void onReadingFileFailed(final Exception e) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
-                ErrorDialog.build(HistoryActivity.this,
+        switch (event.getResult()) {
+            case JsonFileReaderEvent.OK:
+                mProgressBar.setVisibility(View.VISIBLE);
+                break;
+            case JsonFileReaderEvent.ERROR:
+                ErrorDialog.build(this,
                         getString(R.string.download_reading_failure_title),
-                        e.getMessage(), null).show();
-            }
-        });
+                        event.getException().getMessage(), null).show();
+                mProgressBar.setVisibility(View.GONE);
+                break;
+            default:
+                break;
+        }
     }
 
-    @Override
-    public final void onDataInserted() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
+    /**
+     * Triggered on inserter event.
+     *
+     * @param event Inserter event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final void onInsertEvent(final InsertEvent event) {
+        switch (event.getResult()) {
+            case InsertEvent.OK:
                 refreshList();
-                Toast.makeText(HistoryActivity.this, getString(R.string.
+                Toast.makeText(this, getString(R.string.
                         download_success_toast), Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    @Override
-    public final void onInsertDataFailed(final Exception e) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
-                ErrorDialog.build(HistoryActivity.this,
+                mProgressBar.setVisibility(View.GONE);
+                break;
+            case InsertEvent.ERROR:
+                ErrorDialog.build(this,
                         getString(R.string.download_insert_failure_title),
-                        e.getMessage(), null).show();
-            }
-        });
+                        event.getException().getMessage(), null).show();
+                mProgressBar.setVisibility(View.GONE);
+                break;
+            default:
+                break;
+        }
     }
 
-    @Override
-    public final void onWritingFileFailed(final Exception e) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
-                ErrorDialog.build(HistoryActivity.this,
+    /**
+     * Triggered on JSON file writer event.
+     *
+     * @param event JSON file writer event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final void onJsonFileWriterEvent(final JsonFileWriterEvent event) {
+        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+            return;
+        }
+        switch (event.getResult()) {
+            case JsonFileWriterEvent.OK:
+                mProgressBar.setVisibility(View.VISIBLE);
+                break;
+            case JsonFileWriterEvent.ERROR:
+                ErrorDialog.build(this,
                         getString(R.string.upload_writing_failure_title),
-                        e.getMessage(), null).show();
-            }
-        });
+                        event.getException().getMessage(), null).show();
+                mProgressBar.setVisibility(View.GONE);
+                break;
+            default:
+                break;
+        }
     }
 
-    @Override
-    public final void onUploadStart(final JsonFile jsonFile) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.setMessage("Uploading "
-                            + jsonFile.getName() + Json.FILE_EXT + " ...");
-                    mProgressDialog.setIndeterminate(false);
-                }
-            }
-        });
-    }
-
-    @Override
-    public final void onUploading(final int percentage) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.setProgress(percentage);
-                }
-            }
-        });
-    }
-
-    @Override
-    public final void onAllUploadComplete() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
-                Toast.makeText(HistoryActivity.this,
+    /**
+     * Triggered on upload event.
+     *
+     * @param event Upload event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final void onUploadEvent(final UploadEvent event) {
+        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+            return;
+        }
+        switch (event.getResult()) {
+            case UploadEvent.UPLOADING:
+                mProgressBar.setVisibility(View.VISIBLE);
+                break;
+            case UploadEvent.OK:
+                Toast.makeText(this,
                         getString(R.string.history_upload_success_toast),
                         Toast.LENGTH_LONG).show();
-            }
-        });
+                mProgressBar.setVisibility(View.GONE);
+                break;
+            case UploadEvent.ERROR:
+                ErrorDialog.build(this, getString(
+                        R.string.upload_failure_title), event.getMessage(),
+                        null).show();
+                mProgressBar.setVisibility(View.GONE);
+                break;
+            default:
+                break;
+        }
     }
 
-    @Override
-    public final void onUploadFailed(final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
-                ErrorDialog.build(HistoryActivity.this, getString(
-                        R.string.upload_failure_title), message, null).show();
-            }
-        });
-    }
-
-    @Override
-    public final void onSessionsDeleted() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
-                refreshList();
-            }
-        });
+    /**
+     * Triggered on delete event.
+     *
+     * @param event Delete event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final void onDeleteEvent(final DeleteEvent event) {
+        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+            return;
+        }
+        mProgressBar.setVisibility(View.GONE);
+        refreshList();
     }
 
     @Override

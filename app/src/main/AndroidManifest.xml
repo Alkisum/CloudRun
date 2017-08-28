@@ -28,10 +28,12 @@
         </activity>
         <activity
             android:name=".history.HistoryActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".history.SessionActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".history.AddSessionActivity"
             android:configChanges="orientation|screenSize"/>

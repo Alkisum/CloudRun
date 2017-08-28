@@ -10,13 +10,30 @@
         android:id="@+id/history_toolbar"
         style="@style/toolbar"/>
 
-    <ListView
-        android:id="@+id/history_list"
+    <ProgressBar
+        android:id="@+id/history_progressbar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/history_toolbar"
+        android:layout_marginTop="-7dp"
+        android:indeterminate="true"
+        android:visibility="gone"/>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/history_swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/history_toolbar"
-        android:paddingBottom="88dp"/>
+        android:layout_below="@id/history_progressbar"
+        android:paddingBottom="88dp">
+
+        <ListView
+            android:id="@+id/history_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <TextView
         android:id="@+id/history_no_session"

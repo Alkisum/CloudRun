@@ -1,9 +1,8 @@
 package com.alkisum.android.ownrun.history;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,25 +11,30 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alkisum.android.cloudops.file.json.JsonFile;
+import com.alkisum.android.cloudops.events.JsonFileWriterEvent;
+import com.alkisum.android.cloudops.events.UploadEvent;
 import com.alkisum.android.cloudops.net.ConnectDialog;
 import com.alkisum.android.cloudops.net.ConnectInfo;
-import com.alkisum.android.cloudops.net.owncloud.OcUploader;
 import com.alkisum.android.ownrun.BuildConfig;
 import com.alkisum.android.ownrun.R;
 import com.alkisum.android.ownrun.data.Deleter;
 import com.alkisum.android.ownrun.data.Sessions;
 import com.alkisum.android.ownrun.dialog.ConfirmDialog;
 import com.alkisum.android.ownrun.dialog.ErrorDialog;
+import com.alkisum.android.ownrun.event.DeleteEvent;
 import com.alkisum.android.ownrun.model.DataPoint;
 import com.alkisum.android.ownrun.model.Session;
+import com.alkisum.android.ownrun.net.Uploader;
 import com.alkisum.android.ownrun.utils.Format;
-import com.alkisum.android.ownrun.utils.Json;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -50,12 +54,16 @@ import butterknife.ButterKnife;
  * Activity showing session information.
  *
  * @author Alkisum
- * @version 2.4
+ * @version 3.0
  * @since 2.0
  */
 public class SessionActivity extends AppCompatActivity implements
-        ConnectDialog.ConnectDialogListener, OcUploader.UploaderListener,
-        Deleter.DeleterListener {
+        ConnectDialog.ConnectDialogListener {
+
+    /**
+     * Subscriber id to use when receiving event.
+     */
+    private static final int SUBSCRIBER_ID = 639;
 
     /**
      * Argument for session id.
@@ -73,12 +81,6 @@ public class SessionActivity extends AppCompatActivity implements
     private Session mSession;
 
     /**
-     * OcUploader instance created when the user presses on the Upload item from
-     * the context menu, and initialized when the connect dialog is submit.
-     */
-    private OcUploader mUploader;
-
-    /**
      * View containing the OSM.
      */
     @BindView(R.id.session_map)
@@ -91,9 +93,10 @@ public class SessionActivity extends AppCompatActivity implements
     TextView mTextViewNoData;
 
     /**
-     * Progress dialog to show the progress of uploading.
+     * Progress bar to show the progress of operations.
      */
-    private ProgressDialog mProgressDialog;
+    @BindView(R.id.session_progressbar)
+    ProgressBar mProgressBar;
 
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
@@ -113,47 +116,22 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     @Override
-    public final boolean onCreateOptionsMenu(final Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_session, menu);
-        return super.onCreateOptionsMenu(menu);
+    public final void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
     }
 
     @Override
-    public final boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_upload:
-                List<Session> sessions = new ArrayList<>();
-                sessions.add(mSession);
-                DialogFragment connectDialogUpload =
-                        ConnectDialog.newInstance(UPLOAD_OPERATION);
-                connectDialogUpload.show(getSupportFragmentManager(),
-                        ConnectDialog.FRAGMENT_TAG);
-                try {
-                    mUploader = new OcUploader(this,
-                            Json.buildJsonFilesFromSessions(sessions));
-                } catch (JSONException e) {
-                    ErrorDialog.build(this,
-                            getString(R.string.upload_failure_title),
-                            e.getMessage(), null).show();
-                }
-                return true;
-            case R.id.action_delete:
-                mSession.setSelected(true);
-                if (!Sessions.getSelectedSessions().isEmpty()) {
-                    showDeleteConfirmation();
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+    public final void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     /**
      * Set the GUI.
      */
     private void setGui() {
-        Toolbar toolbar = ButterKnife.findById(this, R.id.session_toolbar);
+        Toolbar toolbar = findViewById(R.id.session_toolbar);
         toolbar.setTitle(Format.DATE_TIME_HISTORY.format(mSession.getStart()));
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
@@ -174,23 +152,47 @@ public class SessionActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    public final boolean onCreateOptionsMenu(final Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_session, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public final boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_upload:
+                ConnectDialog connectDialogUpload =
+                        ConnectDialog.newInstance(UPLOAD_OPERATION);
+                connectDialogUpload.setCallback(this);
+                connectDialogUpload.show(getSupportFragmentManager(),
+                        ConnectDialog.FRAGMENT_TAG);
+                return true;
+            case R.id.action_delete:
+                mSession.setSelected(true);
+                if (!Sessions.getSelectedSessions().isEmpty()) {
+                    showDeleteConfirmation();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     /**
      * Initialize the tiles.
      */
     private void initTiles() {
         long duration = mSession.getDuration();
         float distance = mSession.getDistance();
-        TextView durationTextView = ButterKnife.findById(
-                this, R.id.session_txt_duration);
+        TextView durationTextView = findViewById(R.id.session_txt_duration);
         durationTextView.setText(Format.formatDuration(duration));
-        TextView distanceTextView = ButterKnife.findById(
-                this, R.id.session_txt_distance);
+        TextView distanceTextView = findViewById(R.id.session_txt_distance);
         distanceTextView.setText(Format.formatDistance(distance));
-        TextView speedTextView = ButterKnife.findById(
-                this, R.id.session_txt_speed);
+        TextView speedTextView = findViewById(R.id.session_txt_speed);
         speedTextView.setText(Format.formatSpeedAvg(duration, distance));
-        TextView paceTextView = ButterKnife.findById(
-                this, R.id.session_txt_pace);
+        TextView paceTextView = findViewById(R.id.session_txt_pace);
         paceTextView.setText(Format.formatPaceAvg(duration, distance));
     }
 
@@ -215,8 +217,7 @@ public class SessionActivity extends AppCompatActivity implements
         polyline.setWidth(2f);
 
         final BoundingBox boundingBox = BoundingBox.fromGeoPoints(wayPoints);
-        final RelativeLayout layout = ButterKnife.findById(
-                this, R.id.session_layout);
+        final RelativeLayout layout = findViewById(R.id.session_layout);
         ViewTreeObserver vto = layout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -241,22 +242,6 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     /**
-     * Start the upload operation.
-     *
-     * @param connectInfo Connection information given by user
-     */
-    private void startUpload(final ConnectInfo connectInfo) {
-        if (mUploader == null) {
-            return;
-        }
-        mUploader.init(
-                connectInfo.getAddress(),
-                connectInfo.getPath(),
-                connectInfo.getUsername(),
-                connectInfo.getPassword()).start();
-    }
-
-    /**
      * Show dialog to confirm the deletion of the selected sessions.
      */
     private void showDeleteConfirmation() {
@@ -276,118 +261,105 @@ public class SessionActivity extends AppCompatActivity implements
      * Execute the task to delete the selected sessions.
      */
     private void deleteSession() {
-        new Deleter(this).execute();
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        mProgressDialog.setProgressNumberFormat(null);
-        mProgressDialog.setMessage(getString(R.string.session_delete_progress));
-        mProgressDialog.show();
+        new Deleter(new Integer[]{SUBSCRIBER_ID}).execute();
+        mProgressBar.setIndeterminate(true);
+        mProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public final void onSubmit(final int operation,
                                final ConnectInfo connectInfo) {
         if (operation == UPLOAD_OPERATION) {
-            startUpload(connectInfo);
+            try {
+                Intent intent = new Intent(this, SessionActivity.class);
+                intent.putExtra(ARG_SESSION_ID, mSession.getId());
+                List<Session> sessions = new ArrayList<>();
+                sessions.add(mSession);
+                new Uploader(getApplicationContext(), connectInfo, intent,
+                        sessions, SUBSCRIBER_ID);
+            } catch (JSONException e) {
+                ErrorDialog.build(this,
+                        getString(R.string.upload_failure_title),
+                        e.getMessage(), null).show();
+            }
         }
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mProgressDialog = new ProgressDialog(SessionActivity.this);
-                mProgressDialog.setIndeterminate(true);
-                mProgressDialog.setProgressStyle(
-                        ProgressDialog.STYLE_HORIZONTAL);
-                mProgressDialog.setProgressNumberFormat(null);
-                mProgressDialog.setMessage(getString(
-                        R.string.operation_progress_init_msg));
-                mProgressDialog.show();
+                mProgressBar.setIndeterminate(true);
+                mProgressBar.setVisibility(View.VISIBLE);
             }
         });
     }
 
-    @Override
-    public final void onWritingFileFailed(final Exception e) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
-                ErrorDialog.build(SessionActivity.this,
+    /**
+     * Triggered on JSON file writer event.
+     *
+     * @param event JSON file writer event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final void onJsonFileWriterEvent(final JsonFileWriterEvent event) {
+        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+            return;
+        }
+        switch (event.getResult()) {
+            case JsonFileWriterEvent.OK:
+                mProgressBar.setVisibility(View.VISIBLE);
+                break;
+            case JsonFileWriterEvent.ERROR:
+                ErrorDialog.build(this,
                         getString(R.string.upload_writing_failure_title),
-                        e.getMessage(), null).show();
-            }
-        });
+                        event.getException().getMessage(), null).show();
+                mProgressBar.setVisibility(View.GONE);
+                break;
+            default:
+                break;
+        }
     }
 
-    @Override
-    public final void onUploadStart(final JsonFile jsonFile) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.setMessage("Uploading "
-                            + jsonFile.getName() + Json.FILE_EXT + " ...");
-                    mProgressDialog.setIndeterminate(false);
-                }
-            }
-        });
-    }
-
-    @Override
-    public final void onUploading(final int percentage) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.setProgress(percentage);
-                }
-            }
-        });
-    }
-
-    @Override
-    public final void onAllUploadComplete() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
-                Toast.makeText(SessionActivity.this,
+    /**
+     * Triggered on upload event.
+     *
+     * @param event Upload event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final void onUploadEvent(final UploadEvent event) {
+        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+            return;
+        }
+        switch (event.getResult()) {
+            case UploadEvent.UPLOADING:
+                mProgressBar.setVisibility(View.VISIBLE);
+                break;
+            case UploadEvent.OK:
+                Toast.makeText(this,
                         getString(R.string.session_upload_success_toast),
                         Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    @Override
-    public final void onUploadFailed(final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
+                mProgressBar.setVisibility(View.GONE);
+                break;
+            case UploadEvent.ERROR:
                 ErrorDialog.build(SessionActivity.this, getString(
-                        R.string.upload_failure_title), message, null).show();
-            }
-        });
+                        R.string.upload_failure_title), event.getMessage(),
+                        null).show();
+                mProgressBar.setVisibility(View.GONE);
+                break;
+            default:
+                break;
+        }
     }
 
-    @Override
-    public final void onSessionsDeleted() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
-                setResult(HistoryActivity.SESSION_DELETED);
-                finish();
-            }
-        });
+    /**
+     * Triggered on delete event.
+     *
+     * @param event Delete event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final void onDeleteEvent(final DeleteEvent event) {
+        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+            return;
+        }
+        setResult(HistoryActivity.SESSION_DELETED);
+        finish();
     }
 }

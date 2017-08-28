@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.Queue;
  * Class containing constant for Json files.
  *
  * @author Alkisum
- * @version 2.4
+ * @version 3.0
  * @since 2.0
  */
 public final class Json {
@@ -34,15 +35,10 @@ public final class Json {
     private static final String FILE_PREFIX = "ownRun_";
 
     /**
-     * JSON file extension.
-     */
-    public static final String FILE_EXT = ".json";
-
-    /**
      * Regex for the Json file.
      */
     private static final String FILE_REGEX = FILE_PREFIX
-            + "(\\d{4})-(\\d{2})-(\\d{2})_(\\d{6})" + FILE_EXT;
+            + "(\\d{4})-(\\d{2})-(\\d{2})_(\\d{6})" + JsonFile.FILE_EXT + "$";
 
     /**
      * JSON name for JSON file version number.
@@ -117,8 +113,7 @@ public final class Json {
             final List<Session> selectedSessions) throws JSONException {
         Queue<JsonFile> jsonFiles = new LinkedList<>();
         for (Session session : selectedSessions) {
-            String fileName = FILE_PREFIX + Format.DATE_TIME_JSON.format(
-                    new Date(session.getStart()));
+            String fileName = buildJsonFileName(session);
             JSONObject jsonObject = buildJsonFromSession(session);
             jsonFiles.add(new JsonFile(fileName, jsonObject));
         }
@@ -126,10 +121,21 @@ public final class Json {
     }
 
     /**
-     * Build a JSON object from the session data.
+     * Build file name (with extension) for JSON file.
      *
-     * @param session Session to build to JSON object from
-     * @return JSONObject
+     * @param session Session to build the file name from
+     * @return File name
+     */
+    private static String buildJsonFileName(final Session session) {
+        return FILE_PREFIX + Format.DATE_TIME_JSON.format(
+                new Date(session.getStart())) + JsonFile.FILE_EXT;
+    }
+
+    /**
+     * Build a JSON object from the given session.
+     *
+     * @param session Session to build the JSON object from
+     * @return JSONObject JSON object built from the session
      * @throws JSONException An error occurred while building the JSON object
      */
     private static JSONObject buildJsonFromSession(final Session session)
@@ -183,12 +189,23 @@ public final class Json {
         List<Session> sessions = Db.getInstance().getDaoSession()
                 .getSessionDao().loadAll();
         for (Session session : sessions) {
-            if (jsonFile.getName().equals(Json.FILE_PREFIX
-                    + Format.DATE_TIME_JSON.format(new Date(session.getStart()))
-                    + Json.FILE_EXT)) {
+            if (jsonFile.getName().equals(buildJsonFileName(session))) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * @return List of file names of all sessions stored in the database
+     */
+    public static List<String> getSessionJsonFileNames() {
+        List<Session> sessions = Db.getInstance().getDaoSession()
+                .getSessionDao().loadAll();
+        List<String> fileNames = new ArrayList<>();
+        for (Session session : sessions) {
+            fileNames.add(buildJsonFileName(session));
+        }
+        return fileNames;
     }
 }

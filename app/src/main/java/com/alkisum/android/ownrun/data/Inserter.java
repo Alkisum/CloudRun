@@ -2,6 +2,7 @@ package com.alkisum.android.ownrun.data;
 
 import android.os.AsyncTask;
 
+import com.alkisum.android.ownrun.event.InsertEvent;
 import com.alkisum.android.ownrun.model.DaoSession;
 import com.alkisum.android.ownrun.model.DataPoint;
 import com.alkisum.android.ownrun.model.DataPointDao;
@@ -9,6 +10,7 @@ import com.alkisum.android.ownrun.model.Session;
 import com.alkisum.android.ownrun.model.SessionDao;
 import com.alkisum.android.ownrun.utils.Json;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,15 +23,10 @@ import java.util.List;
  * Task to insert sessions in database from JSON objects.
  *
  * @author Alkisum
- * @version 2.4
+ * @version 3.0
  * @since 2.4
  */
 public class Inserter extends AsyncTask<Void, Void, Void> {
-
-    /**
-     * Listener to get notification when the task finishes.
-     */
-    private final InserterListener callback;
 
     /**
      * List of JSON objects to read.
@@ -59,12 +56,9 @@ public class Inserter extends AsyncTask<Void, Void, Void> {
     /**
      * Inserter constructor.
      *
-     * @param callback    Listener of the task
      * @param jsonObjects List of JSON objects to read
      */
-    public Inserter(final InserterListener callback,
-                    final List<JSONObject> jsonObjects) {
-        this.callback = callback;
+    public Inserter(final List<JSONObject> jsonObjects) {
         this.jsonObjects = jsonObjects;
         DaoSession daoSession = Db.getInstance().getDaoSession();
         sessionDao = daoSession.getSessionDao();
@@ -88,9 +82,10 @@ public class Inserter extends AsyncTask<Void, Void, Void> {
     @Override
     protected final void onPostExecute(final Void param) {
         if (exception == null) {
-            callback.onDataInserted();
+            EventBus.getDefault().post(new InsertEvent(InsertEvent.OK));
         } else {
-            callback.onInsertDataFailed(exception);
+            EventBus.getDefault().post(new InsertEvent(InsertEvent.ERROR,
+                    exception));
         }
     }
 
@@ -186,24 +181,5 @@ public class Inserter extends AsyncTask<Void, Void, Void> {
             dataPoint.setSession(session);
             dataPoints.add(dataPoint);
         }
-    }
-
-    /**
-     * Listener for the Inserter.
-     */
-    public interface InserterListener {
-
-        /**
-         * Called when the JSON files are read and the session's data inserted
-         * into the database.
-         */
-        void onDataInserted();
-
-        /**
-         * Called when an exception has been caught during the task.
-         *
-         * @param exception Exception caught
-         */
-        void onInsertDataFailed(Exception exception);
     }
 }
