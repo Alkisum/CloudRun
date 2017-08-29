@@ -11,7 +11,7 @@ import java.util.List;
  * Utility class for session operations.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 3.0
  * @since 1.1
  */
 public final class Sessions {

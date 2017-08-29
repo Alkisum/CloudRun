@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
  * Adapter for History ListView.
  *
  * @author Alkisum
- * @version 2.2
+ * @version 3.0
  * @since 1.0
  */
 class HistoryListAdapter extends BaseAdapter {
@@ -34,33 +34,33 @@ class HistoryListAdapter extends BaseAdapter {
     /**
      * Context.
      */
-    private final Context mContext;
+    private final Context context;
 
     /**
      * List of sessions.
      */
-    private final List<Session> mSessions;
+    private final List<Session> sessions;
 
     /**
      * ID of the session to be highlighted, used after a session has been
      * stopped. The ID is null if the user started the HistoryActivity manually.
      */
-    private final Long mHighlightedSessionId;
+    private final Long highlightedSessionId;
 
     /**
      * Flag set to true if the ListView is in edit mode, false otherwise.
      */
-    private boolean mEditMode;
+    private boolean editMode;
 
     /**
      * Color for checkboxes.
      */
-    private final ColorStateList mCheckBoxColor;
+    private final ColorStateList checkBoxColor;
 
     /**
      * Color for highlighted checkboxes.
      */
-    private final ColorStateList mHighlightedCheckBoxColor;
+    private final ColorStateList highlightedCheckBoxColor;
 
     /**
      * HistoryListAdapter constructor.
@@ -75,18 +75,19 @@ class HistoryListAdapter extends BaseAdapter {
     HistoryListAdapter(final Context context,
                        final List<Session> sessions,
                        final Long highlightedSessionId) {
-        mContext = context;
-        mSessions = sessions;
+        this.context = context;
+        this.sessions = sessions;
         resetSessionsSelectedStates();
-        mHighlightedSessionId = highlightedSessionId;
+        this.highlightedSessionId = highlightedSessionId;
 
         // Checkbox colors
-        mCheckBoxColor = new ColorStateList(
+        checkBoxColor = new ColorStateList(
                 new int[][]{new int[]{android.R.attr.state_enabled}},
-                new int[]{ContextCompat.getColor(mContext, R.color.accent)});
-        mHighlightedCheckBoxColor = new ColorStateList(
+                new int[]{ContextCompat.getColor(this.context,
+                        R.color.accent)});
+        highlightedCheckBoxColor = new ColorStateList(
                 new int[][]{new int[]{android.R.attr.state_enabled}},
-                new int[]{ContextCompat.getColor(mContext,
+                new int[]{ContextCompat.getColor(this.context,
                         android.R.color.white)});
     }
 
@@ -96,22 +97,22 @@ class HistoryListAdapter extends BaseAdapter {
      * @param sessions List of sessions to set
      */
     final void setSessions(final List<Session> sessions) {
-        mSessions.clear();
-        mSessions.addAll(sessions);
+        this.sessions.clear();
+        this.sessions.addAll(sessions);
     }
 
     /**
      * @return True if the ListView is in edit mode, false otherwise
      */
     final boolean isEditMode() {
-        return mEditMode;
+        return editMode;
     }
 
     /**
      * Disable the edit mode and reset the sessions' selected states.
      */
     final void disableEditMode() {
-        mEditMode = false;
+        editMode = false;
         resetSessionsSelectedStates();
     }
 
@@ -122,8 +123,8 @@ class HistoryListAdapter extends BaseAdapter {
      * @param position Position of the item that has been pressed long
      */
     final void enableEditMode(final int position) {
-        mEditMode = true;
-        mSessions.get(position).setSelected(true);
+        editMode = true;
+        sessions.get(position).setSelected(true);
     }
 
     /**
@@ -132,7 +133,7 @@ class HistoryListAdapter extends BaseAdapter {
      * @param position Position of the item that has been pressed
      */
     final void changeSessionSelectedState(final int position) {
-        Session session = mSessions.get(position);
+        Session session = sessions.get(position);
         session.setSelected(!session.getSelected());
     }
 
@@ -141,30 +142,30 @@ class HistoryListAdapter extends BaseAdapter {
      * be selected from actions performed during last HistoryActivity instance.
      */
     private void resetSessionsSelectedStates() {
-        for (Session session : mSessions) {
+        for (Session session : sessions) {
             session.setSelected(false);
         }
     }
 
     @Override
     public final int getCount() {
-        return mSessions.size();
+        return sessions.size();
     }
 
     @Override
     public final Object getItem(final int i) {
-        return mSessions.get(i);
+        return sessions.get(i);
     }
 
     @Override
     public final long getItemId(final int i) {
-        return mSessions.get(i).getId();
+        return sessions.get(i).getId();
     }
 
     @Override
     public final View getView(final int i, final View v,
                               final ViewGroup viewGroup) {
-        final LayoutInflater inflater = LayoutInflater.from(mContext);
+        final LayoutInflater inflater = LayoutInflater.from(context);
         View view = v;
         if (view == null || view.getTag() == null) {
             view = inflater.inflate(R.layout.list_item_history, viewGroup,
@@ -180,13 +181,16 @@ class HistoryListAdapter extends BaseAdapter {
                 new Date(session.getStart())));
         if (session.getEnd() != null) {
             long duration = session.getDuration();
-            holder.distance.setText(String.format("%s km",
-                    Format.formatDistance(session.getDistance())));
+            holder.distance.setText(String.format("%s %s",
+                    Format.formatDistance(session.getDistance()),
+                    context.getString(R.string.unit_distance)));
             holder.duration.setText(Format.formatDuration(duration));
-            holder.speed.setText(String.format("%s km/h",
-                    Format.formatSpeedAvg(duration, session.getDistance())));
-            holder.pace.setText(String.format("%s min/km",
-                    Format.formatPaceAvg(duration, session.getDistance())));
+            holder.speed.setText(String.format("%s %s",
+                    Format.formatSpeedAvg(duration, session.getDistance()),
+                    context.getString(R.string.unit_speed)));
+            holder.pace.setText(String.format("%s %s",
+                    Format.formatPaceAvg(duration, session.getDistance()),
+                    context.getString(R.string.unit_pace)));
         } else {
             // End of session unavailable, cannot calculate values
             holder.distance.setText(R.string.not_available);
@@ -196,27 +200,27 @@ class HistoryListAdapter extends BaseAdapter {
         }
 
         // Set colors
-        if (session.getId().equals(mHighlightedSessionId)) {
+        if (session.getId().equals(highlightedSessionId)) {
             // Highlighted item
             holder.layout.setBackgroundColor(ContextCompat.getColor(
-                    mContext, R.color.primary));
+                    context, R.color.primary));
             holder.dateTime.setTextColor(ContextCompat.getColor(
-                    mContext, android.R.color.white));
+                    context, android.R.color.white));
             CompoundButtonCompat.setButtonTintList(holder.checkBox,
-                    mHighlightedCheckBoxColor);
+                    highlightedCheckBoxColor);
         } else {
             // Default item
             holder.layout.setBackgroundColor(ContextCompat.getColor(
-                    mContext, android.R.color.transparent));
+                    context, android.R.color.transparent));
             holder.dateTime.setTextColor(ContextCompat.getColor(
-                    mContext, R.color.accent));
+                    context, R.color.accent));
             CompoundButtonCompat.setButtonTintList(holder.checkBox,
-                    mCheckBoxColor);
+                    checkBoxColor);
         }
 
         // Handle checkboxes according to the mode
         holder.checkBox.setChecked(session.getSelected());
-        if (mEditMode) {
+        if (editMode) {
             holder.checkBox.setVisibility(View.VISIBLE);
             holder.checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override

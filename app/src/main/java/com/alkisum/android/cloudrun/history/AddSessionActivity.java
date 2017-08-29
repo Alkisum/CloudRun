@@ -29,7 +29,7 @@ import butterknife.ButterKnife;
  * Activity to add a session manually to the database.
  *
  * @author Alkisum
- * @version 2.2
+ * @version 3.0
  * @since 2.0
  */
 public class AddSessionActivity extends AppCompatActivity implements
@@ -51,17 +51,17 @@ public class AddSessionActivity extends AppCompatActivity implements
      * ListView containing the session attributes to set.
      */
     @BindView(R.id.add_session_list)
-    ListView mListView;
+    ListView listView;
 
     /**
      * Session to add to the database.
      */
-    private Session mSession;
+    private Session session;
 
     /**
      * Adapter for the ListView containing the session's attributes to set.
      */
-    private AddSessionListAdapter mListAdapter;
+    private AddSessionListAdapter listAdapter;
 
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
@@ -89,16 +89,16 @@ public class AddSessionActivity extends AppCompatActivity implements
                 });
 
         Calendar now = Calendar.getInstance();
-        mSession = new Session();
-        mSession.setStart(now.getTimeInMillis());
+        session = new Session();
+        session.setStart(now.getTimeInMillis());
         long duration = Format.getMillisFromTime(1, 0, 0);
-        mSession.setEnd(now.getTimeInMillis() + duration);
-        mSession.setDuration(duration);
-        mSession.setDistance(0f);
-        mListAdapter = new AddSessionListAdapter(this, mSession);
-        mListView.setAdapter(mListAdapter);
+        session.setEnd(now.getTimeInMillis() + duration);
+        session.setDuration(duration);
+        session.setDistance(0f);
+        listAdapter = new AddSessionListAdapter(this, session);
+        listView.setAdapter(listAdapter);
 
-        mListView.setOnItemClickListener(onItemClickListener);
+        listView.setOnItemClickListener(onItemClickListener);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class AddSessionActivity extends AppCompatActivity implements
             case R.id.action_save:
                 SessionDao dao = Db.getInstance().getDaoSession()
                         .getSessionDao();
-                dao.insert(mSession);
+                dao.insert(session);
                 setResult(HistoryActivity.SESSION_ADDED);
                 finish();
                 return true;
@@ -157,7 +157,7 @@ public class AddSessionActivity extends AppCompatActivity implements
      */
     private void showDatePickerDialog() {
         Calendar dateCalendar = Calendar.getInstance();
-        dateCalendar.setTimeInMillis(mSession.getStart());
+        dateCalendar.setTimeInMillis(session.getStart());
         DatePickerDialog dpd = DatePickerDialog.newInstance(
                 this,
                 dateCalendar.get(Calendar.YEAR),
@@ -173,7 +173,7 @@ public class AddSessionActivity extends AppCompatActivity implements
      */
     private void showTimePickerDialog() {
         Calendar timeCalendar = Calendar.getInstance();
-        timeCalendar.setTimeInMillis(mSession.getStart());
+        timeCalendar.setTimeInMillis(session.getStart());
         TimePickerDialog tpd = TimePickerDialog.newInstance(
                 this,
                 timeCalendar.get(Calendar.HOUR_OF_DAY),
@@ -189,9 +189,9 @@ public class AddSessionActivity extends AppCompatActivity implements
      */
     private void showDurationDialog() {
         DurationDialog durationDialog = DurationDialog.newInstance(
-                Format.getHourFromMillis(mSession.getDuration()),
-                Format.getMinuteFromMillis(mSession.getDuration()),
-                Format.getSecondFromMillis(mSession.getDuration())
+                Format.getHourFromMillis(session.getDuration()),
+                Format.getMinuteFromMillis(session.getDuration()),
+                Format.getSecondFromMillis(session.getDuration())
         );
         durationDialog.show(getSupportFragmentManager(),
                 DurationDialog.FRAGMENT_TAG);
@@ -202,7 +202,7 @@ public class AddSessionActivity extends AppCompatActivity implements
      */
     private void showDistanceDialog() {
         DistanceDialog distanceDialog = DistanceDialog.newInstance(
-                mSession.getDistance()
+                session.getDistance()
         );
         distanceDialog.show(getSupportFragmentManager(),
                 DistanceDialog.FRAGMENT_TAG);
@@ -213,13 +213,13 @@ public class AddSessionActivity extends AppCompatActivity implements
                                 final int monthOfYear, final int dayOfMonth) {
         Calendar calendar = Calendar.getInstance();
         // Set calendar with old time
-        calendar.setTimeInMillis(mSession.getStart());
+        calendar.setTimeInMillis(session.getStart());
         // Change calendar's date
         calendar.set(year, monthOfYear, dayOfMonth);
         long timeInMillis = calendar.getTimeInMillis();
-        mSession.setStart(timeInMillis);
-        mSession.setEnd(timeInMillis + mSession.getDuration());
-        mListAdapter.notifyDataSetChanged();
+        session.setStart(timeInMillis);
+        session.setEnd(timeInMillis + session.getDuration());
+        listAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -228,28 +228,28 @@ public class AddSessionActivity extends AppCompatActivity implements
                                 final int second) {
         Calendar calendar = Calendar.getInstance();
         // Set calendar with old time
-        calendar.setTimeInMillis(mSession.getStart());
+        calendar.setTimeInMillis(session.getStart());
         // Change calendar's time
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH), hourOfDay, minute, second);
         long timeInMillis = calendar.getTimeInMillis();
-        mSession.setStart(timeInMillis);
-        mSession.setEnd(timeInMillis + mSession.getDuration());
-        mListAdapter.notifyDataSetChanged();
+        session.setStart(timeInMillis);
+        session.setEnd(timeInMillis + session.getDuration());
+        listAdapter.notifyDataSetChanged();
     }
 
     @Override
     public final void onDurationSubmit(final int hour, final int minute,
                                        final int second) {
         long duration = Format.getMillisFromTime(hour, minute, second);
-        mSession.setDuration(duration);
-        mSession.setEnd(mSession.getStart() + duration);
-        mListAdapter.notifyDataSetChanged();
+        session.setDuration(duration);
+        session.setEnd(session.getStart() + duration);
+        listAdapter.notifyDataSetChanged();
     }
 
     @Override
     public final void onDistanceSubmit(final float distance) {
-        mSession.setDistance(distance);
-        mListAdapter.notifyDataSetChanged();
+        session.setDistance(distance);
+        listAdapter.notifyDataSetChanged();
     }
 }

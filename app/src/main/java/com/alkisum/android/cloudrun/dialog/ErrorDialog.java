@@ -8,7 +8,7 @@ import android.content.DialogInterface;
  * Class to build a simple error dialog.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 3.0
  * @since 1.0
  */
 public final class ErrorDialog {

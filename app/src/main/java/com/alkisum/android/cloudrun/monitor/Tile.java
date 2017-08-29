@@ -16,7 +16,7 @@ import com.alkisum.android.cloudrun.dialog.TileDialog;
  * Layout containing a value and a unit TextView.
  *
  * @author Alkisum
- * @version 2.2
+ * @version 3.0
  * @since 1.3
  */
 class Tile {
@@ -49,37 +49,37 @@ class Tile {
     /**
      * Context.
      */
-    private final Context mContext;
+    private final Context context;
 
     /**
      * TileListener instance.
      */
-    private final TileListener mCallback;
+    private final TileListener callback;
 
     /**
      * Preference key to edit when the data type is changed.
      */
-    private final String mPrefKey;
+    private final String prefKey;
 
     /**
      * Data type shown on the tile.
      */
-    private int mData;
+    private int data;
 
     /**
      * Layout used for the tile.
      */
-    private final RelativeLayout mLayout;
+    private final RelativeLayout layout;
 
     /**
      * Value shown on the tile.
      */
-    private final TextView mValue;
+    private final TextView value;
 
     /**
      * Unit shown on the tile.
      */
-    private final TextView mUnit;
+    private final TextView unit;
 
     /**
      * Tile constructor.
@@ -96,17 +96,17 @@ class Tile {
          final String prefKey, final int data,
          final RelativeLayout layout, final TextView value,
          final TextView unit) {
-        mContext = context;
-        mCallback = callback;
-        mData = data;
-        mPrefKey = prefKey;
-        mLayout = layout;
-        mLayout.setOnLongClickListener(new View.OnLongClickListener() {
+        this.context = context;
+        this.callback = callback;
+        this.data = data;
+        this.prefKey = prefKey;
+        this.layout = layout;
+        this.layout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(final View v) {
-                mCallback.onTileLongClicked();
+                Tile.this.callback.onTileLongClicked();
                 // Dialog's checked item is set according to the data constant
-                TileDialog.build(mContext, mData,
+                TileDialog.build(Tile.this.context, Tile.this.data,
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(final DialogInterface dialog,
@@ -124,8 +124,8 @@ class Tile {
                 return false;
             }
         });
-        mValue = value;
-        mUnit = unit;
+        this.value = value;
+        this.unit = unit;
         reset();
     }
 
@@ -133,26 +133,26 @@ class Tile {
      * Reset value and unit with default strings according to the data type.
      */
     private void reset() {
-        switch (mData) {
+        switch (data) {
             case DISTANCE:
-                mValue.setText(R.string.default_distance);
-                mUnit.setText(R.string.unit_distance);
+                value.setText(R.string.default_distance);
+                unit.setText(R.string.unit_distance);
                 break;
             case SPEED:
-                mValue.setText(R.string.default_speed);
-                mUnit.setText(R.string.unit_speed);
+                value.setText(R.string.default_speed);
+                unit.setText(R.string.unit_speed);
                 break;
             case PACE:
-                mValue.setText(R.string.default_pace);
-                mUnit.setText(R.string.unit_pace);
+                value.setText(R.string.default_pace);
+                unit.setText(R.string.unit_pace);
                 break;
             case SPEED_AVG:
-                mValue.setText(R.string.default_speed);
-                mUnit.setText(R.string.unit_speed_avg);
+                value.setText(R.string.default_speed);
+                unit.setText(R.string.unit_speed_avg);
                 break;
             case PACE_AVG:
-                mValue.setText(R.string.default_pace);
-                mUnit.setText(R.string.unit_pace_avg);
+                value.setText(R.string.default_pace);
+                unit.setText(R.string.unit_pace_avg);
                 break;
             default:
                 break;
@@ -165,14 +165,14 @@ class Tile {
      * @param newData New data type chosen by the user
      */
     private void changeData(final int newData) {
-        mData = newData;
-        mCallback.onTileValueRequested(this, newData);
+        data = newData;
+        callback.onTileValueRequested(this, newData);
 
         // Update SharedPreferences
         SharedPreferences sharedPref = PreferenceManager
-                .getDefaultSharedPreferences(mContext);
+                .getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(mPrefKey, newData);
+        editor.putInt(prefKey, newData);
         editor.apply();
     }
 
@@ -180,21 +180,21 @@ class Tile {
      * Reset the values with default strings according to the data type.
      */
     final void resetValues() {
-        switch (mData) {
+        switch (data) {
             case DISTANCE:
-                mValue.setText(R.string.default_distance);
+                value.setText(R.string.default_distance);
                 break;
             case SPEED:
-                mValue.setText(R.string.default_speed);
+                value.setText(R.string.default_speed);
                 break;
             case PACE:
-                mValue.setText(R.string.default_pace);
+                value.setText(R.string.default_pace);
                 break;
             case SPEED_AVG:
-                mValue.setText(R.string.default_speed);
+                value.setText(R.string.default_speed);
                 break;
             case PACE_AVG:
-                mValue.setText(R.string.default_pace);
+                value.setText(R.string.default_pace);
                 break;
             default:
                 break;
@@ -205,21 +205,21 @@ class Tile {
      * Reset the units with default strings according to the data type.
      */
     private void resetUnits() {
-        switch (mData) {
+        switch (data) {
             case DISTANCE:
-                mUnit.setText(R.string.unit_distance);
+                unit.setText(R.string.unit_distance);
                 break;
             case SPEED:
-                mUnit.setText(R.string.unit_speed);
+                unit.setText(R.string.unit_speed);
                 break;
             case PACE:
-                mUnit.setText(R.string.unit_pace);
+                unit.setText(R.string.unit_pace);
                 break;
             case SPEED_AVG:
-                mUnit.setText(R.string.unit_speed_avg);
+                unit.setText(R.string.unit_speed_avg);
                 break;
             case PACE_AVG:
-                mUnit.setText(R.string.unit_pace_avg);
+                unit.setText(R.string.unit_pace_avg);
                 break;
             default:
                 break;
@@ -232,21 +232,21 @@ class Tile {
      * @param enabled True to enable long click action, false otherwise
      */
     final void setEnabled(final boolean enabled) {
-        mLayout.setEnabled(enabled);
+        layout.setEnabled(enabled);
     }
 
     /**
      * @return Data type shown on the tile
      */
     public final int getData() {
-        return mData;
+        return data;
     }
 
     /**
      * @param value Data type shown on the tile to set
      */
     public final void setValue(final String value) {
-        mValue.setText(value);
+        this.value.setText(value);
     }
 
     /**

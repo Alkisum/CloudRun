@@ -22,7 +22,7 @@ import org.greenrobot.eventbus.EventBus;
  * through EventBus.
  *
  * @author Alkisum
- * @version 2.2
+ * @version 3.0
  * @since 1.0
  */
 public class LocationHelper implements LocationHandlerListener {
@@ -40,17 +40,17 @@ public class LocationHelper implements LocationHandlerListener {
     /**
      * LocationHandler instance.
      */
-    private final LocationHandler mLocationHandler;
+    private final LocationHandler locationHandler;
 
     /**
      * EventBus instance.
      */
-    private final EventBus mEventBus;
+    private final EventBus eventBus;
 
     /**
      * Activity instance.
      */
-    private final Activity mActivity;
+    private final Activity activity;
 
     /**
      * LocationHelper constructor.
@@ -58,17 +58,17 @@ public class LocationHelper implements LocationHandlerListener {
      * @param activity Activity
      */
     public LocationHelper(final Activity activity) {
-        mActivity = activity;
-        mEventBus = EventBus.getDefault();
-        mLocationHandler = new LocationHandler(activity, this);
+        this.activity = activity;
+        eventBus = EventBus.getDefault();
+        locationHandler = new LocationHandler(activity, this);
     }
 
     /**
      * Called when the activity attached to the helper is destroyed.
      */
     public final void onDestroy() {
-        if (mLocationHandler != null) {
-            mLocationHandler.onDestroy();
+        if (locationHandler != null) {
+            locationHandler.onDestroy();
         }
     }
 
@@ -76,28 +76,28 @@ public class LocationHelper implements LocationHandlerListener {
      * Start location updates.
      */
     public final void start() {
-        mLocationHandler.startLocationUpdates();
+        locationHandler.startLocationUpdates();
     }
 
     /**
      * Stop location updates.
      */
     public final void stop() {
-        if (mLocationHandler != null) {
-            mLocationHandler.stopLocationUpdates();
+        if (locationHandler != null) {
+            locationHandler.stopLocationUpdates();
         }
     }
 
     @Override
     public final void onLocationRequestCreated() {
-        mLocationHandler.buildLocationSettingsRequest();
+        locationHandler.buildLocationSettingsRequest();
     }
 
     @Override
     public final void onLocationSettingsChangeUnavailable() {
-        ErrorDialog.build(mActivity,
-                mActivity.getString(R.string.location_required_title),
-                mActivity.getString(R.string.location_required_message),
+        ErrorDialog.build(activity,
+                activity.getString(R.string.location_required_title),
+                activity.getString(R.string.location_required_message),
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialog,
@@ -106,7 +106,7 @@ public class LocationHelper implements LocationHandlerListener {
                         // to manually turn the location service on
                         Intent intent = new Intent(
                                 Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        mActivity.startActivityForResult(intent,
+                        activity.startActivityForResult(intent,
                                 REQUEST_LOCATION_MANUAL);
                     }
                 }).show();
@@ -114,22 +114,22 @@ public class LocationHelper implements LocationHandlerListener {
 
     @Override
     public final void onNewSpeedValue(final float value) {
-        mEventBus.post(new SpeedEvent(value));
+        eventBus.post(new SpeedEvent(value));
     }
 
     @Override
     public final void onNewPaceValue(final long value) {
-        mEventBus.post(new PaceEvent(value));
+        eventBus.post(new PaceEvent(value));
     }
 
     @Override
     public final void onNewDistanceValue(final float value) {
-        mEventBus.post(new DistanceEvent(value));
+        eventBus.post(new DistanceEvent(value));
     }
 
     @Override
     public final void onNewCoordinate(final Coordinate coordinate) {
-        mEventBus.post(new CoordinateEvent(coordinate));
+        eventBus.post(new CoordinateEvent(coordinate));
     }
 
     /**

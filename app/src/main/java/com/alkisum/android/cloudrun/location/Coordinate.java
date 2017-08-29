@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Class defining coordinates (latitude, longitude and elevation).
  *
  * @author Alkisum
- * @version 1.3
+ * @version 3.0
  * @since 1.0
  */
 public class Coordinate implements Parcelable {
@@ -15,17 +15,17 @@ public class Coordinate implements Parcelable {
     /**
      * Latitude.
      */
-    private final double mLatitude;
+    private final double latitude;
 
     /**
      * Longitude.
      */
-    private final double mLongitude;
+    private final double longitude;
 
     /**
      * Elevation.
      */
-    private final double mElevation;
+    private final double elevation;
 
     /**
      * Coordinate constructor.
@@ -36,30 +36,30 @@ public class Coordinate implements Parcelable {
      */
     Coordinate(final double latitude, final double longitude,
                final double elevation) {
-        mLatitude = latitude;
-        mLongitude = longitude;
-        mElevation = elevation;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.elevation = elevation;
     }
 
     /**
      * @return Latitude
      */
     public final double getLatitude() {
-        return mLatitude;
+        return latitude;
     }
 
     /**
      * @return Longitude
      */
     public final double getLongitude() {
-        return mLongitude;
+        return longitude;
     }
 
     /**
      * @return Elevation
      */
     public final double getElevation() {
-        return mElevation;
+        return elevation;
     }
 
     /**
@@ -71,8 +71,8 @@ public class Coordinate implements Parcelable {
     final float distanceTo(final Coordinate dest) {
         float[] results = new float[2];
         android.location.Location.distanceBetween(
-                mLatitude,
-                mLongitude,
+                latitude,
+                longitude,
                 dest.getLatitude(),
                 dest.getLongitude(),
                 results);
@@ -85,9 +85,9 @@ public class Coordinate implements Parcelable {
      * @param in Parcel to read
      */
     private Coordinate(final Parcel in) {
-        mLatitude = in.readDouble();
-        mLongitude = in.readDouble();
-        mElevation = in.readDouble();
+        latitude = in.readDouble();
+        longitude = in.readDouble();
+        elevation = in.readDouble();
     }
 
     @Override
@@ -97,9 +97,9 @@ public class Coordinate implements Parcelable {
 
     @Override
     public final void writeToParcel(final Parcel dest, final int flags) {
-        dest.writeDouble(mLatitude);
-        dest.writeDouble(mLongitude);
-        dest.writeDouble(mElevation);
+        dest.writeDouble(latitude);
+        dest.writeDouble(longitude);
+        dest.writeDouble(elevation);
     }
 
     /**

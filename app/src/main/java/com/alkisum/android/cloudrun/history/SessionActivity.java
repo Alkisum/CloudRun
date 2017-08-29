@@ -78,25 +78,25 @@ public class SessionActivity extends AppCompatActivity implements
     /**
      * Instance of the current session.
      */
-    private Session mSession;
+    private Session session;
 
     /**
      * View containing the OSM.
      */
     @BindView(R.id.session_map)
-    MapView mMapView;
+    MapView mapView;
 
     /**
      * TextView informing the user that there no data available to show the map.
      */
     @BindView(R.id.session_txt_no_data)
-    TextView mTextViewNoData;
+    TextView textViewNoData;
 
     /**
      * Progress bar to show the progress of operations.
      */
     @BindView(R.id.session_progressbar)
-    ProgressBar mProgressBar;
+    ProgressBar progressBar;
 
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
@@ -109,7 +109,7 @@ public class SessionActivity extends AppCompatActivity implements
 
         if (extras != null) {
             long sessionId = extras.getLong(ARG_SESSION_ID);
-            mSession = Sessions.getSessionById(sessionId);
+            session = Sessions.getSessionById(sessionId);
         }
 
         setGui();
@@ -132,7 +132,7 @@ public class SessionActivity extends AppCompatActivity implements
      */
     private void setGui() {
         Toolbar toolbar = findViewById(R.id.session_toolbar);
-        toolbar.setTitle(Format.DATE_TIME_HISTORY.format(mSession.getStart()));
+        toolbar.setTitle(Format.DATE_TIME_HISTORY.format(session.getStart()));
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -144,11 +144,11 @@ public class SessionActivity extends AppCompatActivity implements
 
         initTiles();
 
-        if (!mSession.getDataPoints().isEmpty()) {
+        if (!session.getDataPoints().isEmpty()) {
             initMap();
         } else {
-            mMapView.setVisibility(View.GONE);
-            mTextViewNoData.setVisibility(View.VISIBLE);
+            mapView.setVisibility(View.GONE);
+            textViewNoData.setVisibility(View.VISIBLE);
         }
     }
 
@@ -170,7 +170,7 @@ public class SessionActivity extends AppCompatActivity implements
                         ConnectDialog.FRAGMENT_TAG);
                 return true;
             case R.id.action_delete:
-                mSession.setSelected(true);
+                session.setSelected(true);
                 if (!Sessions.getSelectedSessions().isEmpty()) {
                     showDeleteConfirmation();
                 }
@@ -184,8 +184,8 @@ public class SessionActivity extends AppCompatActivity implements
      * Initialize the tiles.
      */
     private void initTiles() {
-        long duration = mSession.getDuration();
-        float distance = mSession.getDistance();
+        long duration = session.getDuration();
+        float distance = session.getDistance();
         TextView durationTextView = findViewById(R.id.session_txt_duration);
         durationTextView.setText(Format.formatDuration(duration));
         TextView distanceTextView = findViewById(R.id.session_txt_distance);
@@ -202,11 +202,11 @@ public class SessionActivity extends AppCompatActivity implements
     private void initMap() {
         Configuration.getInstance().setUserAgentValue(
                 BuildConfig.APPLICATION_ID);
-        mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
-        mMapView.setMultiTouchControls(true);
+        mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+        mapView.setMultiTouchControls(true);
 
         ArrayList<GeoPoint> wayPoints = new ArrayList<>();
-        for (DataPoint dp : mSession.getDataPoints()) {
+        for (DataPoint dp : session.getDataPoints()) {
             wayPoints.add(new GeoPoint(dp.getLatitude(), dp.getLongitude()));
         }
 
@@ -224,21 +224,21 @@ public class SessionActivity extends AppCompatActivity implements
                     @Override
                     public void onGlobalLayout() {
                         // Will be called when the layout is ready
-                        mMapView.zoomToBoundingBox(boundingBox, false);
-                        mMapView.invalidate();
+                        mapView.zoomToBoundingBox(boundingBox, false);
+                        mapView.invalidate();
                         layout.getViewTreeObserver()
                                 .removeOnGlobalLayoutListener(this);
                     }
                 });
-        IMapController mapController = mMapView.getController();
+        IMapController mapController = mapView.getController();
         // Set zoom to max
         mapController.setZoom(19);
         // Set center with the start GeoPoint
-        DataPoint dpStart = mSession.getDataPoints().get(0);
+        DataPoint dpStart = session.getDataPoints().get(0);
         mapController.setCenter(new GeoPoint(
                 dpStart.getLatitude(), dpStart.getLongitude()));
-        mMapView.getOverlays().add(polyline);
-        mMapView.invalidate();
+        mapView.getOverlays().add(polyline);
+        mapView.invalidate();
     }
 
     /**
@@ -262,8 +262,8 @@ public class SessionActivity extends AppCompatActivity implements
      */
     private void deleteSession() {
         new Deleter(new Integer[]{SUBSCRIBER_ID}).execute();
-        mProgressBar.setIndeterminate(true);
-        mProgressBar.setVisibility(View.VISIBLE);
+        progressBar.setIndeterminate(true);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -272,9 +272,9 @@ public class SessionActivity extends AppCompatActivity implements
         if (operation == UPLOAD_OPERATION) {
             try {
                 Intent intent = new Intent(this, SessionActivity.class);
-                intent.putExtra(ARG_SESSION_ID, mSession.getId());
+                intent.putExtra(ARG_SESSION_ID, session.getId());
                 List<Session> sessions = new ArrayList<>();
-                sessions.add(mSession);
+                sessions.add(session);
                 new Uploader(getApplicationContext(), connectInfo, intent,
                         sessions, SUBSCRIBER_ID);
             } catch (JSONException e) {
@@ -287,8 +287,8 @@ public class SessionActivity extends AppCompatActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mProgressBar.setIndeterminate(true);
-                mProgressBar.setVisibility(View.VISIBLE);
+                progressBar.setIndeterminate(true);
+                progressBar.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -305,13 +305,13 @@ public class SessionActivity extends AppCompatActivity implements
         }
         switch (event.getResult()) {
             case JsonFileWriterEvent.OK:
-                mProgressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
                 break;
             case JsonFileWriterEvent.ERROR:
                 ErrorDialog.build(this,
                         getString(R.string.upload_writing_failure_title),
                         event.getException().getMessage(), null).show();
-                mProgressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 break;
             default:
                 break;
@@ -330,19 +330,19 @@ public class SessionActivity extends AppCompatActivity implements
         }
         switch (event.getResult()) {
             case UploadEvent.UPLOADING:
-                mProgressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
                 break;
             case UploadEvent.OK:
                 Toast.makeText(this,
                         getString(R.string.session_upload_success_toast),
                         Toast.LENGTH_LONG).show();
-                mProgressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 break;
             case UploadEvent.ERROR:
                 ErrorDialog.build(SessionActivity.this, getString(
                         R.string.upload_failure_title), event.getMessage(),
                         null).show();
-                mProgressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 break;
             default:
                 break;

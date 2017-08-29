@@ -4,7 +4,7 @@ package com.alkisum.android.cloudrun.event;
  * Class defining speed event for EventBus.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 3.0
  * @since 1.3
  */
 public class SpeedEvent {
@@ -12,7 +12,7 @@ public class SpeedEvent {
     /**
      * Speed value in km/h.
      */
-    private final float mValue;
+    private final float value;
 
     /**
      * SpeedEvent constructor.
@@ -20,13 +20,13 @@ public class SpeedEvent {
      * @param value Speed value in km/h
      */
     public SpeedEvent(final float value) {
-        mValue = value;
+        this.value = value;
     }
 
     /**
      * @return Speed value in km/h
      */
     public final float getValue() {
-        return mValue;
+        return value;
     }
 }

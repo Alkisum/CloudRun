@@ -16,13 +16,11 @@ import com.alkisum.android.cloudrun.utils.Pref;
 
 import java.util.Date;
 
-import butterknife.ButterKnife;
-
 /**
  * Activity listing information about the application.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 3.0
  * @since 1.2
  */
 public class AboutActivity extends AppCompatActivity {
@@ -32,8 +30,6 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_about);
-        ButterKnife.bind(this);
-
 
         Toolbar toolbar = findViewById(R.id.about_toolbar);
         toolbar.setTitle(getString(R.string.about_title));

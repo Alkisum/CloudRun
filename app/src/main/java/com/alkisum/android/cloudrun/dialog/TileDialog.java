@@ -10,7 +10,7 @@ import com.alkisum.android.cloudrun.R;
  * Dialog showing the list of data type that can be applied to a tile.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 3.0
  * @since 1.3
  */
 

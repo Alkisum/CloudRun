@@ -4,7 +4,7 @@ package com.alkisum.android.cloudrun.event;
  * Class defining pace event for EventBus.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 3.0
  * @since 1.3
  */
 public class PaceEvent {
@@ -12,7 +12,7 @@ public class PaceEvent {
     /**
      * Pace value in milliseconds.
      */
-    private final long mValue;
+    private final long value;
 
     /**
      * PaceEvent constructor.
@@ -20,13 +20,13 @@ public class PaceEvent {
      * @param value Pace value in milliseconds
      */
     public PaceEvent(final long value) {
-        mValue = value;
+        this.value = value;
     }
 
     /**
      * @return Pace value in milliseconds
      */
     public final long getValue() {
-        return mValue;
+        return value;
     }
 }

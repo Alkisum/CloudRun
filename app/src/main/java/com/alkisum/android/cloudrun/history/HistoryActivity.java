@@ -103,47 +103,47 @@ public class HistoryActivity extends AppCompatActivity implements
      * Toolbar.
      */
     @BindView(R.id.history_toolbar)
-    Toolbar mToolbar;
+    Toolbar toolbar;
 
     /**
      * SwipeRefreshLayout for list view.
      */
     @BindView(R.id.history_swipe_refresh_layout)
-    SwipeRefreshLayout mSwipeRefreshLayout;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     /**
      * ListView containing the sessions.
      */
     @BindView(R.id.history_list)
-    ListView mListView;
+    ListView listView;
 
     /**
      * TextView informing the user that no sessions are available.
      */
     @BindView(R.id.history_no_session)
-    TextView mNoSessionTextView;
+    TextView noSessionTextView;
 
     /**
      * Progress bar to show the progress of operations.
      */
     @BindView(R.id.history_progressbar)
-    ProgressBar mProgressBar;
+    ProgressBar progressBar;
 
     /**
      * List adapter for the list of session.
      */
-    private HistoryListAdapter mListAdapter;
+    private HistoryListAdapter listAdapter;
 
     /**
      * ID of the session that should be highlighted.
      */
-    private Long mHighlightedSessionId;
+    private Long highlightedSessionId;
 
     /**
      * ID of the session that should be ignored because it is still running. The
      * ID is null if no session is running.
      */
-    private Long mIgnoreSessionId;
+    private Long ignoreSessionId;
 
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
@@ -153,15 +153,15 @@ public class HistoryActivity extends AppCompatActivity implements
         ButterKnife.bind(this);
 
         Bundle extras = getIntent().getExtras();
-        mHighlightedSessionId = null;
-        mIgnoreSessionId = null;
+        highlightedSessionId = null;
+        ignoreSessionId = null;
 
         if (extras != null) {
-            mHighlightedSessionId = extras.getLong(ARG_HIGHLIGHTED_SESSION_ID);
-            mIgnoreSessionId = extras.getLong(ARG_IGNORE_SESSION_ID);
+            highlightedSessionId = extras.getLong(ARG_HIGHLIGHTED_SESSION_ID);
+            ignoreSessionId = extras.getLong(ARG_IGNORE_SESSION_ID);
         }
 
-        Sessions.fixSessions(mIgnoreSessionId);
+        Sessions.fixSessions(ignoreSessionId);
 
         setGui();
 
@@ -192,10 +192,10 @@ public class HistoryActivity extends AppCompatActivity implements
      * Set the GUI.
      */
     private void setGui() {
-        mToolbar.setTitle(R.string.history_title);
-        setSupportActionBar(mToolbar);
-        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        toolbar.setTitle(R.string.history_title);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
                 if (isEditMode()) {
@@ -206,14 +206,14 @@ public class HistoryActivity extends AppCompatActivity implements
             }
         });
 
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> adapterView,
                                     final View view, final int position,
                                     final long id) {
-                if (mListAdapter.isEditMode()) {
-                    mListAdapter.changeSessionSelectedState(position);
-                    mListAdapter.notifyDataSetInvalidated();
+                if (listAdapter.isEditMode()) {
+                    listAdapter.changeSessionSelectedState(position);
+                    listAdapter.notifyDataSetInvalidated();
                 } else {
                     Intent intent = new Intent(HistoryActivity.this,
                             SessionActivity.class);
@@ -223,7 +223,7 @@ public class HistoryActivity extends AppCompatActivity implements
             }
         });
 
-        mListView.setOnItemLongClickListener(
+        listView.setOnItemLongClickListener(
                 new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(
@@ -234,21 +234,21 @@ public class HistoryActivity extends AppCompatActivity implements
                     }
                 });
 
-        List<Session> sessions = Sessions.loadSessions(mIgnoreSessionId);
+        List<Session> sessions = Sessions.loadSessions(ignoreSessionId);
         if (sessions.isEmpty()) {
-            mListView.setVisibility(View.GONE);
-            mNoSessionTextView.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
+            noSessionTextView.setVisibility(View.VISIBLE);
         }
-        mListAdapter = new HistoryListAdapter(this, sessions,
-                mHighlightedSessionId);
-        mListView.setAdapter(mListAdapter);
+        listAdapter = new HistoryListAdapter(this, sessions,
+                highlightedSessionId);
+        listView.setAdapter(listAdapter);
 
-        mSwipeRefreshLayout.setOnRefreshListener(
+        swipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
                         refreshList();
-                        mSwipeRefreshLayout.setRefreshing(false);
+                        swipeRefreshLayout.setRefreshing(false);
                     }
                 }
         );
@@ -263,7 +263,7 @@ public class HistoryActivity extends AppCompatActivity implements
 
     @Override
     public final boolean onPrepareOptionsMenu(final Menu menu) {
-        boolean editMode = mListAdapter.isEditMode();
+        boolean editMode = listAdapter.isEditMode();
         menu.findItem(R.id.action_download).setVisible(!editMode);
         menu.findItem(R.id.action_upload).setVisible(editMode);
         menu.findItem(R.id.action_delete).setVisible(editMode);
@@ -297,11 +297,11 @@ public class HistoryActivity extends AppCompatActivity implements
                 return true;
             case R.id.action_select_all:
                 List<Session> sessions = Sessions.loadSessions(
-                        mIgnoreSessionId);
+                        ignoreSessionId);
                 for (Session session : sessions) {
                     session.setSelected(true);
                 }
-                mListAdapter.notifyDataSetChanged();
+                listAdapter.notifyDataSetChanged();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -314,7 +314,7 @@ public class HistoryActivity extends AppCompatActivity implements
      * @return true if the list is in edit mode, false otherwise
      */
     private boolean isEditMode() {
-        return mListAdapter != null && mListAdapter.isEditMode();
+        return listAdapter != null && listAdapter.isEditMode();
     }
 
     /**
@@ -322,9 +322,9 @@ public class HistoryActivity extends AppCompatActivity implements
      * disable, otherwise the activity should be finished.
      */
     private void disableEditMode() {
-        mListAdapter.disableEditMode();
-        mListAdapter.notifyDataSetInvalidated();
-        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        listAdapter.disableEditMode();
+        listAdapter.notifyDataSetInvalidated();
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         invalidateOptionsMenu();
     }
 
@@ -334,10 +334,10 @@ public class HistoryActivity extends AppCompatActivity implements
      * @param position Position of the item that has been pressed long
      */
     private void enableEditMode(final int position) {
-        if (!mListAdapter.isEditMode()) {
-            mListAdapter.enableEditMode(position);
-            mListAdapter.notifyDataSetInvalidated();
-            mToolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
+        if (!listAdapter.isEditMode()) {
+            listAdapter.enableEditMode(position);
+            listAdapter.notifyDataSetInvalidated();
+            toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
             invalidateOptionsMenu();
         }
     }
@@ -363,8 +363,8 @@ public class HistoryActivity extends AppCompatActivity implements
      */
     private void deleteSelectedSessions() {
         new Deleter(new Integer[]{SUBSCRIBER_ID}).execute();
-        mProgressBar.setIndeterminate(true);
-        mProgressBar.setVisibility(View.VISIBLE);
+        progressBar.setIndeterminate(true);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -374,16 +374,16 @@ public class HistoryActivity extends AppCompatActivity implements
         if (isEditMode()) {
             disableEditMode();
         }
-        List<Session> sessions = Sessions.loadSessions(mIgnoreSessionId);
+        List<Session> sessions = Sessions.loadSessions(ignoreSessionId);
         if (sessions.isEmpty()) {
-            mListView.setVisibility(View.GONE);
-            mNoSessionTextView.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
+            noSessionTextView.setVisibility(View.VISIBLE);
         } else {
-            mListView.setVisibility(View.VISIBLE);
-            mNoSessionTextView.setVisibility(View.GONE);
+            listView.setVisibility(View.VISIBLE);
+            noSessionTextView.setVisibility(View.GONE);
         }
-        mListAdapter.setSessions(sessions);
-        mListAdapter.notifyDataSetChanged();
+        listAdapter.setSessions(sessions);
+        listAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -407,8 +407,8 @@ public class HistoryActivity extends AppCompatActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mProgressBar.setIndeterminate(true);
-                mProgressBar.setVisibility(View.VISIBLE);
+                progressBar.setIndeterminate(true);
+                progressBar.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -425,21 +425,21 @@ public class HistoryActivity extends AppCompatActivity implements
         }
         switch (event.getResult()) {
             case DownloadEvent.DOWNLOADING:
-                mProgressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
                 break;
             case DownloadEvent.OK:
-                mProgressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
                 break;
             case DownloadEvent.NO_FILE:
                 Toast.makeText(this, getString(R.string.download_no_file_toast),
                         Toast.LENGTH_LONG).show();
-                mProgressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 break;
             case DownloadEvent.ERROR:
                 ErrorDialog.build(this,
                         getString(R.string.download_failure_title),
                         event.getMessage(), null).show();
-                mProgressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 break;
             default:
                 break;
@@ -458,13 +458,13 @@ public class HistoryActivity extends AppCompatActivity implements
         }
         switch (event.getResult()) {
             case JsonFileReaderEvent.OK:
-                mProgressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
                 break;
             case JsonFileReaderEvent.ERROR:
                 ErrorDialog.build(this,
                         getString(R.string.download_reading_failure_title),
                         event.getException().getMessage(), null).show();
-                mProgressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 break;
             default:
                 break;
@@ -483,13 +483,13 @@ public class HistoryActivity extends AppCompatActivity implements
                 refreshList();
                 Toast.makeText(this, getString(R.string.
                         download_success_toast), Toast.LENGTH_LONG).show();
-                mProgressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 break;
             case InsertEvent.ERROR:
                 ErrorDialog.build(this,
                         getString(R.string.download_insert_failure_title),
                         event.getException().getMessage(), null).show();
-                mProgressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 break;
             default:
                 break;
@@ -508,13 +508,13 @@ public class HistoryActivity extends AppCompatActivity implements
         }
         switch (event.getResult()) {
             case JsonFileWriterEvent.OK:
-                mProgressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
                 break;
             case JsonFileWriterEvent.ERROR:
                 ErrorDialog.build(this,
                         getString(R.string.upload_writing_failure_title),
                         event.getException().getMessage(), null).show();
-                mProgressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 break;
             default:
                 break;
@@ -533,19 +533,19 @@ public class HistoryActivity extends AppCompatActivity implements
         }
         switch (event.getResult()) {
             case UploadEvent.UPLOADING:
-                mProgressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
                 break;
             case UploadEvent.OK:
                 Toast.makeText(this,
                         getString(R.string.history_upload_success_toast),
                         Toast.LENGTH_LONG).show();
-                mProgressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 break;
             case UploadEvent.ERROR:
                 ErrorDialog.build(this, getString(
                         R.string.upload_failure_title), event.getMessage(),
                         null).show();
-                mProgressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 break;
             default:
                 break;
@@ -562,7 +562,7 @@ public class HistoryActivity extends AppCompatActivity implements
         if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
-        mProgressBar.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
         refreshList();
     }
 

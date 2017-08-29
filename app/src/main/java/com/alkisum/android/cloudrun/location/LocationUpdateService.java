@@ -9,7 +9,7 @@ import android.os.Bundle;
  * IntentService for location update from GoogleAPI.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 3.0
  * @since 1.0
  */
 public class LocationUpdateService extends IntentService {

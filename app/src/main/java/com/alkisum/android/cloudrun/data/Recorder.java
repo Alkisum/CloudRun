@@ -17,7 +17,7 @@ import org.greenrobot.eventbus.Subscribe;
  * Class recording GPS data.
  *
  * @author Alkisum
- * @version 2.2
+ * @version 3.0
  * @since 1.0
  */
 public class Recorder {
@@ -25,32 +25,32 @@ public class Recorder {
     /**
      * Listener for recorder.
      */
-    private final RecorderListener mCallback;
+    private final RecorderListener callback;
 
     /**
      * EventBus instance.
      */
-    private EventBus mEventBus;
+    private EventBus eventBus;
 
     /**
      * Session instance.
      */
-    private Session mSession;
+    private Session session;
 
     /**
      * Handler for duration task.
      */
-    private final Handler mDurationHandler = new Handler();
+    private final Handler durationHandler = new Handler();
 
     /**
      * Time when the pause started.
      */
-    private long mPauseStart;
+    private long pauseStart;
 
     /**
      * Total duration when the session was on paused.
      */
-    private long mPauseDuration;
+    private long pauseDuration;
 
     /**
      * Recorder constructor.
@@ -58,69 +58,69 @@ public class Recorder {
      * @param callback Recorder listener
      */
     public Recorder(final RecorderListener callback) {
-        mCallback = callback;
+        this.callback = callback;
     }
 
     /**
      * Start recording: insert new session.
      */
     public final void start() {
-        mSession = new Session();
-        mSession.setStart(System.currentTimeMillis());
-        mSession.setDuration(0L);
-        mSession.setDistance(0f);
+        session = new Session();
+        session.setStart(System.currentTimeMillis());
+        session.setDuration(0L);
+        session.setDistance(0f);
         SessionDao sessionDao = Db.getInstance().getDaoSession()
                 .getSessionDao();
-        sessionDao.insert(mSession);
+        sessionDao.insert(session);
 
-        mDurationHandler.postDelayed(mDurationTask, 1000);
+        durationHandler.postDelayed(durationTask, 1000);
 
-        mEventBus = EventBus.getDefault();
-        mEventBus.register(this);
+        eventBus = EventBus.getDefault();
+        eventBus.register(this);
     }
 
     /**
      * Resume the recorder.
      */
     public final void resume() {
-        mPauseDuration += System.currentTimeMillis() - mPauseStart;
-        mDurationHandler.postDelayed(mDurationTask, 1000);
-        mEventBus.register(this);
+        pauseDuration += System.currentTimeMillis() - pauseStart;
+        durationHandler.postDelayed(durationTask, 1000);
+        eventBus.register(this);
     }
 
     /**
      * Pause the recorder.
      */
     public final void pause() {
-        mEventBus.unregister(this);
-        mDurationHandler.removeCallbacks(mDurationTask);
-        mPauseStart = System.currentTimeMillis();
+        eventBus.unregister(this);
+        durationHandler.removeCallbacks(durationTask);
+        pauseStart = System.currentTimeMillis();
     }
 
     /**
      * Stop recording: update current session.
      */
     public final void stop() {
-        mEventBus.unregister(this);
+        eventBus.unregister(this);
 
-        mDurationHandler.removeCallbacks(mDurationTask);
+        durationHandler.removeCallbacks(durationTask);
 
-        mSession.setEnd(System.currentTimeMillis());
-        mSession.update();
+        session.setEnd(System.currentTimeMillis());
+        session.update();
     }
 
     /**
      * Task to increment the duration and update the value in the database.
      */
-    private final Runnable mDurationTask = new Runnable() {
+    private final Runnable durationTask = new Runnable() {
         @Override
         public void run() {
-            mDurationHandler.postDelayed(this, 1000);
-            long newDuration = System.currentTimeMillis() - mSession.getStart()
-                    - mPauseDuration;
-            mSession.setDuration(newDuration);
-            mSession.update();
-            mCallback.onDurationUpdated(newDuration);
+            durationHandler.postDelayed(this, 1000);
+            long newDuration = System.currentTimeMillis() - session.getStart()
+                    - pauseDuration;
+            session.setDuration(newDuration);
+            session.update();
+            callback.onDurationUpdated(newDuration);
         }
     };
 
@@ -131,11 +131,11 @@ public class Recorder {
      */
     @Subscribe
     public final void onDistanceEvent(final DistanceEvent event) {
-        Float currentDistance = mSession.getDistance();
+        Float currentDistance = session.getDistance();
         float newDistance = currentDistance + event.getValue();
-        mSession.setDistance(newDistance);
-        mSession.update();
-        mCallback.onDistanceUpdated(newDistance);
+        session.setDistance(newDistance);
+        session.update();
+        callback.onDistanceUpdated(newDistance);
     }
 
     /**
@@ -149,7 +149,7 @@ public class Recorder {
         Coordinate c = event.getValues();
         DataPoint dataPoint = new DataPoint(null, System.currentTimeMillis(),
                 c.getLatitude(), c.getLongitude(), c.getElevation(),
-                mSession.getId());
+                session.getId());
         DataPointDao dataPointDao = Db.getInstance().getDaoSession()
                 .getDataPointDao();
         dataPointDao.insert(dataPoint);
@@ -159,14 +159,14 @@ public class Recorder {
      * @return Session instance
      */
     public final Session getSession() {
-        return mSession;
+        return session;
     }
 
     /**
      * @return Current session's duration
      */
     public final long getCurrentDuration() {
-        return mSession.getDuration();
+        return session.getDuration();
     }
 
     /**

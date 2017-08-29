@@ -4,7 +4,7 @@ package com.alkisum.android.cloudrun.location;
  * Listener for LocationHandler.
  *
  * @author Alkisum
- * @version 2.2
+ * @version 3.0
  * @since 1.0
  */
 interface LocationHandlerListener {

@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
  * List adapter for AddSessionActivity.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 3.0
  * @since 2.0
  */
 class AddSessionListAdapter extends BaseAdapter {
@@ -51,17 +51,17 @@ class AddSessionListAdapter extends BaseAdapter {
     /**
      * Context.
      */
-    private final Context mContext;
+    private final Context context;
 
     /**
      * Session instance to add to database.
      */
-    private final Session mSession;
+    private final Session session;
 
     /**
      * List of session's attributes to set.
      */
-    private final List<Integer> mAttributes;
+    private final List<Integer> attributes;
 
     /**
      * AddSessionListAdapter constructor.
@@ -70,23 +70,23 @@ class AddSessionListAdapter extends BaseAdapter {
      * @param session Session instance to add to database
      */
     AddSessionListAdapter(final Context context, final Session session) {
-        mContext = context;
-        mSession = session;
-        mAttributes = new ArrayList<>();
-        mAttributes.add(DATE);
-        mAttributes.add(TIME);
-        mAttributes.add(DURATION);
-        mAttributes.add(DISTANCE);
+        this.context = context;
+        this.session = session;
+        attributes = new ArrayList<>();
+        attributes.add(DATE);
+        attributes.add(TIME);
+        attributes.add(DURATION);
+        attributes.add(DISTANCE);
     }
 
     @Override
     public int getCount() {
-        return mAttributes.size();
+        return attributes.size();
     }
 
     @Override
     public Integer getItem(final int i) {
-        return mAttributes.get(i);
+        return attributes.get(i);
     }
 
     @Override
@@ -97,7 +97,7 @@ class AddSessionListAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, final View convertView,
                         final ViewGroup parent) {
-        final LayoutInflater inflater = LayoutInflater.from(mContext);
+        final LayoutInflater inflater = LayoutInflater.from(context);
         View view = convertView;
         if (view == null || view.getTag() == null) {
             view = inflater.inflate(R.layout.list_item_add_session, parent,
@@ -113,28 +113,28 @@ class AddSessionListAdapter extends BaseAdapter {
                         R.drawable.ic_date_range_accent_24dp);
                 holder.label.setText(R.string.add_session_date);
                 holder.value.setText(Format.DATE_ADD_SESSION.format(
-                        mSession.getStart()));
+                        session.getStart()));
                 break;
             case TIME:
                 holder.icon.setImageResource(
                         R.drawable.ic_access_time_accent_24dp);
                 holder.label.setText(R.string.add_session_time);
                 holder.value.setText(Format.TIME_ADD_SESSION.format(
-                        mSession.getStart()));
+                        session.getStart()));
                 break;
             case DURATION:
                 holder.icon.setImageResource(
                         R.drawable.ic_timer_accent_24dp);
                 holder.label.setText(R.string.add_session_duration);
                 holder.value.setText(Format.formatDuration(
-                        mSession.getDuration()));
+                        session.getDuration()));
                 break;
             case DISTANCE:
                 holder.icon.setImageResource(
                         R.drawable.ic_directions_run_accent_24dp);
                 holder.label.setText(R.string.add_session_distance);
                 holder.value.setText(String.format(Locale.getDefault(), "%s %s",
-                        Format.formatDistance(mSession.getDistance()), "km"));
+                        Format.formatDistance(session.getDistance()), "km"));
                 break;
             default:
                 break;

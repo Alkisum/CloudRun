@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  * Utility class to format values.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 3.0
  * @since 1.0
  */
 public final class Format {
@@ -37,7 +37,7 @@ public final class Format {
     /**
      * Format for JSON file name.
      */
-    public static final SimpleDateFormat DATE_TIME_JSON =
+    static final SimpleDateFormat DATE_TIME_JSON =
             new SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.getDefault());
 
     /**

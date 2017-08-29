@@ -12,13 +12,11 @@ import android.widget.NumberPicker;
 
 import com.alkisum.android.cloudrun.R;
 
-import butterknife.ButterKnife;
-
 /**
  * Dialog to set the distance.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 3.0
  * @since 2.0
  */
 
@@ -37,7 +35,7 @@ public class DistanceDialog extends DialogFragment {
     /**
      * Listener for the dialog.
      */
-    private DistanceDialogListener mCallback;
+    private DistanceDialogListener callback;
 
     /**
      * Create a new instance of DistanceDialog.
@@ -57,7 +55,7 @@ public class DistanceDialog extends DialogFragment {
     public final void onAttach(final Context context) {
         super.onAttach(context);
         try {
-            mCallback = (DistanceDialogListener) context;
+            callback = (DistanceDialogListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.getClass().getSimpleName()
                     + " must implement DistanceDialogListener");
@@ -72,7 +70,6 @@ public class DistanceDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         View view = View.inflate(getActivity(), R.layout.dialog_distance, null);
-        ButterKnife.bind(this, view);
 
         final NumberPicker nbInteger = view.findViewById(
                 R.id.distance_nb_integer);
@@ -98,7 +95,7 @@ public class DistanceDialog extends DialogFragment {
                                 float result = (nbInteger.getValue()
                                         + nbFractional.getValue() / 100f)
                                         * 1000;
-                                mCallback.onDistanceSubmit(result);
+                                callback.onDistanceSubmit(result);
 
                             }
                         })

@@ -14,13 +14,11 @@ import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.location.LocationHandler;
 import com.alkisum.android.cloudrun.utils.Pref;
 
-import butterknife.ButterKnife;
-
 /**
  * Activity showing the application settings.
  *
  * @author Alkisum
- * @version 2.4
+ * @version 3.0
  * @since 1.1
  */
 public class SettingsActivity extends AppCompatActivity {
@@ -30,7 +28,6 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_settings);
-        ButterKnife.bind(this);
 
         Toolbar toolbar = findViewById(R.id.settings_toolbar);
         toolbar.setTitle(getString(R.string.settings_title));
@@ -57,7 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
         /**
          * NumberPicker for the distance count.
          */
-        private NumberPickerPreference mNpDistanceCnt;
+        private NumberPickerPreference npDistanceCnt;
 
         @Override
         public final void onCreate(final Bundle savedInstanceState) {
@@ -66,9 +63,9 @@ public class SettingsActivity extends AppCompatActivity {
             addPreferencesFromResource(R.xml.preferences);
 
             // Distance count
-            mNpDistanceCnt = (NumberPickerPreference) findPreference(
+            npDistanceCnt = (NumberPickerPreference) findPreference(
                     Pref.DISTANCE_CNT);
-            mNpDistanceCnt.setSummary(mNpDistanceCnt.getValue()
+            npDistanceCnt.setSummary(npDistanceCnt.getValue()
                     + getString(R.string.distance_cnt_summary));
 
             // About
@@ -106,7 +103,7 @@ public class SettingsActivity extends AppCompatActivity {
                 case Pref.DISTANCE_CNT:
                     int value = sharedPreferences.getInt(Pref.DISTANCE_CNT,
                             LocationHandler.DISTANCE_CNT_DEFAULT);
-                    mNpDistanceCnt.setSummary(value + getString(
+                    npDistanceCnt.setSummary(value + getString(
                             R.string.distance_cnt_summary));
                     break;
                 case CloudPref.SAVE_CLOUD_INFO:

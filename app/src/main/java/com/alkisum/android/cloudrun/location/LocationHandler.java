@@ -36,7 +36,7 @@ import java.util.Queue;
  * Class handling location updates.
  *
  * @author Alkisum
- * @version 2.2
+ * @version 3.0
  * @since 1.0
  */
 public class LocationHandler implements
@@ -89,47 +89,47 @@ public class LocationHandler implements
      * Queue storing the last distance values with the time passed to travel
      * each distance.
      */
-    private final Queue<DistanceWrapper> mDistanceQueue = new LinkedList<>();
+    private final Queue<DistanceWrapper> distanceQueue = new LinkedList<>();
 
     /**
      * Pending Intent to get data from {@link LocationUpdateService}.
      */
-    private PendingIntent mPendingIntent;
+    private PendingIntent pendingIntent;
 
     /**
      * Flag set to true when the location updates have started, false otherwise.
      */
-    private boolean mLocationUpdatesStarted;
+    private boolean locationUpdatesStarted;
 
     /**
      * Last location received.
      */
-    private Coordinate mLastCoordinate;
+    private Coordinate lastCoordinate;
 
     /**
      * Time of the last location received.
      */
-    private long mLastLocationMillis;
+    private long lastLocationMillis;
 
     /**
      * Activity instance.
      */
-    private final Activity mActivity;
+    private final Activity activity;
 
     /**
      * LocationHandlerListener instance.
      */
-    private final LocationHandlerListener mCallback;
+    private final LocationHandlerListener callback;
 
     /**
      * Google API Client.
      */
-    private GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient googleApiClient;
 
     /**
      * Location Request instance.
      */
-    private LocationRequest mLocationRequest;
+    private LocationRequest locationRequest;
 
     /**
      * LocationHandler constructor.
@@ -139,13 +139,13 @@ public class LocationHandler implements
      */
     LocationHandler(final Activity activity,
                     final LocationHandlerListener callback) {
-        mActivity = activity;
-        mCallback = callback;
+        this.activity = activity;
+        this.callback = callback;
 
         // Build and connect GoogleApiClient
         buildGoogleApiClient();
-        if (!mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
+        if (!googleApiClient.isConnected()) {
+            googleApiClient.connect();
         }
     }
 
@@ -153,8 +153,8 @@ public class LocationHandler implements
      * Called when the activity attached to the helper is destroyed.
      */
     final void onDestroy() {
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
+        if (googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
         }
     }
 
@@ -162,7 +162,7 @@ public class LocationHandler implements
      * Build Google Api Client.
      */
     private synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(mActivity)
+        googleApiClient = new GoogleApiClient.Builder(activity)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
@@ -176,11 +176,11 @@ public class LocationHandler implements
      */
     final void buildLocationSettingsRequest() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.
-                Builder().addLocationRequest(mLocationRequest)
+                Builder().addLocationRequest(locationRequest)
                 .setAlwaysShow(true);
         PendingResult<LocationSettingsResult> result =
                 LocationServices.SettingsApi.checkLocationSettings(
-                        mGoogleApiClient, builder.build());
+                        googleApiClient, builder.build());
         result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
             @Override
             public void onResult(@NonNull final LocationSettingsResult result) {
@@ -193,7 +193,7 @@ public class LocationHandler implements
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         try {
                             // Location off: show dialog
-                            status.startResolutionForResult(mActivity,
+                            status.startResolutionForResult(activity,
                                     REQUEST_LOCATION_AUTO);
                         } catch (IntentSender.SendIntentException e) {
                             Log.e(TAG, e.getMessage());
@@ -202,12 +202,12 @@ public class LocationHandler implements
                     case LocationSettingsStatusCodes.
                             SETTINGS_CHANGE_UNAVAILABLE:
                         // There is no way to fix the settings
-                        if (LocationHelper.isLocationEnabled(mActivity)) {
+                        if (LocationHelper.isLocationEnabled(activity)) {
                             // Location on: start location updates
                             startLocationUpdates();
                         } else {
                             // Location off: user must change settings manually
-                            mCallback.onLocationSettingsChangeUnavailable();
+                            callback.onLocationSettingsChangeUnavailable();
                         }
                         break;
                     default:
@@ -221,11 +221,11 @@ public class LocationHandler implements
      * Create location request.
      */
     private void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(LOCATION_REQUEST_INTERVAL);
-        mLocationRequest.setFastestInterval(LOCATION_REQUEST_FASTEST_INTERVAL);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mCallback.onLocationRequestCreated();
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(LOCATION_REQUEST_INTERVAL);
+        locationRequest.setFastestInterval(LOCATION_REQUEST_FASTEST_INTERVAL);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        callback.onLocationRequestCreated();
     }
 
     @Override
@@ -246,15 +246,15 @@ public class LocationHandler implements
         int code = connectionResult.getErrorCode();
         switch (code) {
             case ConnectionResult.SERVICE_MISSING:
-                googleApiAvailability.getErrorDialog(mActivity, code,
+                googleApiAvailability.getErrorDialog(activity, code,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
                 break;
             case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
-                googleApiAvailability.getErrorDialog(mActivity, code,
+                googleApiAvailability.getErrorDialog(activity, code,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
                 break;
             case ConnectionResult.SERVICE_DISABLED:
-                googleApiAvailability.getErrorDialog(mActivity, code,
+                googleApiAvailability.getErrorDialog(activity, code,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
                 break;
             default:
@@ -267,35 +267,35 @@ public class LocationHandler implements
      * Start location updates.
      */
     final void startLocationUpdates() {
-        Intent intent = new Intent(mActivity, LocationUpdateService.class);
-        mPendingIntent = PendingIntent.getService(mActivity,
+        Intent intent = new Intent(activity, LocationUpdateService.class);
+        pendingIntent = PendingIntent.getService(activity,
                 REQUEST_LOCATION, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission
                 .ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(mActivity, Manifest
+                && ActivityCompat.checkSelfPermission(activity, Manifest
                 .permission.ACCESS_COARSE_LOCATION) != PackageManager
                 .PERMISSION_GRANTED) {
             return;
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, mPendingIntent);
-        mActivity.registerReceiver(mLocationReceiver, new IntentFilter(
+                googleApiClient, locationRequest, pendingIntent);
+        activity.registerReceiver(mLocationReceiver, new IntentFilter(
                 LocationUpdateService.LOCATION_NOTIFICATION));
-        mLocationUpdatesStarted = true;
+        locationUpdatesStarted = true;
     }
 
     /**
      * Stop location updates.
      */
     final void stopLocationUpdates() {
-        mLastCoordinate = null;
-        if (mLocationUpdatesStarted) {
-            mActivity.unregisterReceiver(mLocationReceiver);
-            if (mGoogleApiClient.isConnected()) {
+        lastCoordinate = null;
+        if (locationUpdatesStarted) {
+            activity.unregisterReceiver(mLocationReceiver);
+            if (googleApiClient.isConnected()) {
                 LocationServices.FusedLocationApi.removeLocationUpdates(
-                        mGoogleApiClient, mPendingIntent);
+                        googleApiClient, pendingIntent);
             }
-            mLocationUpdatesStarted = false;
+            locationUpdatesStarted = false;
         }
     }
 
@@ -312,34 +312,34 @@ public class LocationHandler implements
             // Coordinate
             Coordinate coordinate = new Coordinate(location.getLatitude(),
                     location.getLongitude(), location.getAltitude());
-            mCallback.onNewCoordinate(coordinate);
+            callback.onNewCoordinate(coordinate);
 
-            if (mLastCoordinate != null) {
+            if (lastCoordinate != null) {
 
                 // Distance
-                float distance = coordinate.distanceTo(mLastCoordinate);
-                mCallback.onNewDistanceValue(distance);
+                float distance = coordinate.distanceTo(lastCoordinate);
+                callback.onNewDistanceValue(distance);
 
                 // Add distance and time to the queue
-                long time = locationMillis - mLastLocationMillis;
-                mDistanceQueue.add(new DistanceWrapper(distance, time));
-                while (mDistanceQueue.size() > getDistanceCnt()) {
-                    mDistanceQueue.poll();
+                long time = locationMillis - lastLocationMillis;
+                distanceQueue.add(new DistanceWrapper(distance, time));
+                while (distanceQueue.size() > getDistanceCnt()) {
+                    distanceQueue.poll();
                 }
 
                 // Speed and pace
                 float speed = calculateSpeed();
                 long pace = calculatePace();
                 if (speed > 1) {
-                    mCallback.onNewSpeedValue(speed);
-                    mCallback.onNewPaceValue(pace);
+                    callback.onNewSpeedValue(speed);
+                    callback.onNewPaceValue(pace);
                 } else {
-                    mCallback.onNewSpeedValue(0);
-                    mCallback.onNewPaceValue(0);
+                    callback.onNewSpeedValue(0);
+                    callback.onNewPaceValue(0);
                 }
             }
-            mLastCoordinate = coordinate;
-            mLastLocationMillis = locationMillis;
+            lastCoordinate = coordinate;
+            lastLocationMillis = locationMillis;
         }
     }
 
@@ -367,7 +367,7 @@ public class LocationHandler implements
      * @return Distance count from the SharedPreferences
      */
     private int getDistanceCnt() {
-        return PreferenceManager.getDefaultSharedPreferences(mActivity).getInt(
+        return PreferenceManager.getDefaultSharedPreferences(activity).getInt(
                 Pref.DISTANCE_CNT, DISTANCE_CNT_DEFAULT);
     }
 
@@ -379,7 +379,7 @@ public class LocationHandler implements
     private float calculateSpeed() {
         float totalDistance = 0;
         long totalTime = 0;
-        for (DistanceWrapper distanceWrapper : mDistanceQueue) {
+        for (DistanceWrapper distanceWrapper : distanceQueue) {
             totalDistance += distanceWrapper.getDistance();
             totalTime += distanceWrapper.getTime();
         }
@@ -394,7 +394,7 @@ public class LocationHandler implements
     private long calculatePace() {
         float totalDistance = 0;
         long totalTime = 0;
-        for (DistanceWrapper distanceWrapper : mDistanceQueue) {
+        for (DistanceWrapper distanceWrapper : distanceQueue) {
             totalDistance += distanceWrapper.getDistance();
             totalTime += distanceWrapper.getTime();
         }
@@ -409,12 +409,12 @@ public class LocationHandler implements
         /**
          * Distance travelled.
          */
-        private final float mDistance;
+        private final float distance;
 
         /**
          * Time passed to travel the distance.
          */
-        private final long mTime;
+        private final long time;
 
         /**
          * DistanceWrapper constructor.
@@ -423,22 +423,22 @@ public class LocationHandler implements
          * @param time     Time passed to travel the distance
          */
         DistanceWrapper(final float distance, final long time) {
-            mDistance = distance;
-            mTime = time;
+            this.distance = distance;
+            this.time = time;
         }
 
         /**
          * @return Distance travelled
          */
         final float getDistance() {
-            return mDistance;
+            return distance;
         }
 
         /**
          * @return Time passed to travel the distance
          */
         final long getTime() {
-            return mTime;
+            return time;
         }
     }
 }

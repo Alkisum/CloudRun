@@ -53,7 +53,7 @@ import butterknife.OnClick;
  * Main activity showing location values.
  *
  * @author Alkisum
- * @version 2.2
+ * @version 3.0
  * @since 1.0
  */
 public class MonitorActivity extends AppCompatActivity
@@ -109,132 +109,132 @@ public class MonitorActivity extends AppCompatActivity
     /**
      * SharedPreferences instance.
      */
-    private SharedPreferences mSharedPref;
+    private SharedPreferences sharedPref;
 
     /**
      * EventBus instance.
      */
-    private EventBus mEventBus;
+    private EventBus eventBus;
 
     /**
      * LocationHelper instance.
      */
-    private LocationHelper mLocationHelper;
+    private LocationHelper locationHelper;
 
     /**
      * Recorder instance to start and stop recording data.
      */
-    private Recorder mRecorder;
+    private Recorder recorder;
 
     /**
      * Flag set to true if the session is currently running, false otherwise.
      */
-    private boolean mSessionRunning;
+    private boolean sessionRunning;
 
     /**
      * Flag set to true if the session is currently paused, false otherwise.
      */
-    private boolean mSessionPaused;
+    private boolean sessionPaused;
 
     /**
      * Flag set to true if the session is locked, false otherwise.
      */
-    private boolean mLocked;
+    private boolean locked;
 
     /**
      * Flag set to true when new GPS data has been received, false otherwise.
      */
-    private boolean mNewGpsDataReceived;
+    private boolean newGpsDataReceived;
 
     /**
      * Handler for the task to make the stopwatch blink when the session is
      * paused.
      */
-    private final Handler mStopwatchBlinkHandler = new Handler();
+    private final Handler stopwatchBlinkHandler = new Handler();
 
     /**
      * Handler for the task checking for the GPS status.
      */
-    private final Handler mGpsStatusHandler = new Handler();
+    private final Handler gpsStatusHandler = new Handler();
 
     /**
      * Handler for the lock timeout.
      */
-    private final Handler mLockTimeoutHandler = new Handler();
+    private final Handler lockTimeoutHandler = new Handler();
 
     /**
      * Flag set to true when the lock timeout task delay is on, false otherwise.
      */
-    private boolean mLockTimeoutOn;
+    private boolean lockTimeoutOn;
 
     /**
      * List of layout containing GPS data.
      */
-    private List<Tile> mTiles;
+    private List<Tile> tiles;
 
     /**
      * Array containing the last values for each data type. The index is based
      * on the data type constants.
      */
-    private String[] mCurrentValues;
+    private String[] currentValues;
 
     /**
      * Id for current GPS status icon.
      */
-    private int mGpsStatusIconId = R.drawable.ic_gps_not_fixed_white_24dp;
+    private int gpsStatusIconId = R.drawable.ic_gps_not_fixed_white_24dp;
 
     /**
      * Flag set to true if the GPS accuracy must be shown, false otherwise.
      */
-    private boolean mShowGpsAccuracy;
+    private boolean showGpsAccuracy;
 
     /**
      * TextView showing the GPS accuracy by displaying the distance in meter
      * between 2 coordinates.
      */
     @BindView(R.id.monitor_txt_gps_accuracy)
-    TextView mTextGpsAccuracy;
+    TextView textGpsAccuracy;
 
     /**
      * TextView at the top of the layout.
      */
     @BindView(R.id.monitor_txt_top)
-    TextView mTextTop;
+    TextView textTop;
 
     /**
      * Drawer layout.
      */
     @BindView(R.id.monitor_drawer_layout)
-    DrawerLayout mDrawerLayout;
+    DrawerLayout drawerLayout;
 
     /**
      * ActionBarDrawerToggle instance.
      */
-    private ActionBarDrawerToggle mDrawerToggle;
+    private ActionBarDrawerToggle drawerToggle;
 
     /**
      * Layout containing the start button.
      */
     @BindView(R.id.monitor_layout_start)
-    RelativeLayout mLayoutStart;
+    RelativeLayout layoutStart;
 
     /**
      * Layout containing the lock button.
      */
     @BindView(R.id.monitor_layout_lock)
-    RelativeLayout mLayoutLock;
+    RelativeLayout layoutLock;
 
     /**
      * Layout containing the pause button.
      */
     @BindView(R.id.monitor_layout_pause)
-    RelativeLayout mLayoutPause;
+    RelativeLayout layoutPause;
 
     /**
      * Layout containing the stop button.
      */
     @BindView(R.id.monitor_layout_stop)
-    RelativeLayout mLayoutStop;
+    RelativeLayout layoutStop;
 
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
@@ -252,12 +252,12 @@ public class MonitorActivity extends AppCompatActivity
             init();
         }
 
-        mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
-        mSharedPref.registerOnSharedPreferenceChangeListener(this);
+        sharedPref.registerOnSharedPreferenceChangeListener(this);
 
-        mEventBus = EventBus.getDefault();
-        mEventBus.register(this);
+        eventBus = EventBus.getDefault();
+        eventBus.register(this);
 
         initCurrentValues();
 
@@ -271,14 +271,14 @@ public class MonitorActivity extends AppCompatActivity
 
     @Override
     protected final void onDestroy() {
-        mSharedPref.unregisterOnSharedPreferenceChangeListener(this);
-        mEventBus.unregister(this);
+        sharedPref.unregisterOnSharedPreferenceChangeListener(this);
+        eventBus.unregister(this);
 
-        mGpsStatusHandler.removeCallbacks(mGpsStatusTask);
+        gpsStatusHandler.removeCallbacks(gpsStatusTask);
 
-        if (mLocationHelper != null) {
-            mLocationHelper.stop();
-            mLocationHelper.onDestroy();
+        if (locationHelper != null) {
+            locationHelper.stop();
+            locationHelper.onDestroy();
         }
         super.onDestroy();
     }
@@ -362,7 +362,7 @@ public class MonitorActivity extends AppCompatActivity
     @Override
     public final boolean onPrepareOptionsMenu(final Menu menu) {
         MenuItem gps = menu.findItem(R.id.action_gps);
-        gps.setIcon(mGpsStatusIconId);
+        gps.setIcon(gpsStatusIconId);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -370,8 +370,8 @@ public class MonitorActivity extends AppCompatActivity
     public final boolean onOptionsItemSelected(final MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_gps) {
-            mShowGpsAccuracy = !mShowGpsAccuracy;
-            mTextGpsAccuracy.setText("");
+            showGpsAccuracy = !showGpsAccuracy;
+            textGpsAccuracy.setText("");
         }
         return super.onOptionsItemSelected(item);
     }
@@ -380,7 +380,7 @@ public class MonitorActivity extends AppCompatActivity
      * Initialise activity.
      */
     private void init() {
-        mLocationHelper = new LocationHelper(this);
+        locationHelper = new LocationHelper(this);
     }
 
     /**
@@ -391,11 +391,11 @@ public class MonitorActivity extends AppCompatActivity
         toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
 
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this, mDrawerLayout, toolbar, R.string.navigation_drawer_open,
+        drawerToggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar, R.string.navigation_drawer_open,
                 R.string.navigation_drawer_close);
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
+        drawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
 
         NavigationView navigationView = findViewById(
                 R.id.monitor_navigation_view);
@@ -404,7 +404,7 @@ public class MonitorActivity extends AppCompatActivity
         navigationView.addHeaderView(header);
         navigationView.setNavigationItemSelectedListener(this);
 
-        mGpsStatusHandler.postDelayed(mGpsStatusTask,
+        gpsStatusHandler.postDelayed(gpsStatusTask,
                 LocationHandler.LOCATION_REQUEST_INTERVAL * 2);
 
         setTiles();
@@ -415,21 +415,21 @@ public class MonitorActivity extends AppCompatActivity
      */
     private void setTiles() {
 
-        int leftData = mSharedPref.getInt(Pref.TILE_LEFT, Tile.DISTANCE);
-        int topRightData = mSharedPref.getInt(Pref.TILE_RIGHT_TOP, Tile.SPEED);
-        int bottomRightData = mSharedPref.getInt(
+        int leftData = sharedPref.getInt(Pref.TILE_LEFT, Tile.DISTANCE);
+        int topRightData = sharedPref.getInt(Pref.TILE_RIGHT_TOP, Tile.SPEED);
+        int bottomRightData = sharedPref.getInt(
                 Pref.TILE_RIGHT_BOTTOM, Tile.PACE);
 
-        mTiles = new ArrayList<>();
-        mTiles.add(new Tile(this, this, Pref.TILE_LEFT, leftData,
+        tiles = new ArrayList<>();
+        tiles.add(new Tile(this, this, Pref.TILE_LEFT, leftData,
                 (RelativeLayout) findViewById(R.id.monitor_layout_left),
                 (TextView) findViewById(R.id.monitor_txt_left_value),
                 (TextView) findViewById(R.id.monitor_txt_left_unit)));
-        mTiles.add(new Tile(this, this, Pref.TILE_RIGHT_TOP, topRightData,
+        tiles.add(new Tile(this, this, Pref.TILE_RIGHT_TOP, topRightData,
                 (RelativeLayout) findViewById(R.id.monitor_layout_right_top),
                 (TextView) findViewById(R.id.monitor_txt_right_top_value),
                 (TextView) findViewById(R.id.monitor_txt_right_top_unit)));
-        mTiles.add(new Tile(this, this, Pref.TILE_RIGHT_BOTTOM, bottomRightData,
+        tiles.add(new Tile(this, this, Pref.TILE_RIGHT_BOTTOM, bottomRightData,
                 (RelativeLayout) findViewById(R.id.monitor_layout_right_bottom),
                 (TextView) findViewById(R.id.monitor_txt_right_bottom_value),
                 (TextView) findViewById(R.id.monitor_txt_right_bottom_unit)));
@@ -437,14 +437,14 @@ public class MonitorActivity extends AppCompatActivity
 
     @Override
     public final void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-            mDrawerLayout.closeDrawer(GravityCompat.START);
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            if (mLocked) {
+            if (locked) {
                 Toast.makeText(this, R.string.monitor_session_locked,
                         Toast.LENGTH_LONG).show();
             } else {
-                if (mSessionRunning) {
+                if (sessionRunning) {
                     stopSession();
                 }
                 super.onBackPressed();
@@ -455,18 +455,18 @@ public class MonitorActivity extends AppCompatActivity
     @Override
     public final boolean onNavigationItemSelected(
             @NonNull final MenuItem item) {
-        mDrawerLayout.closeDrawer(GravityCompat.START);
+        drawerLayout.closeDrawer(GravityCompat.START);
         // Start activity a bit later to avoid the lag when closing the drawer
-        mDrawerLayout.postDelayed(new Runnable() {
+        drawerLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
                 int id = item.getItemId();
                 if (id == R.id.nav_history) {
                     Intent intent = new Intent(MonitorActivity.this,
                             HistoryActivity.class);
-                    if (mSessionRunning) {
+                    if (sessionRunning) {
                         intent.putExtra(HistoryActivity.ARG_IGNORE_SESSION_ID,
-                                mRecorder.getSession().getId());
+                                recorder.getSession().getId());
                     }
                     startActivity(intent);
                 } else if (id == R.id.nav_settings) {
@@ -487,15 +487,15 @@ public class MonitorActivity extends AppCompatActivity
         switch (requestCode) {
             case LocationHandler.REQUEST_LOCATION_AUTO:
                 if (resultCode == RESULT_OK) {
-                    if (mLocationHelper != null) {
-                        mLocationHelper.start();
+                    if (locationHelper != null) {
+                        locationHelper.start();
                     }
                 }
                 break;
             case LocationHelper.REQUEST_LOCATION_MANUAL:
                 if (LocationHelper.isLocationEnabled(this)) {
-                    if (mLocationHelper != null) {
-                        mLocationHelper.start();
+                    if (locationHelper != null) {
+                        locationHelper.start();
                     }
                 }
             default:
@@ -505,13 +505,13 @@ public class MonitorActivity extends AppCompatActivity
 
     @Override
     public final void onDurationUpdated(final long duration) {
-        mTextTop.setText(Format.formatDuration(duration));
+        textTop.setText(Format.formatDuration(duration));
     }
 
     @Override
     public final void onDistanceUpdated(final float distance) {
         updateTile(Tile.DISTANCE, Format.formatDistance(distance));
-        long elapsedTime = mRecorder.getCurrentDuration();
+        long elapsedTime = recorder.getCurrentDuration();
 
         // Speed average
         updateTile(Tile.SPEED_AVG,
@@ -529,7 +529,7 @@ public class MonitorActivity extends AppCompatActivity
      */
     @Subscribe
     public final void onCoordinateEvent(final CoordinateEvent event) {
-        mNewGpsDataReceived = true;
+        newGpsDataReceived = true;
     }
 
     /**
@@ -539,8 +539,8 @@ public class MonitorActivity extends AppCompatActivity
      */
     @Subscribe
     public final void onDistanceEvent(final DistanceEvent event) {
-        if ((!mSessionRunning || mSessionPaused) && mShowGpsAccuracy) {
-            mTextGpsAccuracy.setText(Format.formatGpsAccuracy(
+        if ((!sessionRunning || sessionPaused) && showGpsAccuracy) {
+            textGpsAccuracy.setText(Format.formatGpsAccuracy(
                     event.getValue()));
         }
     }
@@ -552,7 +552,7 @@ public class MonitorActivity extends AppCompatActivity
      */
     @Subscribe
     public final void onSpeedEvent(final SpeedEvent event) {
-        if (mSessionRunning && !mSessionPaused) {
+        if (sessionRunning && !sessionPaused) {
             updateTile(Tile.SPEED, Format.formatSpeed(event.getValue()));
         }
     }
@@ -564,7 +564,7 @@ public class MonitorActivity extends AppCompatActivity
      */
     @Subscribe
     public final void onPaceEvent(final PaceEvent event) {
-        if (mSessionRunning && !mSessionPaused) {
+        if (sessionRunning && !sessionPaused) {
             updateTile(Tile.PACE, Format.formatPace(event.getValue()));
         }
     }
@@ -576,8 +576,8 @@ public class MonitorActivity extends AppCompatActivity
      * @param value New value to set
      */
     private void updateTile(final int data, final String value) {
-        mCurrentValues[data] = value;
-        for (Tile tile : mTiles) {
+        currentValues[data] = value;
+        for (Tile tile : tiles) {
             if (tile.getData() == data) {
                 tile.setValue(value);
             }
@@ -586,19 +586,19 @@ public class MonitorActivity extends AppCompatActivity
 
     @Override
     public final void onTileLongClicked() {
-        if (mSessionRunning && !mLocked) {
-            if (mLockTimeoutOn) {
-                mLockTimeoutHandler.removeCallbacks(mLockTimeoutTask);
-                mLockTimeoutOn = false;
+        if (sessionRunning && !locked) {
+            if (lockTimeoutOn) {
+                lockTimeoutHandler.removeCallbacks(lockTimeoutTask);
+                lockTimeoutOn = false;
             }
-            mLockTimeoutHandler.postDelayed(mLockTimeoutTask, LOCK_DELAY);
-            mLockTimeoutOn = true;
+            lockTimeoutHandler.postDelayed(lockTimeoutTask, LOCK_DELAY);
+            lockTimeoutOn = true;
         }
     }
 
     @Override
     public final void onTileValueRequested(final Tile tile, final int data) {
-        tile.setValue(mCurrentValues[data]);
+        tile.setValue(currentValues[data]);
     }
 
     /**
@@ -606,7 +606,7 @@ public class MonitorActivity extends AppCompatActivity
      */
     @OnClick(R.id.monitor_button_start)
     public final void onStartButtonClicked() {
-        if (!mSessionRunning) {
+        if (!sessionRunning) {
             startSession();
         } else {
             resumeSession();
@@ -618,7 +618,7 @@ public class MonitorActivity extends AppCompatActivity
      */
     @OnClick(R.id.monitor_button_pause)
     public final void onPauseButtonClicked() {
-        if (mSessionRunning) {
+        if (sessionRunning) {
             pauseSession();
         }
     }
@@ -628,7 +628,7 @@ public class MonitorActivity extends AppCompatActivity
      */
     @OnClick(R.id.monitor_button_stop)
     public final void onStopButtonClicked() {
-        if (mSessionRunning) {
+        if (sessionRunning) {
             stopSession();
         }
     }
@@ -639,22 +639,22 @@ public class MonitorActivity extends AppCompatActivity
     @OnClick(R.id.monitor_button_lock)
     public final void onLockButtonClicked() {
         setLocked(false);
-        mLockTimeoutHandler.postDelayed(mLockTimeoutTask, LOCK_DELAY);
-        mLockTimeoutOn = true;
+        lockTimeoutHandler.postDelayed(lockTimeoutTask, LOCK_DELAY);
+        lockTimeoutOn = true;
     }
 
     /**
      * Task to make the stopwatch blink when the session is paused.
      */
-    private final Runnable mStopwatchBlinkTask = new Runnable() {
+    private final Runnable stopwatchBlinkTask = new Runnable() {
         @Override
         public void run() {
-            mStopwatchBlinkHandler.postDelayed(this, BLINK_DELAY);
-            int currentVisibility = mTextTop.getVisibility();
+            stopwatchBlinkHandler.postDelayed(this, BLINK_DELAY);
+            int currentVisibility = textTop.getVisibility();
             if (currentVisibility == View.VISIBLE) {
-                mTextTop.setVisibility(View.GONE);
+                textTop.setVisibility(View.GONE);
             } else {
-                mTextTop.setVisibility(View.VISIBLE);
+                textTop.setVisibility(View.VISIBLE);
             }
         }
     };
@@ -662,10 +662,10 @@ public class MonitorActivity extends AppCompatActivity
     /**
      * Task to lock the screen again after timeout.
      */
-    private final Runnable mLockTimeoutTask = new Runnable() {
+    private final Runnable lockTimeoutTask = new Runnable() {
         @Override
         public void run() {
-            mLockTimeoutOn = false;
+            lockTimeoutOn = false;
             setLocked(true);
         }
     };
@@ -674,21 +674,21 @@ public class MonitorActivity extends AppCompatActivity
      * Task checking for the GPS status and updating the Views according to the
      * status.
      */
-    private final Runnable mGpsStatusTask = new Runnable() {
+    private final Runnable gpsStatusTask = new Runnable() {
         @Override
         public void run() {
-            mGpsStatusHandler.postDelayed(this,
+            gpsStatusHandler.postDelayed(this,
                     LocationHandler.LOCATION_REQUEST_INTERVAL * 2);
             if (!LocationHelper.isLocationEnabled(MonitorActivity.this)) {
-                mGpsStatusIconId = R.drawable.ic_gps_off_white_24dp;
-                mTextGpsAccuracy.setText("");
-            } else if (mNewGpsDataReceived) {
-                mGpsStatusIconId = R.drawable.ic_gps_fixed_white_24dp;
+                gpsStatusIconId = R.drawable.ic_gps_off_white_24dp;
+                textGpsAccuracy.setText("");
+            } else if (newGpsDataReceived) {
+                gpsStatusIconId = R.drawable.ic_gps_fixed_white_24dp;
             } else {
-                mGpsStatusIconId = R.drawable.ic_gps_not_fixed_white_24dp;
-                mTextGpsAccuracy.setText("");
+                gpsStatusIconId = R.drawable.ic_gps_not_fixed_white_24dp;
+                textGpsAccuracy.setText("");
             }
-            mNewGpsDataReceived = false;
+            newGpsDataReceived = false;
             invalidateOptionsMenu();
         }
     };
@@ -697,7 +697,7 @@ public class MonitorActivity extends AppCompatActivity
      * Set keep screen on flag according to the preferences.
      */
     private void setKeepScreenOn() {
-        boolean keepScreenOn = mSharedPref.getBoolean(
+        boolean keepScreenOn = sharedPref.getBoolean(
                 Pref.KEEP_SCREEN_ON, false);
         if (keepScreenOn) {
             getWindow().addFlags(
@@ -712,12 +712,12 @@ public class MonitorActivity extends AppCompatActivity
      * Start a session.
      */
     private void startSession() {
-        mRecorder = new Recorder(this);
-        mRecorder.start();
+        recorder = new Recorder(this);
+        recorder.start();
         setLocked(true);
         updateActionButton(ACTION_START);
-        mTextGpsAccuracy.setText("");
-        mSessionRunning = true;
+        textGpsAccuracy.setText("");
+        sessionRunning = true;
     }
 
     /**
@@ -725,54 +725,54 @@ public class MonitorActivity extends AppCompatActivity
      */
     private void resumeSession() {
         setLocked(true);
-        mStopwatchBlinkHandler.removeCallbacks(mStopwatchBlinkTask);
-        mTextTop.setVisibility(View.VISIBLE);
+        stopwatchBlinkHandler.removeCallbacks(stopwatchBlinkTask);
+        textTop.setVisibility(View.VISIBLE);
         updateActionButton(ACTION_RESUME);
-        mTextGpsAccuracy.setText("");
-        mSessionPaused = false;
-        mRecorder.resume();
+        textGpsAccuracy.setText("");
+        sessionPaused = false;
+        recorder.resume();
     }
 
     /**
      * Set the session on pause.
      */
     private void pauseSession() {
-        if (mLockTimeoutOn) {
-            mLockTimeoutHandler.removeCallbacks(mLockTimeoutTask);
-            mLockTimeoutOn = false;
+        if (lockTimeoutOn) {
+            lockTimeoutHandler.removeCallbacks(lockTimeoutTask);
+            lockTimeoutOn = false;
         }
-        mStopwatchBlinkHandler.post(mStopwatchBlinkTask);
+        stopwatchBlinkHandler.post(stopwatchBlinkTask);
         updateActionButton(ACTION_PAUSE);
-        mSessionPaused = true;
-        mRecorder.pause();
+        sessionPaused = true;
+        recorder.pause();
     }
 
     /**
      * Stop the current session.
      */
     private void stopSession() {
-        mRecorder.stop();
+        recorder.stop();
 
-        if (mLockTimeoutOn) {
-            mLockTimeoutHandler.removeCallbacks(mLockTimeoutTask);
-            mLockTimeoutOn = false;
+        if (lockTimeoutOn) {
+            lockTimeoutHandler.removeCallbacks(lockTimeoutTask);
+            lockTimeoutOn = false;
         }
-        if (mSessionPaused) {
-            mStopwatchBlinkHandler.removeCallbacks(mStopwatchBlinkTask);
-            mTextTop.setVisibility(View.VISIBLE);
+        if (sessionPaused) {
+            stopwatchBlinkHandler.removeCallbacks(stopwatchBlinkTask);
+            textTop.setVisibility(View.VISIBLE);
         }
 
         updateActionButton(ACTION_STOP);
 
         Intent intent = new Intent(this, HistoryActivity.class);
         intent.putExtra(HistoryActivity.ARG_HIGHLIGHTED_SESSION_ID,
-                mRecorder.getSession().getId());
+                recorder.getSession().getId());
         startActivity(intent);
 
         resetViews();
         initCurrentValues();
 
-        mSessionRunning = false;
+        sessionRunning = false;
     }
 
     /**
@@ -781,22 +781,22 @@ public class MonitorActivity extends AppCompatActivity
      * @param locked True if the session is to be locked, false otherwise
      */
     private void setLocked(final boolean locked) {
-        mLocked = locked;
+        this.locked = locked;
 
-        for (Tile tile : mTiles) {
+        for (Tile tile : tiles) {
             tile.setEnabled(!locked);
         }
 
-        if (mLocked) {
+        if (this.locked) {
             updateActionButton(ACTION_LOCK);
-            mDrawerLayout.setDrawerLockMode(
+            drawerLayout.setDrawerLockMode(
                     DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         } else {
             updateActionButton(ACTION_UNLOCK);
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
-        mDrawerToggle.setDrawerIndicatorEnabled(!locked);
-        mDrawerToggle.syncState();
+        drawerToggle.setDrawerIndicatorEnabled(!locked);
+        drawerToggle.syncState();
 
         invalidateOptionsMenu();
     }
@@ -805,8 +805,8 @@ public class MonitorActivity extends AppCompatActivity
      * Reset the views that are updated during a session.
      */
     private void resetViews() {
-        mTextTop.setText(R.string.default_stopwatch);
-        for (Tile tile : mTiles) {
+        textTop.setText(R.string.default_stopwatch);
+        for (Tile tile : tiles) {
             tile.resetValues();
         }
     }
@@ -815,7 +815,7 @@ public class MonitorActivity extends AppCompatActivity
      * Initialise the current values strings with their default values.
      */
     private void initCurrentValues() {
-        mCurrentValues = new String[]{
+        currentValues = new String[]{
                 getString(R.string.default_distance),
                 getString(R.string.default_speed),
                 getString(R.string.default_pace),
@@ -832,40 +832,40 @@ public class MonitorActivity extends AppCompatActivity
     private void updateActionButton(final int action) {
         switch (action) {
             case ACTION_START:
-                mLayoutStart.setVisibility(View.GONE);
-                mLayoutLock.setVisibility(View.VISIBLE);
-                mLayoutPause.setVisibility(View.GONE);
-                mLayoutStop.setVisibility(View.GONE);
+                layoutStart.setVisibility(View.GONE);
+                layoutLock.setVisibility(View.VISIBLE);
+                layoutPause.setVisibility(View.GONE);
+                layoutStop.setVisibility(View.GONE);
                 break;
             case ACTION_RESUME:
-                mLayoutStart.setVisibility(View.GONE);
-                mLayoutLock.setVisibility(View.VISIBLE);
-                mLayoutPause.setVisibility(View.GONE);
-                mLayoutStop.setVisibility(View.GONE);
+                layoutStart.setVisibility(View.GONE);
+                layoutLock.setVisibility(View.VISIBLE);
+                layoutPause.setVisibility(View.GONE);
+                layoutStop.setVisibility(View.GONE);
                 break;
             case ACTION_PAUSE:
-                mLayoutStart.setVisibility(View.VISIBLE);
-                mLayoutLock.setVisibility(View.GONE);
-                mLayoutPause.setVisibility(View.GONE);
-                mLayoutStop.setVisibility(View.VISIBLE);
+                layoutStart.setVisibility(View.VISIBLE);
+                layoutLock.setVisibility(View.GONE);
+                layoutPause.setVisibility(View.GONE);
+                layoutStop.setVisibility(View.VISIBLE);
                 break;
             case ACTION_STOP:
-                mLayoutStart.setVisibility(View.VISIBLE);
-                mLayoutLock.setVisibility(View.GONE);
-                mLayoutPause.setVisibility(View.GONE);
-                mLayoutStop.setVisibility(View.GONE);
+                layoutStart.setVisibility(View.VISIBLE);
+                layoutLock.setVisibility(View.GONE);
+                layoutPause.setVisibility(View.GONE);
+                layoutStop.setVisibility(View.GONE);
                 break;
             case ACTION_LOCK:
-                mLayoutStart.setVisibility(View.GONE);
-                mLayoutLock.setVisibility(View.VISIBLE);
-                mLayoutPause.setVisibility(View.GONE);
-                mLayoutStop.setVisibility(View.GONE);
+                layoutStart.setVisibility(View.GONE);
+                layoutLock.setVisibility(View.VISIBLE);
+                layoutPause.setVisibility(View.GONE);
+                layoutStop.setVisibility(View.GONE);
                 break;
             case ACTION_UNLOCK:
-                mLayoutStart.setVisibility(View.GONE);
-                mLayoutLock.setVisibility(View.GONE);
-                mLayoutPause.setVisibility(View.VISIBLE);
-                mLayoutStop.setVisibility(View.VISIBLE);
+                layoutStart.setVisibility(View.GONE);
+                layoutLock.setVisibility(View.GONE);
+                layoutPause.setVisibility(View.VISIBLE);
+                layoutStop.setVisibility(View.VISIBLE);
                 break;
             default:
                 break;

@@ -6,7 +6,7 @@ import com.alkisum.android.cloudrun.location.Coordinate;
  * Class defining coordinate event for EventBus.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 3.0
  * @since 1.0
  */
 public class CoordinateEvent {
@@ -14,21 +14,21 @@ public class CoordinateEvent {
     /**
      * Coordinate values.
      */
-    private final Coordinate mValues;
+    private final Coordinate values;
 
     /**
      * CoordinateEvent constructor.
      *
-     * @param value Coordinate values
+     * @param values Coordinate values
      */
-    public CoordinateEvent(final Coordinate value) {
-        mValues = value;
+    public CoordinateEvent(final Coordinate values) {
+        this.values = values;
     }
 
     /**
      * @return Coordinate values
      */
     public final Coordinate getValues() {
-        return mValues;
+        return values;
     }
 }

@@ -10,7 +10,7 @@ import com.squareup.leakcanary.LeakCanary;
  * Application class.
  *
  * @author Alkisum
- * @version 2.3
+ * @version 3.0
  * @since 2.0
  */
 public class CloudRunApp extends Application {

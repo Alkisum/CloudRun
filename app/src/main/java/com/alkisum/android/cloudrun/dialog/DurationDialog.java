@@ -12,13 +12,11 @@ import android.widget.NumberPicker;
 
 import com.alkisum.android.cloudrun.R;
 
-import butterknife.ButterKnife;
-
 /**
  * Dialog to set the duration.
  *
  * @author Alkisum
- * @version 2.0
+ * @version 3.0
  * @since 2.0
  */
 
@@ -47,7 +45,7 @@ public class DurationDialog extends DialogFragment {
     /**
      * Listener for the dialog.
      */
-    private DurationDialogListener mCallback;
+    private DurationDialogListener callback;
 
     /**
      * Create a new instance of DurationDialog.
@@ -72,7 +70,7 @@ public class DurationDialog extends DialogFragment {
     public final void onAttach(final Context context) {
         super.onAttach(context);
         try {
-            mCallback = (DurationDialogListener) context;
+            callback = (DurationDialogListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.getClass().getSimpleName()
                     + " must implement DurationDialogListener");
@@ -89,7 +87,6 @@ public class DurationDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         View view = View.inflate(getActivity(), R.layout.dialog_duration, null);
-        ButterKnife.bind(this, view);
 
         final NumberPicker nbHour = view.findViewById(R.id.duration_nb_hour);
         nbHour.setMinValue(0);
@@ -113,7 +110,7 @@ public class DurationDialog extends DialogFragment {
                             @Override
                             public void onClick(final DialogInterface dialog,
                                                 final int id) {
-                                mCallback.onDurationSubmit(
+                                callback.onDurationSubmit(
                                         nbHour.getValue(),
                                         nbMinute.getValue(),
                                         nbSecond.getValue());

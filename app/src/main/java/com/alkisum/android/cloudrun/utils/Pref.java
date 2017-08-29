@@ -11,7 +11,7 @@ import com.alkisum.android.cloudrun.location.LocationHandler;
  * Class defining constants for SharedPreferences.
  *
  * @author Alkisum
- * @version 2.4
+ * @version 3.0
  * @since 1.0
  */
 public final class Pref {
