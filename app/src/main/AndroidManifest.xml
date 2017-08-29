@@ -17,7 +17,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="com.alkisum.android.cloudrun.monitor.MonitorActivity"
+            android:name="com.alkisum.android.cloudrun.activities.MonitorActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
@@ -27,21 +27,21 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.alkisum.android.cloudrun.history.HistoryActivity"
+            android:name="com.alkisum.android.cloudrun.activities.HistoryActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"/>
         <activity
-            android:name="com.alkisum.android.cloudrun.history.SessionActivity"
+            android:name="com.alkisum.android.cloudrun.activities.SessionActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"/>
         <activity
-            android:name="com.alkisum.android.cloudrun.history.AddSessionActivity"
+            android:name="com.alkisum.android.cloudrun.activities.AddSessionActivity"
             android:configChanges="orientation|screenSize"/>
         <activity
-            android:name="com.alkisum.android.cloudrun.settings.SettingsActivity"
+            android:name="com.alkisum.android.cloudrun.activities.SettingsActivity"
             android:configChanges="orientation|screenSize"/>
         <activity
-            android:name="com.alkisum.android.cloudrun.settings.AboutActivity"
+            android:name="com.alkisum.android.cloudrun.activities.AboutActivity"
             android:configChanges="orientation|screenSize"/>
 
         <service android:name="com.alkisum.android.cloudrun.location.LocationUpdateService"/>

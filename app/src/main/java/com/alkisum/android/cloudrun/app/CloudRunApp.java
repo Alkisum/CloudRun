@@ -2,7 +2,7 @@ package com.alkisum.android.cloudrun.app;
 
 import android.app.Application;
 
-import com.alkisum.android.cloudrun.data.Db;
+import com.alkisum.android.cloudrun.database.Db;
 import com.alkisum.android.cloudrun.utils.Pref;
 import com.squareup.leakcanary.LeakCanary;
 

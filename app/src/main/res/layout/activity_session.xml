@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bgOut"
-    tools:context=".history.SessionActivity">
+    tools:context=".activities.SessionActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/session_toolbar"

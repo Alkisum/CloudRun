@@ -9,11 +9,11 @@ import android.provider.Settings;
 import android.util.Log;
 
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.dialog.ErrorDialog;
-import com.alkisum.android.cloudrun.event.CoordinateEvent;
-import com.alkisum.android.cloudrun.event.DistanceEvent;
-import com.alkisum.android.cloudrun.event.PaceEvent;
-import com.alkisum.android.cloudrun.event.SpeedEvent;
+import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
+import com.alkisum.android.cloudrun.events.CoordinateEvent;
+import com.alkisum.android.cloudrun.events.DistanceEvent;
+import com.alkisum.android.cloudrun.events.PaceEvent;
+import com.alkisum.android.cloudrun.events.SpeedEvent;
 
 import org.greenrobot.eventbus.EventBus;
 

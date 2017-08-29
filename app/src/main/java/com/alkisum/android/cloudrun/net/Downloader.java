@@ -9,8 +9,8 @@ import com.alkisum.android.cloudops.file.json.JsonFile;
 import com.alkisum.android.cloudops.file.json.JsonFileReader;
 import com.alkisum.android.cloudops.net.ConnectInfo;
 import com.alkisum.android.cloudops.net.owncloud.OcDownloader;
-import com.alkisum.android.cloudrun.data.Inserter;
-import com.alkisum.android.cloudrun.event.InsertEvent;
+import com.alkisum.android.cloudrun.database.Inserter;
+import com.alkisum.android.cloudrun.events.InsertEvent;
 import com.alkisum.android.cloudrun.utils.Json;
 
 import org.greenrobot.eventbus.EventBus;

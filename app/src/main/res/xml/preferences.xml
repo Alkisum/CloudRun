@@ -18,7 +18,7 @@
             android:key="keepScreenOn"
             android:title="Keep screen on"/>
 
-        <com.alkisum.android.cloudrun.settings.NumberPickerPreference
+        <com.alkisum.android.cloudrun.ui.NumberPickerPreference
             android:key="distanceCnt"
             android:title="Speed calculation"
             app:minValue="1"
