@@ -101,6 +101,6 @@
 
     <!-- About -->
     <string name="about_title">About CloudRun</string>
-    <string name="about_github">https://github.com/Alkisum/ownRun/</string>
+    <string name="about_github">https://github.com/Alkisum/CloudRun/</string>
 
 </resources>
