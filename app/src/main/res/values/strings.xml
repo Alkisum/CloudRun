@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ownRun</string>
+    <string name="app_name">CloudRun</string>
 
     <!-- Permissions -->
     <string name="permission_title">Insufficient permissions</string>
@@ -53,7 +53,6 @@
     <string name="history_no_session">No sessions available</string>
     <string name="history_delete_title">Delete sessions</string>
     <string name="history_delete_msg">Are you sure you want to delete the selected sessions?</string>
-    <string name="history_delete_progress">Deleting selected sessions&#8230;</string>
     <string name="history_upload_success_toast">Sessions uploaded</string>
 
     <!-- History List -->
@@ -65,7 +64,6 @@
     <!-- Session -->
     <string name="session_delete_title">Delete session</string>
     <string name="session_delete_msg">Are you sure you want to delete the session?</string>
-    <string name="session_delete_progress">Deleting session&#8230;</string>
     <string name="session_upload_success_toast">Session uploaded</string>
     <string name="session_label_duration">duration</string>
     <string name="session_label_distance">distance (km)</string>
@@ -73,17 +71,14 @@
     <string name="session_label_pace">pace (min/km)</string>
     <string name="session_no_data_available">No data available</string>
 
-    <!-- General OwnCloud Operations -->
-    <string name="operation_progress_init_msg">Preparing&#8230; (0%)</string>
+    <!-- General Cloud Operations -->
     <string name="upload_writing_failure_title">File creation failed</string>
     <string name="upload_failure_title">Upload failed</string>
     <string name="download_failure_title">Download failed</string>
     <string name="download_success_toast">Sessions downloaded</string>
     <string name="download_no_file_toast">No sessions to be downloaded</string>
     <string name="download_reading_failure_title">File parsing failed</string>
-    <string name="download_reading_msg">Reading data&#8230;</string>
     <string name="download_insert_failure_title">Insertion into database failed</string>
-    <string name="download_inserting_msg">Inserting data&#8230;</string>
 
     <!-- Add Session -->
     <string name="add_session_title">Add session</string>
@@ -105,7 +100,7 @@
     <string name="distance_cnt_summary">&#160;measurements</string>
 
     <!-- About -->
-    <string name="about_title">About ownRun</string>
+    <string name="about_title">About CloudRun</string>
     <string name="about_github">https://github.com/Alkisum/ownRun/</string>
 
 </resources>

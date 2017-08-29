@@ -3,10 +3,10 @@
                   xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
-        android:title="ownCloud">
+        android:title="Cloud">
 
         <SwitchPreference
-            android:key="saveOwnCloudInfo"
+            android:key="saveCloudInfo"
             android:title="Save connection information"/>
 
     </PreferenceCategory>
@@ -18,7 +18,7 @@
             android:key="keepScreenOn"
             android:title="Keep screen on"/>
 
-        <com.alkisum.android.ownrun.settings.NumberPickerPreference
+        <com.alkisum.android.cloudrun.settings.NumberPickerPreference
             android:key="distanceCnt"
             android:title="Speed calculation"
             app:minValue="1"
@@ -32,7 +32,7 @@
 
         <Preference
             android:key="about"
-            android:title="About ownRun"/>
+            android:title="About CloudRun"/>
 
     </PreferenceCategory>
 
