@@ -6,7 +6,7 @@ android {
     buildToolsVersion "26.0.1"
 
     defaultConfig {
-        applicationId "com.alkisum.android.ownrun"
+        applicationId "com.alkisum.android.cloudrun"
         minSdkVersion 18
         targetSdkVersion 26
         versionCode 10

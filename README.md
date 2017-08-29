@@ -1,6 +1,6 @@
-# ownRun
+# CloudRun
 
-ownRun is an Android application allowing the user to track his running sessions and to upload the data on his ownCloud or Nextcloud server.
+CloudRun is an Android application allowing the user to track his running sessions and to upload the data on his ownCloud or Nextcloud server.
 
 
 ## Requirements
@@ -10,7 +10,7 @@ ownRun is an Android application allowing the user to track his running sessions
 
 ## Installation
 
-+ Download the ownRun-x.x.apk file under the *release* directory to your smartphone
++ Download the cloudrun-x.x.apk file under the *release* directory to your smartphone
 + Install the application by executing the file 
 
 
