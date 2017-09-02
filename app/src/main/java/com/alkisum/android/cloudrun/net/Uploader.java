@@ -3,11 +3,11 @@ package com.alkisum.android.cloudrun.net;
 import android.content.Context;
 import android.content.Intent;
 
-import com.alkisum.android.cloudops.events.JsonFileWriterEvent;
-import com.alkisum.android.cloudops.events.UploadEvent;
-import com.alkisum.android.cloudops.file.json.JsonFileWriter;
-import com.alkisum.android.cloudops.net.ConnectInfo;
-import com.alkisum.android.cloudops.net.owncloud.OcUploader;
+import com.alkisum.android.cloudlib.events.JsonFileWriterEvent;
+import com.alkisum.android.cloudlib.events.UploadEvent;
+import com.alkisum.android.cloudlib.file.json.JsonFileWriter;
+import com.alkisum.android.cloudlib.net.ConnectInfo;
+import com.alkisum.android.cloudlib.net.owncloud.OcUploader;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.utils.Json;
 

@@ -1,6 +1,6 @@
 package com.alkisum.android.cloudrun.events;
 
-import com.alkisum.android.cloudops.events.FilteredEvent;
+import com.alkisum.android.cloudlib.events.FilteredEvent;
 
 /**
  * Class defining inserter event for EventBus.

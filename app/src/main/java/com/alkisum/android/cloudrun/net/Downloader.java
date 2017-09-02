@@ -3,12 +3,12 @@ package com.alkisum.android.cloudrun.net;
 import android.content.Context;
 import android.content.Intent;
 
-import com.alkisum.android.cloudops.events.DownloadEvent;
-import com.alkisum.android.cloudops.events.JsonFileReaderEvent;
-import com.alkisum.android.cloudops.file.json.JsonFile;
-import com.alkisum.android.cloudops.file.json.JsonFileReader;
-import com.alkisum.android.cloudops.net.ConnectInfo;
-import com.alkisum.android.cloudops.net.owncloud.OcDownloader;
+import com.alkisum.android.cloudlib.events.DownloadEvent;
+import com.alkisum.android.cloudlib.events.JsonFileReaderEvent;
+import com.alkisum.android.cloudlib.file.json.JsonFile;
+import com.alkisum.android.cloudlib.file.json.JsonFileReader;
+import com.alkisum.android.cloudlib.net.ConnectInfo;
+import com.alkisum.android.cloudlib.net.owncloud.OcDownloader;
 import com.alkisum.android.cloudrun.database.Inserter;
 import com.alkisum.android.cloudrun.events.InsertEvent;
 import com.alkisum.android.cloudrun.utils.Json;

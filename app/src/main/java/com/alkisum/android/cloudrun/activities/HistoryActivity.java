@@ -16,12 +16,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alkisum.android.cloudops.events.DownloadEvent;
-import com.alkisum.android.cloudops.events.JsonFileReaderEvent;
-import com.alkisum.android.cloudops.events.JsonFileWriterEvent;
-import com.alkisum.android.cloudops.events.UploadEvent;
-import com.alkisum.android.cloudops.net.ConnectDialog;
-import com.alkisum.android.cloudops.net.ConnectInfo;
+import com.alkisum.android.cloudlib.events.DownloadEvent;
+import com.alkisum.android.cloudlib.events.JsonFileReaderEvent;
+import com.alkisum.android.cloudlib.events.JsonFileWriterEvent;
+import com.alkisum.android.cloudlib.events.UploadEvent;
+import com.alkisum.android.cloudlib.net.ConnectDialog;
+import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.database.Deleter;
 import com.alkisum.android.cloudrun.utils.Sessions;

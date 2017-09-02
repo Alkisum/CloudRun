@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.alkisum.android.cloudops.utils.CloudPref;
+import com.alkisum.android.cloudlib.utils.CloudPref;
 import com.alkisum.android.cloudrun.location.LocationHandler;
 
 /**

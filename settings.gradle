@@ -1,2 +1,2 @@
-include ':cloudops', ':app'
-project(':cloudops').projectDir = new File(settingsDir, '../CloudOps/cloudops')
+include ':cloudlib', ':app'
+project(':cloudlib').projectDir = new File(settingsDir, '../CloudLib/cloudlib')
