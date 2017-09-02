@@ -30,7 +30,7 @@ public final class Db {
     /**
      * Database name.
      */
-    private static final String NAME = "cloudRun.db";
+    private static final String NAME = "CloudRun.db";
 
     /**
      * DaoSession instance.

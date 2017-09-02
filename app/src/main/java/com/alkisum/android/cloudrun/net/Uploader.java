@@ -7,7 +7,7 @@ import com.alkisum.android.cloudlib.events.JsonFileWriterEvent;
 import com.alkisum.android.cloudlib.events.UploadEvent;
 import com.alkisum.android.cloudlib.file.json.JsonFileWriter;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
-import com.alkisum.android.cloudlib.net.owncloud.OcUploader;
+import com.alkisum.android.cloudlib.net.nextcloud.NcUploader;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.utils.Json;
 
@@ -35,7 +35,7 @@ public class Uploader {
     /**
      * OcUploader instance to start.
      */
-    private final OcUploader ocUploader;
+    private final NcUploader ncUploader;
 
     /**
      * Uploader constructor.
@@ -52,9 +52,9 @@ public class Uploader {
                     final int subscriberId) throws JSONException {
         EventBus.getDefault().register(this);
 
-        ocUploader = new OcUploader(context, intent, new Integer[]{
+        ncUploader = new NcUploader(context, intent, new Integer[]{
                 SUBSCRIBER_ID, subscriberId});
-        ocUploader.init(
+        ncUploader.init(
                 connectInfo.getAddress(),
                 connectInfo.getPath(),
                 connectInfo.getUsername(),
@@ -78,7 +78,7 @@ public class Uploader {
         }
         switch (event.getResult()) {
             case JsonFileWriterEvent.OK:
-                ocUploader.start(event.getJsonFiles());
+                ncUploader.start(event.getJsonFiles());
                 break;
             case JsonFileWriterEvent.ERROR:
                 EventBus.getDefault().unregister(this);

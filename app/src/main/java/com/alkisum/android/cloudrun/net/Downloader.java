@@ -8,7 +8,7 @@ import com.alkisum.android.cloudlib.events.JsonFileReaderEvent;
 import com.alkisum.android.cloudlib.file.json.JsonFile;
 import com.alkisum.android.cloudlib.file.json.JsonFileReader;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
-import com.alkisum.android.cloudlib.net.owncloud.OcDownloader;
+import com.alkisum.android.cloudlib.net.nextcloud.NcDownloader;
 import com.alkisum.android.cloudrun.database.Inserter;
 import com.alkisum.android.cloudrun.events.InsertEvent;
 import com.alkisum.android.cloudrun.utils.Json;
@@ -53,16 +53,16 @@ public class Downloader {
         EventBus.getDefault().register(this);
 
         this.subscriberId = subscriberId;
-        OcDownloader ocDownloader = new OcDownloader(context, intent,
+        NcDownloader ncDownloader = new NcDownloader(context, intent,
                 new Integer[]{SUBSCRIBER_ID, subscriberId});
 
-        ocDownloader.init(
+        ncDownloader.init(
                 connectInfo.getAddress(),
                 connectInfo.getPath(),
                 connectInfo.getUsername(),
                 connectInfo.getPassword());
-        ocDownloader.setExcludeFileNames(Json.getSessionJsonFileNames());
-        ocDownloader.start();
+        ncDownloader.setExcludeFileNames(Json.getSessionJsonFileNames());
+        ncDownloader.start();
     }
 
     /**

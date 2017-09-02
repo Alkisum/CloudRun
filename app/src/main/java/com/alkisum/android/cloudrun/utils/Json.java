@@ -32,7 +32,7 @@ public final class Json {
     /**
      * JSON file name prefix.
      */
-    private static final String FILE_PREFIX = "cloudRun_";
+    private static final String FILE_PREFIX = "CloudRun_";
 
     /**
      * Regex for the Json file.
