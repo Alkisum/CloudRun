@@ -18,7 +18,7 @@ import java.util.List;
  * @version 3.0
  * @since 2.0
  */
-public class Deleter extends AsyncTask<Void, Void, Void> {
+public class Deleter extends AsyncTask<Void, Void, List<Session>> {
 
     /**
      * Subscriber ids allowed to process the events.
@@ -35,18 +35,18 @@ public class Deleter extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected final Void doInBackground(final Void... voids) {
+    protected final List<Session> doInBackground(final Void... voids) {
         DaoSession daoSession = Db.getInstance().getDaoSession();
         List<Session> sessions = Sessions.getSelectedSessions();
         for (Session session : sessions) {
             daoSession.getDataPointDao().deleteInTx(session.getDataPoints());
             session.delete();
         }
-        return null;
+        return sessions;
     }
 
     @Override
-    protected final void onPostExecute(final Void param) {
-        EventBus.getDefault().post(new DeleteEvent(subscriberIds));
+    protected final void onPostExecute(final List<Session> sessions) {
+        EventBus.getDefault().post(new DeleteEvent(subscriberIds, sessions));
     }
 }

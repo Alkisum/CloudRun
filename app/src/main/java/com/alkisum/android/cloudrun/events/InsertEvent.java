@@ -1,7 +1,7 @@
 package com.alkisum.android.cloudrun.events;
 
 /**
- * Class defining inserter event for EventBus.
+ * Class defining insert event for EventBus.
  *
  * @author Alkisum
  * @version 3.0

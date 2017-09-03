@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -23,7 +24,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.database.Recorder;
@@ -440,8 +440,8 @@ public class MonitorActivity extends AppCompatActivity
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             if (locked) {
-                Toast.makeText(this, R.string.monitor_session_locked,
-                        Toast.LENGTH_LONG).show();
+                Snackbar.make(drawerLayout, R.string.monitor_session_locked,
+                        Snackbar.LENGTH_LONG).show();
             } else {
                 if (sessionRunning) {
                     stopSession();

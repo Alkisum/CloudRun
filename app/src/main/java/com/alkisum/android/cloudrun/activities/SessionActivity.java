@@ -1,8 +1,8 @@
 package com.alkisum.android.cloudrun.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,7 +14,6 @@ import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alkisum.android.cloudlib.events.JsonFileWriterEvent;
 import com.alkisum.android.cloudlib.events.UploadEvent;
@@ -23,14 +22,17 @@ import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.database.Deleter;
-import com.alkisum.android.cloudrun.utils.Sessions;
-import com.alkisum.android.cloudrun.dialogs.ConfirmDialog;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.DeleteEvent;
 import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.net.Uploader;
 import com.alkisum.android.cloudrun.utils.Format;
+import com.alkisum.android.cloudrun.utils.Sessions;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -69,6 +71,12 @@ public class SessionActivity extends AppCompatActivity implements
      * Argument for session id.
      */
     public static final String ARG_SESSION_ID = "arg_session_id";
+
+    /**
+     * Argument for the JSON representation of the session, sent to the
+     * HistoryActivity when the session has been deleted.
+     */
+    static final String ARG_SESSION_JSON = "arg_session_json";
 
     /**
      * Operation id for upload.
@@ -172,7 +180,7 @@ public class SessionActivity extends AppCompatActivity implements
             case R.id.action_delete:
                 session.setSelected(true);
                 if (!Sessions.getSelectedSessions().isEmpty()) {
-                    showDeleteConfirmation();
+                    deleteSession();
                 }
                 return true;
             default:
@@ -239,22 +247,6 @@ public class SessionActivity extends AppCompatActivity implements
                 dpStart.getLatitude(), dpStart.getLongitude()));
         mapView.getOverlays().add(polyline);
         mapView.invalidate();
-    }
-
-    /**
-     * Show dialog to confirm the deletion of the selected sessions.
-     */
-    private void showDeleteConfirmation() {
-        ConfirmDialog.build(this,
-                getString(R.string.session_delete_title),
-                getString(R.string.session_delete_msg),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialogInterface,
-                                        final int i) {
-                        deleteSession();
-                    }
-                }).show();
     }
 
     /**
@@ -333,9 +325,9 @@ public class SessionActivity extends AppCompatActivity implements
                 progressBar.setVisibility(View.VISIBLE);
                 break;
             case UploadEvent.OK:
-                Toast.makeText(this,
-                        getString(R.string.session_upload_success_toast),
-                        Toast.LENGTH_LONG).show();
+                Snackbar.make(findViewById(R.id.session_layout),
+                        R.string.session_upload_success_snackbar,
+                        Snackbar.LENGTH_LONG).show();
                 progressBar.setVisibility(View.GONE);
                 break;
             case UploadEvent.ERROR:
@@ -359,7 +351,26 @@ public class SessionActivity extends AppCompatActivity implements
         if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
-        setResult(HistoryActivity.SESSION_DELETED);
+
+        // Exclude session field in DataPoint to avoid circular references
+        Gson gson = new GsonBuilder()
+                .setExclusionStrategies(new ExclusionStrategy() {
+                    @Override
+                    public boolean shouldSkipField(final FieldAttributes f) {
+                        return f.getName().equals("session");
+                    }
+
+                    @Override
+                    public boolean shouldSkipClass(final Class<?> clazz) {
+                        return false;
+                    }
+                })
+                .create();
+
+        // Notify MainActivity that a session has been deleted
+        Intent intent = new Intent();
+        intent.putExtra(ARG_SESSION_JSON, gson.toJson(session));
+        setResult(HistoryActivity.SESSION_DELETED, intent);
         finish();
     }
 }

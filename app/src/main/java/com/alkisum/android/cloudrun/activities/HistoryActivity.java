@@ -1,8 +1,9 @@
 package com.alkisum.android.cloudrun.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alkisum.android.cloudlib.events.DownloadEvent;
 import com.alkisum.android.cloudlib.events.JsonFileReaderEvent;
@@ -23,16 +23,18 @@ import com.alkisum.android.cloudlib.events.UploadEvent;
 import com.alkisum.android.cloudlib.net.ConnectDialog;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudrun.R;
+import com.alkisum.android.cloudrun.adapters.HistoryListAdapter;
 import com.alkisum.android.cloudrun.database.Deleter;
-import com.alkisum.android.cloudrun.utils.Sessions;
-import com.alkisum.android.cloudrun.dialogs.ConfirmDialog;
+import com.alkisum.android.cloudrun.database.Restorer;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.DeleteEvent;
 import com.alkisum.android.cloudrun.events.InsertEvent;
-import com.alkisum.android.cloudrun.adapters.HistoryListAdapter;
-import com.alkisum.android.cloudrun.net.Downloader;
+import com.alkisum.android.cloudrun.events.RestoreEvent;
 import com.alkisum.android.cloudrun.model.Session;
+import com.alkisum.android.cloudrun.net.Downloader;
 import com.alkisum.android.cloudrun.net.Uploader;
+import com.alkisum.android.cloudrun.utils.Sessions;
+import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -95,12 +97,6 @@ public class HistoryActivity extends AppCompatActivity implements
     public static final int SESSION_DELETED = 627;
 
     /**
-     * Result returned by AddSessionActivity when the session has been inserted
-     * into the database.
-     */
-    public static final int SESSION_ADDED = 861;
-
-    /**
      * Toolbar.
      */
     @BindView(R.id.history_toolbar)
@@ -129,6 +125,12 @@ public class HistoryActivity extends AppCompatActivity implements
      */
     @BindView(R.id.history_progressbar)
     ProgressBar progressBar;
+
+    /**
+     * Floating action button to add sessions.
+     */
+    @BindView(R.id.history_fab_add)
+    FloatingActionButton fab;
 
     /**
      * List adapter for the list of session.
@@ -171,22 +173,38 @@ public class HistoryActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected final void onActivityResult(final int requestCode,
-                                          final int resultCode,
-                                          final Intent data) {
-        if (requestCode == SESSION_REQUEST_CODE) {
-            if (resultCode == SESSION_DELETED) {
-                refreshList();
-            } else if (resultCode == SESSION_ADDED) {
-                refreshList();
-            }
-        }
+    protected final void onStart() {
+        super.onStart();
+        refreshList();
     }
 
     @Override
     public final void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    protected final void onActivityResult(final int requestCode,
+                                          final int resultCode,
+                                          final Intent data) {
+        if (requestCode == SESSION_REQUEST_CODE) {
+            if (resultCode == SESSION_DELETED) {
+                String json = data.getStringExtra(
+                        SessionActivity.ARG_SESSION_JSON);
+                final Session session = new Gson().fromJson(
+                        json, Session.class);
+                Snackbar.make(fab, R.string.session_delete_snackbar,
+                        Snackbar.LENGTH_LONG)
+                        .setAction(R.string.action_undo,
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(final View v) {
+                                        restoreSessions(session);
+                                    }
+                                }).show();
+            }
+        }
     }
 
     /**
@@ -293,7 +311,7 @@ public class HistoryActivity extends AppCompatActivity implements
                 return true;
             case R.id.action_delete:
                 if (!Sessions.getSelectedSessions().isEmpty()) {
-                    showDeleteConfirmation();
+                    deleteSessions();
                 }
                 return true;
             case R.id.action_select_all:
@@ -323,6 +341,7 @@ public class HistoryActivity extends AppCompatActivity implements
      * disable, otherwise the activity should be finished.
      */
     private void disableEditMode() {
+        fab.setVisibility(View.VISIBLE);
         listAdapter.disableEditMode();
         listAdapter.notifyDataSetInvalidated();
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
@@ -336,6 +355,7 @@ public class HistoryActivity extends AppCompatActivity implements
      */
     private void enableEditMode(final int position) {
         if (!listAdapter.isEditMode()) {
+            fab.setVisibility(View.GONE);
             listAdapter.enableEditMode(position);
             listAdapter.notifyDataSetInvalidated();
             toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
@@ -344,26 +364,21 @@ public class HistoryActivity extends AppCompatActivity implements
     }
 
     /**
-     * Show dialog to confirm the deletion of the selected sessions.
+     * Execute the task to delete the selected sessions.
      */
-    private void showDeleteConfirmation() {
-        ConfirmDialog.build(this,
-                getString(R.string.history_delete_title),
-                getString(R.string.history_delete_msg),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialogInterface,
-                                        final int i) {
-                        deleteSelectedSessions();
-                    }
-                }).show();
+    private void deleteSessions() {
+        new Deleter(new Integer[]{SUBSCRIBER_ID}).execute();
+        progressBar.setIndeterminate(true);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     /**
-     * Execute the task to delete the selected sessions.
+     * Execute the task to restore the given sessions.
+     *
+     * @param sessions Sessions to restore
      */
-    private void deleteSelectedSessions() {
-        new Deleter(new Integer[]{SUBSCRIBER_ID}).execute();
+    private void restoreSessions(final Session... sessions) {
+        new Restorer().execute(sessions);
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -432,8 +447,8 @@ public class HistoryActivity extends AppCompatActivity implements
                 progressBar.setVisibility(View.VISIBLE);
                 break;
             case DownloadEvent.NO_FILE:
-                Toast.makeText(this, getString(R.string.download_no_file_toast),
-                        Toast.LENGTH_LONG).show();
+                Snackbar.make(fab, R.string.download_no_file_snackbar,
+                        Snackbar.LENGTH_LONG).show();
                 progressBar.setVisibility(View.GONE);
                 break;
             case DownloadEvent.ERROR:
@@ -482,8 +497,8 @@ public class HistoryActivity extends AppCompatActivity implements
         switch (event.getResult()) {
             case InsertEvent.OK:
                 refreshList();
-                Toast.makeText(this, getString(R.string.
-                        download_success_toast), Toast.LENGTH_LONG).show();
+                Snackbar.make(fab, R.string.download_success_snackbar,
+                        Snackbar.LENGTH_LONG).show();
                 progressBar.setVisibility(View.GONE);
                 break;
             case InsertEvent.ERROR:
@@ -537,9 +552,8 @@ public class HistoryActivity extends AppCompatActivity implements
                 progressBar.setVisibility(View.VISIBLE);
                 break;
             case UploadEvent.OK:
-                Toast.makeText(this,
-                        getString(R.string.history_upload_success_toast),
-                        Toast.LENGTH_LONG).show();
+                Snackbar.make(fab, R.string.history_upload_success_snackbar,
+                        Snackbar.LENGTH_LONG).show();
                 progressBar.setVisibility(View.GONE);
                 break;
             case UploadEvent.ERROR:
@@ -565,6 +579,27 @@ public class HistoryActivity extends AppCompatActivity implements
         }
         progressBar.setVisibility(View.GONE);
         refreshList();
+        Snackbar.make(fab, R.string.history_delete_snackbar,
+                Snackbar.LENGTH_LONG)
+                .setAction(R.string.action_undo, new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        List<Session> sessions = event.getDeletedSessions();
+                        restoreSessions(sessions.toArray(
+                                new Session[sessions.size()]));
+                    }
+                }).show();
+    }
+
+    /**
+     * Triggered on restore event.
+     *
+     * @param event Restore event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final void onRestoreEvent(final RestoreEvent event) {
+        progressBar.setVisibility(View.GONE);
+        refreshList();
     }
 
     @Override
@@ -582,6 +617,6 @@ public class HistoryActivity extends AppCompatActivity implements
     @OnClick(R.id.history_fab_add)
     public final void onAddSessionClicked() {
         Intent intent = new Intent(this, AddSessionActivity.class);
-        startActivityForResult(intent, SESSION_REQUEST_CODE);
+        startActivity(intent);
     }
 }

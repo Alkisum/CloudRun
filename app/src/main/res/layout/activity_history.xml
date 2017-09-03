@@ -1,57 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".activities.HistoryActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/history_toolbar"
-        style="@style/toolbar"/>
-
-    <ProgressBar
-        android:id="@+id/history_progressbar"
-        style="?android:attr/progressBarStyleHorizontal"
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/history_toolbar"
-        android:layout_marginTop="-7dp"
-        android:indeterminate="true"
-        android:visibility="gone"/>
+        android:layout_height="match_parent">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/history_swipe_refresh_layout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@id/history_progressbar"
-        android:paddingBottom="88dp">
 
-        <ListView
-            android:id="@+id/history_list"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/history_toolbar"
+                style="@style/toolbar"/>
 
-    <TextView
-        android:id="@+id/history_no_session"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/history_no_session"
-        android:textStyle="italic"
-        android:visibility="gone"/>
+        </android.support.design.widget.AppBarLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/history_fab_add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:src="@drawable/ic_add_white_24dp"/>
+        <include layout="@layout/content_history"/>
 
-</RelativeLayout>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/history_fab_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            app:srcCompat="@drawable/ic_add_white_24dp"/>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</LinearLayout>

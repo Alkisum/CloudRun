@@ -116,7 +116,6 @@ public class AddSessionActivity extends AppCompatActivity implements
                 SessionDao dao = Db.getInstance().getDaoSession()
                         .getSessionDao();
                 dao.insert(session);
-                setResult(HistoryActivity.SESSION_ADDED);
                 finish();
                 return true;
             default:

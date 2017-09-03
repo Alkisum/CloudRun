@@ -34,8 +34,7 @@ public final class Sessions {
      * @return List of sessions in the anti-chronological order
      */
     public static List<Session> loadSessions(final Long ignoreSessionId) {
-        SessionDao dao = Db.getInstance().getDaoSession()
-                .getSessionDao();
+        SessionDao dao = Db.getInstance().getDaoSession().getSessionDao();
         List<Session> sessions = dao.queryBuilder().orderDesc(
                 SessionDao.Properties.Start).list();
         if (ignoreSessionId != null) {
@@ -51,8 +50,7 @@ public final class Sessions {
      * @return List of selected sessions.
      */
     public static List<Session> getSelectedSessions() {
-        SessionDao dao = Db.getInstance().getDaoSession()
-                .getSessionDao();
+        SessionDao dao = Db.getInstance().getDaoSession().getSessionDao();
         List<Session> selectedSessions = new ArrayList<>();
         for (Session session : dao.loadAll()) {
             if (session.getSelected()) {
@@ -71,7 +69,6 @@ public final class Sessions {
      */
     public static void fixSessions(final Long ignoreSessionId) {
         List<Session> sessions = loadSessions(ignoreSessionId);
-
         for (Session session : sessions) {
             if (session.getEnd() == null) {
                 fixSession(session);
@@ -86,8 +83,7 @@ public final class Sessions {
      * @return Session
      */
     public static Session getSessionById(final long sessionId) {
-        SessionDao dao = Db.getInstance().getDaoSession()
-                .getSessionDao();
+        SessionDao dao = Db.getInstance().getDaoSession().getSessionDao();
         return dao.load(sessionId);
     }
 

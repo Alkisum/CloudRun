@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">CloudRun</string>
 
     <!-- Permissions -->
@@ -35,6 +35,7 @@
     <string name="action_select_all">Select all</string>
     <string name="action_gps">Show or hide GPS accuracy</string>
     <string name="action_save">Save</string>
+    <string name="action_undo">Undo</string>
 
     <!-- Navigation drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -51,9 +52,8 @@
     <!-- History -->
     <string name="history_title">History</string>
     <string name="history_no_session">No sessions available</string>
-    <string name="history_delete_title">Delete sessions</string>
-    <string name="history_delete_msg">Are you sure you want to delete the selected sessions?</string>
-    <string name="history_upload_success_toast">Sessions uploaded</string>
+    <string name="history_upload_success_snackbar">Sessions uploaded</string>
+    <string name="history_delete_snackbar">Sessions deleted</string>
 
     <!-- History List -->
     <string name="history_list_distance">Distance:</string>
@@ -62,21 +62,20 @@
     <string name="history_list_pace">Pace:</string>
 
     <!-- Session -->
-    <string name="session_delete_title">Delete session</string>
-    <string name="session_delete_msg">Are you sure you want to delete the session?</string>
-    <string name="session_upload_success_toast">Session uploaded</string>
+    <string name="session_upload_success_snackbar">Session uploaded</string>
     <string name="session_label_duration">duration</string>
     <string name="session_label_distance">distance (km)</string>
     <string name="session_label_speed">speed (km/h)</string>
     <string name="session_label_pace">pace (min/km)</string>
     <string name="session_no_data_available">No data available</string>
+    <string name="session_delete_snackbar">Session deleted</string>
 
     <!-- General Cloud Operations -->
     <string name="upload_writing_failure_title">File creation failed</string>
     <string name="upload_failure_title">Upload failed</string>
     <string name="download_failure_title">Download failed</string>
-    <string name="download_success_toast">Sessions downloaded</string>
-    <string name="download_no_file_toast">No sessions to be downloaded</string>
+    <string name="download_success_snackbar">Sessions downloaded</string>
+    <string name="download_no_file_snackbar">No sessions to be downloaded</string>
     <string name="download_reading_failure_title">File parsing failed</string>
     <string name="download_insert_failure_title">Insertion into database failed</string>
 
