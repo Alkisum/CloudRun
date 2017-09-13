@@ -32,7 +32,6 @@ CloudRun is an Android application allowing the user to track his running sessio
 + [Butter Knife](https://github.com/JakeWharton/butterknife)
 + [LeakCanary](https://github.com/square/leakcanary)
 + [osmdroid](https://github.com/osmdroid/osmdroid)
-+ [OSMBonusPack](https://github.com/MKergall/osmbonuspack)
 + [Material DateTime Picker](https://github.com/wdullaer/MaterialDateTimePicker)
 
 

@@ -214,15 +214,15 @@ public class SessionActivity extends AppCompatActivity implements
         mapView.setMultiTouchControls(true);
 
         ArrayList<GeoPoint> wayPoints = new ArrayList<>();
+        session.resetDataPoints();
         for (DataPoint dp : session.getDataPoints()) {
             wayPoints.add(new GeoPoint(dp.getLatitude(), dp.getLongitude()));
         }
 
         Polyline polyline = new Polyline();
-        polyline.setColor(ContextCompat.getColor(this,
-                android.R.color.holo_red_light));
+        polyline.setColor(ContextCompat.getColor(this, R.color.map_blue));
         polyline.setPoints(wayPoints);
-        polyline.setWidth(2f);
+        polyline.setWidth(10f);
 
         final BoundingBox boundingBox = BoundingBox.fromGeoPoints(wayPoints);
         final RelativeLayout layout = findViewById(R.id.session_layout);

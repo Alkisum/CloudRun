@@ -30,10 +30,13 @@ import com.alkisum.android.cloudrun.database.Recorder;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.DistanceEvent;
+import com.alkisum.android.cloudrun.events.GpsStatusEvent;
 import com.alkisum.android.cloudrun.events.PaceEvent;
 import com.alkisum.android.cloudrun.events.SpeedEvent;
+import com.alkisum.android.cloudrun.location.Coordinate;
 import com.alkisum.android.cloudrun.location.LocationHandler;
 import com.alkisum.android.cloudrun.location.LocationHelper;
+import com.alkisum.android.cloudrun.ui.GpsStatus;
 import com.alkisum.android.cloudrun.ui.Tile;
 import com.alkisum.android.cloudrun.utils.Format;
 import com.alkisum.android.cloudrun.utils.Pref;
@@ -141,20 +144,10 @@ public class MonitorActivity extends AppCompatActivity
     private boolean locked;
 
     /**
-     * Flag set to true when new GPS data has been received, false otherwise.
-     */
-    private boolean newGpsDataReceived;
-
-    /**
      * Handler for the task to make the stopwatch blink when the session is
      * paused.
      */
     private final Handler stopwatchBlinkHandler = new Handler();
-
-    /**
-     * Handler for the task checking for the GPS status.
-     */
-    private final Handler gpsStatusHandler = new Handler();
 
     /**
      * Handler for the lock timeout.
@@ -178,14 +171,24 @@ public class MonitorActivity extends AppCompatActivity
     private String[] currentValues;
 
     /**
+     * Flag set to true if the GPS accuracy must be shown, false otherwise.
+     */
+    private boolean showGpsAccuracy;
+
+    /**
+     * Last coordinate received, used to initialize the map {@link MapActivity}.
+     */
+    private Coordinate lastCoordinate;
+
+    /**
      * Id for current GPS status icon.
      */
     private int gpsStatusIconId = R.drawable.ic_gps_not_fixed_white_24dp;
 
     /**
-     * Flag set to true if the GPS accuracy must be shown, false otherwise.
+     * GpsStatus instance.
      */
-    private boolean showGpsAccuracy;
+    private GpsStatus gpsStatus;
 
     /**
      * TextView showing the GPS accuracy by displaying the distance in meter
@@ -258,6 +261,9 @@ public class MonitorActivity extends AppCompatActivity
         eventBus = EventBus.getDefault();
         eventBus.register(this);
 
+        gpsStatus = new GpsStatus(getApplicationContext());
+        gpsStatus.start();
+
         initCurrentValues();
 
         setContentView(R.layout.activity_monitor);
@@ -272,8 +278,7 @@ public class MonitorActivity extends AppCompatActivity
     protected final void onDestroy() {
         sharedPref.unregisterOnSharedPreferenceChangeListener(this);
         eventBus.unregister(this);
-
-        gpsStatusHandler.removeCallbacks(gpsStatusTask);
+        gpsStatus.stop();
 
         if (locationHelper != null) {
             locationHelper.stop();
@@ -360,8 +365,12 @@ public class MonitorActivity extends AppCompatActivity
 
     @Override
     public final boolean onPrepareOptionsMenu(final Menu menu) {
+        // GPS status icon
         MenuItem gps = menu.findItem(R.id.action_gps);
         gps.setIcon(gpsStatusIconId);
+        // Map icon
+        MenuItem map = menu.findItem(R.id.action_map);
+        map.setVisible(lastCoordinate != null);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -371,6 +380,15 @@ public class MonitorActivity extends AppCompatActivity
         if (id == R.id.action_gps) {
             showGpsAccuracy = !showGpsAccuracy;
             textGpsAccuracy.setText("");
+        } else if (id == R.id.action_map) {
+            Intent intent = new Intent(this, MapActivity.class);
+            if (recorder != null && recorder.getSession() != null) {
+                intent.putExtra(MapActivity.ARG_SESSION_ID,
+                        recorder.getSession().getId());
+            }
+            intent.putExtra(MapActivity.ARG_COORDINATE, lastCoordinate);
+            intent.putExtra(MapActivity.ARG_GPS_STATUS, gpsStatusIconId);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -402,9 +420,6 @@ public class MonitorActivity extends AppCompatActivity
                 R.layout.nav_header_monitor, navigationView, false);
         navigationView.addHeaderView(header);
         navigationView.setNavigationItemSelectedListener(this);
-
-        gpsStatusHandler.postDelayed(gpsStatusTask,
-                LocationHandler.LOCATION_REQUEST_INTERVAL * 2);
 
         setTiles();
     }
@@ -528,7 +543,7 @@ public class MonitorActivity extends AppCompatActivity
      */
     @Subscribe
     public final void onCoordinateEvent(final CoordinateEvent event) {
-        newGpsDataReceived = true;
+        lastCoordinate = event.getValues();
     }
 
     /**
@@ -566,6 +581,17 @@ public class MonitorActivity extends AppCompatActivity
         if (sessionRunning && !sessionPaused) {
             updateTile(Tile.PACE, Format.formatPace(event.getValue()));
         }
+    }
+
+    /**
+     * Triggered when new coordinates are received.
+     *
+     * @param event Coordinate event
+     */
+    @Subscribe
+    public final void onGpsStatusEvent(final GpsStatusEvent event) {
+        gpsStatusIconId = event.getIcon();
+        invalidateOptionsMenu();
     }
 
     /**
@@ -666,29 +692,6 @@ public class MonitorActivity extends AppCompatActivity
         public void run() {
             lockTimeoutOn = false;
             setLocked(true);
-        }
-    };
-
-    /**
-     * Task checking for the GPS status and updating the Views according to the
-     * status.
-     */
-    private final Runnable gpsStatusTask = new Runnable() {
-        @Override
-        public void run() {
-            gpsStatusHandler.postDelayed(this,
-                    LocationHandler.LOCATION_REQUEST_INTERVAL * 2);
-            if (!LocationHelper.isLocationEnabled(MonitorActivity.this)) {
-                gpsStatusIconId = R.drawable.ic_gps_off_white_24dp;
-                textGpsAccuracy.setText("");
-            } else if (newGpsDataReceived) {
-                gpsStatusIconId = R.drawable.ic_gps_fixed_white_24dp;
-            } else {
-                gpsStatusIconId = R.drawable.ic_gps_not_fixed_white_24dp;
-                textGpsAccuracy.setText("");
-            }
-            newGpsDataReceived = false;
-            invalidateOptionsMenu();
         }
     };
 

@@ -7,10 +7,4 @@
         android:orderInCategory="1"
         android:title="@string/action_gps"
         app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/action_map"
-        android:icon="@drawable/ic_near_me_white_24dp"
-        android:orderInCategory="1"
-        android:title="@string/action_map"
-        app:showAsAction="ifRoom"/>
 </menu>

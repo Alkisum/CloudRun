@@ -27,6 +27,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.alkisum.android.cloudrun.activities.MapActivity"
+            android:configChanges="orientation|screenSize"/>
+        <activity
             android:name="com.alkisum.android.cloudrun.activities.HistoryActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"/>

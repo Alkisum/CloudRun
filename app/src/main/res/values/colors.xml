@@ -2,8 +2,10 @@
 <resources>
     <color name="primary">#607d8b</color>
     <color name="primaryDark">#455A64</color>
+    <color name="primaryDarkTransparent">#80455A64</color>
     <color name="accent">#8bc34a</color>
     <color name="accent_inactive">#808bc34a</color>
     <color name="bgTile">#303030</color>
     <color name="bgOut">#212121</color>
+    <color name="map_blue">#2196f3</color>
 </resources>

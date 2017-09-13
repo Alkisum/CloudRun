@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">CloudRun</string>
 
     <!-- Permissions -->
@@ -34,6 +34,7 @@
     <string name="action_connect">Connect</string>
     <string name="action_select_all">Select all</string>
     <string name="action_gps">Show or hide GPS accuracy</string>
+    <string name="action_map">Open map</string>
     <string name="action_save">Save</string>
     <string name="action_undo">Undo</string>
 
