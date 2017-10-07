@@ -22,7 +22,7 @@ import java.util.List;
  * Subscriber for background logic upload operations.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 3.1
  * @since 3.0
  */
 public class Uploader {
@@ -52,8 +52,9 @@ public class Uploader {
                     final int subscriberId) throws JSONException {
         EventBus.getDefault().register(this);
 
-        ncUploader = new NcUploader(context, intent, new Integer[]{
-                SUBSCRIBER_ID, subscriberId});
+        ncUploader = new NcUploader(context, intent,
+                "CloudRunUploader", "CloudRun upload",
+                new Integer[]{SUBSCRIBER_ID, subscriberId});
         ncUploader.init(
                 connectInfo.getAddress(),
                 connectInfo.getPath(),

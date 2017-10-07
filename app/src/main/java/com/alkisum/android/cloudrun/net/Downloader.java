@@ -25,7 +25,7 @@ import java.util.List;
  * Class starting download operation and subscribing to download events.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 3.1
  * @since 3.0
  */
 public class Downloader {
@@ -54,6 +54,7 @@ public class Downloader {
 
         this.subscriberId = subscriberId;
         NcDownloader ncDownloader = new NcDownloader(context, intent,
+                "CloudRunDownloader", "CloudRun download",
                 new Integer[]{SUBSCRIBER_ID, subscriberId});
 
         ncDownloader.init(

@@ -3,16 +3,15 @@ apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         applicationId "com.alkisum.android.cloudrun"
         minSdkVersion 18
         targetSdkVersion 26
-        versionCode 10
-        versionName "3.0"
+        versionCode 11
+        versionName "3.1.dev"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
-        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -28,9 +27,9 @@ greendao {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:26.0.0'
-    compile 'com.android.support:support-v13:26.0.0'
-    compile 'com.android.support:design:26.0.0'
+    compile 'com.android.support:appcompat-v7:26.0.1'
+    compile 'com.android.support:support-v13:26.0.1'
+    compile 'com.android.support:design:26.0.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.android.gms:play-services-basement:11.0.4'
     compile 'com.google.android.gms:play-services-location:11.0.4'
@@ -38,10 +37,10 @@ dependencies {
     compile 'org.greenrobot:greendao:3.2.2'
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.2'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.2'
-    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.2'
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     compile 'org.osmdroid:osmdroid-android:5.6.5'
-    compile 'com.wdullaer:materialdatetimepicker:3.3.0'
+    compile 'com.wdullaer:materialdatetimepicker:3.3.1'
     compile project(path: ':cloudlib')
 }
