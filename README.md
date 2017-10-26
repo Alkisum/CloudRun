@@ -17,6 +17,7 @@ CloudRun is an Android application allowing the user to track his running sessio
 ## Usage
 
 + Track the running sessions using GPS data
++ Visualise where you are running on a real-time map
 + Browse through all your running sessions
 + Upload your running sessions as a JSON file to your ownCloud server or Nextcloud server
 + Download your JSON files from your ownCloud server or Nextcloud server

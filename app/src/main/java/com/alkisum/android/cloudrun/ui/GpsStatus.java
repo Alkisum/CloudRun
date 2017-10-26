@@ -6,8 +6,8 @@ import android.os.Handler;
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.GpsStatusEvent;
-import com.alkisum.android.cloudrun.location.LocationHandler;
 import com.alkisum.android.cloudrun.location.LocationHelper;
+import com.alkisum.android.cloudrun.location.LocationUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -16,7 +16,7 @@ import org.greenrobot.eventbus.Subscribe;
  * Class to handle the GPS status view show on toolbars.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 3.1
  * @since 3.0
  */
 public class GpsStatus {
@@ -57,7 +57,7 @@ public class GpsStatus {
     public final void start() {
         eventBus.register(this);
         gpsStatusHandler.postDelayed(gpsStatusTask,
-                LocationHandler.LOCATION_REQUEST_INTERVAL * 2);
+                LocationHelper.LOCATION_REQUEST_INTERVAL * 2);
     }
 
     /**
@@ -76,8 +76,8 @@ public class GpsStatus {
         @Override
         public void run() {
             gpsStatusHandler.postDelayed(this,
-                    LocationHandler.LOCATION_REQUEST_INTERVAL * 2);
-            if (!LocationHelper.isLocationEnabled(context)) {
+                    LocationHelper.LOCATION_REQUEST_INTERVAL * 2);
+            if (!LocationUtils.isLocationEnabled(context)) {
                 eventBus.post(new GpsStatusEvent(
                         R.drawable.ic_gps_off_white_24dp));
 

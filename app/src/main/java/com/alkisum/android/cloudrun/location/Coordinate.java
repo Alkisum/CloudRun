@@ -4,13 +4,18 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Class defining coordinates (latitude, longitude and elevation).
+ * Class defining coordinates (time, latitude, longitude and elevation).
  *
  * @author Alkisum
- * @version 3.0
+ * @version 3.1
  * @since 1.0
  */
 public class Coordinate implements Parcelable {
+
+    /**
+     * Time.
+     */
+    private final long time;
 
     /**
      * Latitude.
@@ -30,15 +35,24 @@ public class Coordinate implements Parcelable {
     /**
      * Coordinate constructor.
      *
+     * @param time      Time
      * @param latitude  Latitude
      * @param longitude Longitude
      * @param elevation Elevation
      */
-    Coordinate(final double latitude, final double longitude,
+    Coordinate(final long time, final double latitude, final double longitude,
                final double elevation) {
+        this.time = time;
         this.latitude = latitude;
         this.longitude = longitude;
         this.elevation = elevation;
+    }
+
+    /**
+     * @return Time
+     */
+    public final long getTime() {
+        return time;
     }
 
     /**
@@ -85,6 +99,7 @@ public class Coordinate implements Parcelable {
      * @param in Parcel to read
      */
     private Coordinate(final Parcel in) {
+        time = in.readLong();
         latitude = in.readDouble();
         longitude = in.readDouble();
         elevation = in.readDouble();
@@ -97,6 +112,7 @@ public class Coordinate implements Parcelable {
 
     @Override
     public final void writeToParcel(final Parcel dest, final int flags) {
+        dest.writeLong(time);
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
         dest.writeDouble(elevation);

@@ -34,8 +34,8 @@ import com.alkisum.android.cloudrun.events.GpsStatusEvent;
 import com.alkisum.android.cloudrun.events.PaceEvent;
 import com.alkisum.android.cloudrun.events.SpeedEvent;
 import com.alkisum.android.cloudrun.location.Coordinate;
-import com.alkisum.android.cloudrun.location.LocationHandler;
 import com.alkisum.android.cloudrun.location.LocationHelper;
+import com.alkisum.android.cloudrun.location.LocationUtils;
 import com.alkisum.android.cloudrun.ui.GpsStatus;
 import com.alkisum.android.cloudrun.ui.Tile;
 import com.alkisum.android.cloudrun.utils.Format;
@@ -55,7 +55,7 @@ import butterknife.OnClick;
  * Main activity showing location values.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 3.1
  * @since 1.0
  */
 public class MonitorActivity extends AppCompatActivity
@@ -275,16 +275,29 @@ public class MonitorActivity extends AppCompatActivity
     }
 
     @Override
+    protected final void onStart() {
+        super.onStart();
+        if (locationHelper != null && locationHelper.isRunningInForeground()
+                && sessionRunning) {
+            locationHelper.stopForeground();
+        }
+    }
+
+    @Override
+    protected final void onStop() {
+        super.onStop();
+        if (locationHelper != null && sessionRunning) {
+            locationHelper.startForeground();
+        }
+    }
+
+    @Override
     protected final void onDestroy() {
+        super.onDestroy();
         sharedPref.unregisterOnSharedPreferenceChangeListener(this);
         eventBus.unregister(this);
         gpsStatus.stop();
-
-        if (locationHelper != null) {
-            locationHelper.stop();
-            locationHelper.onDestroy();
-        }
-        super.onDestroy();
+        locationHelper.onDestroy();
     }
 
     /**
@@ -312,25 +325,27 @@ public class MonitorActivity extends AppCompatActivity
             return;
         }
         boolean permissionsGranted = true;
-        String errorMessage = "";
+        StringBuilder errorMessage = new StringBuilder();
         for (int i = 0; i < permissions.length; i++) {
             switch (permissions[i]) {
                 case Manifest.permission.ACCESS_FINE_LOCATION:
                     if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                         if (!permissionsGranted) {
-                            errorMessage += "\n\n";
+                            errorMessage.append("\n\n");
                         }
                         permissionsGranted = false;
-                        errorMessage += getString(R.string.permission_location);
+                        errorMessage.append(getString(
+                                R.string.permission_location));
                     }
                     break;
                 case Manifest.permission.WRITE_EXTERNAL_STORAGE:
                     if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                         if (!permissionsGranted) {
-                            errorMessage += "\n\n";
+                            errorMessage.append("\n\n");
                         }
                         permissionsGranted = false;
-                        errorMessage += getString(R.string.permission_storage);
+                        errorMessage.append(getString(
+                                R.string.permission_storage));
                     }
                     break;
                 default:
@@ -341,7 +356,7 @@ public class MonitorActivity extends AppCompatActivity
             init();
         } else {
             ErrorDialog.build(this, getString(R.string.permission_title),
-                    errorMessage, mExit).show();
+                    errorMessage.toString(), mExit).show();
         }
     }
 
@@ -499,17 +514,17 @@ public class MonitorActivity extends AppCompatActivity
                                           final int resultCode,
                                           final Intent data) {
         switch (requestCode) {
-            case LocationHandler.REQUEST_LOCATION_AUTO:
+            case LocationHelper.REQUEST_LOCATION_AUTO:
                 if (resultCode == RESULT_OK) {
                     if (locationHelper != null) {
-                        locationHelper.start();
+                        locationHelper.requestLocationUpdates();
                     }
                 }
                 break;
             case LocationHelper.REQUEST_LOCATION_MANUAL:
-                if (LocationHelper.isLocationEnabled(this)) {
+                if (LocationUtils.isLocationEnabled(this)) {
                     if (locationHelper != null) {
-                        locationHelper.start();
+                        locationHelper.requestLocationUpdates();
                     }
                 }
             default:

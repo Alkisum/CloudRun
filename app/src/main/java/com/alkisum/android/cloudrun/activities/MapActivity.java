@@ -41,7 +41,7 @@ import butterknife.ButterKnife;
  * Activity showing current location and tracking session on map.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 3.1
  * @since 3.0
  */
 public class MapActivity extends AppCompatActivity {
@@ -100,7 +100,8 @@ public class MapActivity extends AppCompatActivity {
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
 
-        if (getIntent().hasExtra(ARG_SESSION_ID)) {
+        if (getIntent().hasExtra(ARG_SESSION_ID)
+                && getIntent().getExtras() != null) {
             long sessionId = getIntent().getExtras().getLong(ARG_SESSION_ID);
             session = Sessions.getSessionById(sessionId);
         }
@@ -121,8 +122,7 @@ public class MapActivity extends AppCompatActivity {
 
         mapView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(final View view,
-                                   final MotionEvent motionEvent) {
+            public boolean onTouch(final View v, final MotionEvent event) {
                 focused = false;
                 return false;
             }

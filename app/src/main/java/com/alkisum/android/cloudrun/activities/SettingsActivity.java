@@ -11,7 +11,7 @@ import android.view.View;
 
 import com.alkisum.android.cloudlib.utils.CloudPref;
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.location.LocationHandler;
+import com.alkisum.android.cloudrun.location.LocationHelper;
 import com.alkisum.android.cloudrun.ui.NumberPickerPreference;
 import com.alkisum.android.cloudrun.utils.Pref;
 
@@ -19,7 +19,7 @@ import com.alkisum.android.cloudrun.utils.Pref;
  * Activity showing the application settings.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 3.1
  * @since 1.1
  */
 public class SettingsActivity extends AppCompatActivity {
@@ -103,7 +103,7 @@ public class SettingsActivity extends AppCompatActivity {
             switch (key) {
                 case Pref.DISTANCE_CNT:
                     int value = sharedPreferences.getInt(Pref.DISTANCE_CNT,
-                            LocationHandler.DISTANCE_CNT_DEFAULT);
+                            LocationHelper.DISTANCE_CNT_DEFAULT);
                     npDistanceCnt.setSummary(value + getString(
                             R.string.distance_cnt_summary));
                     break;

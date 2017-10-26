@@ -17,7 +17,7 @@ import org.greenrobot.eventbus.Subscribe;
  * Class recording GPS data.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 3.1
  * @since 1.0
  */
 public class Recorder {
@@ -147,7 +147,7 @@ public class Recorder {
     @Subscribe
     public final void onCoordinateEvent(final CoordinateEvent event) {
         Coordinate c = event.getValues();
-        DataPoint dataPoint = new DataPoint(null, System.currentTimeMillis(),
+        DataPoint dataPoint = new DataPoint(null, c.getTime(),
                 c.getLatitude(), c.getLongitude(), c.getElevation(),
                 session.getId());
         DataPointDao dataPointDao = Db.getInstance().getDaoSession()

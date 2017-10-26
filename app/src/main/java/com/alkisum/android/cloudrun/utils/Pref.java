@@ -5,13 +5,13 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.alkisum.android.cloudlib.utils.CloudPref;
-import com.alkisum.android.cloudrun.location.LocationHandler;
+import com.alkisum.android.cloudrun.location.LocationHelper;
 
 /**
  * Class defining constants for SharedPreferences.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 3.1
  * @since 1.0
  */
 public final class Pref {
@@ -84,7 +84,7 @@ public final class Pref {
             editor.putBoolean(KEEP_SCREEN_ON, true);
         }
         if (!sharedPref.contains(DISTANCE_CNT)) {
-            editor.putInt(DISTANCE_CNT, LocationHandler.DISTANCE_CNT_DEFAULT);
+            editor.putInt(DISTANCE_CNT, LocationHelper.DISTANCE_CNT_DEFAULT);
         }
         editor.apply();
     }

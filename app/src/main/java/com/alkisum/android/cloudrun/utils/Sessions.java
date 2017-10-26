@@ -12,7 +12,7 @@ import java.util.List;
  * Utility class for session operations.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 3.1
  * @since 1.1
  */
 public final class Sessions {
@@ -107,5 +107,20 @@ public final class Sessions {
         // Update database with the new session's information
         session.setEnd(end);
         session.update();
+    }
+
+    /**
+     * Retrieve the last session stored in the database.
+     *
+     * @return Last session
+     */
+    public static Session getLastSession() {
+        SessionDao dao = Db.getInstance().getDaoSession().getSessionDao();
+        List<Session> sessions = dao.queryBuilder().orderDesc(
+                SessionDao.Properties.Start).limit(1).list();
+        if (sessions != null && !sessions.isEmpty()) {
+            return sessions.get(0);
+        }
+        return null;
     }
 }
