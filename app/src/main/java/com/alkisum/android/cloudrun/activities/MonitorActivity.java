@@ -397,7 +397,8 @@ public class MonitorActivity extends AppCompatActivity
             textGpsAccuracy.setText("");
         } else if (id == R.id.action_map) {
             Intent intent = new Intent(this, MapActivity.class);
-            if (recorder != null && recorder.getSession() != null) {
+            if (recorder != null && recorder.getSession() != null
+                    && recorder.getSession().getEnd() == null) {
                 intent.putExtra(MapActivity.ARG_SESSION_ID,
                         recorder.getSession().getId());
             }
