@@ -18,7 +18,7 @@ import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.activities.MonitorActivity;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.utils.Format;
-import com.alkisum.android.cloudrun.utils.Sessions;
+import com.alkisum.android.cloudrun.database.Sessions;
 
 /**
  * Bound and started service that can be promoted to a foreground service.

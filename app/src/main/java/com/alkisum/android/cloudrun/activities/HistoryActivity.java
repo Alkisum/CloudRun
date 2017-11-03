@@ -33,7 +33,7 @@ import com.alkisum.android.cloudrun.events.RestoreEvent;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.net.Downloader;
 import com.alkisum.android.cloudrun.net.Uploader;
-import com.alkisum.android.cloudrun.utils.Sessions;
+import com.alkisum.android.cloudrun.database.Sessions;
 import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
@@ -414,9 +414,9 @@ public class HistoryActivity extends AppCompatActivity implements
                         new Intent(this, HistoryActivity.class),
                         Sessions.getSelectedSessions(), SUBSCRIBER_ID);
             } catch (JSONException e) {
-                ErrorDialog.build(this,
+                ErrorDialog.show(this,
                         getString(R.string.upload_failure_title),
-                        e.getMessage(), null).show();
+                        e.getMessage(), null);
             }
         }
 
@@ -452,9 +452,9 @@ public class HistoryActivity extends AppCompatActivity implements
                 progressBar.setVisibility(View.GONE);
                 break;
             case DownloadEvent.ERROR:
-                ErrorDialog.build(this,
+                ErrorDialog.show(this,
                         getString(R.string.download_failure_title),
-                        event.getMessage(), null).show();
+                        event.getMessage(), null);
                 progressBar.setVisibility(View.GONE);
                 break;
             default:
@@ -477,9 +477,9 @@ public class HistoryActivity extends AppCompatActivity implements
                 progressBar.setVisibility(View.VISIBLE);
                 break;
             case JsonFileReaderEvent.ERROR:
-                ErrorDialog.build(this,
+                ErrorDialog.show(this,
                         getString(R.string.download_reading_failure_title),
-                        event.getException().getMessage(), null).show();
+                        event.getException().getMessage(), null);
                 progressBar.setVisibility(View.GONE);
                 break;
             default:
@@ -502,9 +502,9 @@ public class HistoryActivity extends AppCompatActivity implements
                 progressBar.setVisibility(View.GONE);
                 break;
             case InsertEvent.ERROR:
-                ErrorDialog.build(this,
+                ErrorDialog.show(this,
                         getString(R.string.download_insert_failure_title),
-                        event.getException().getMessage(), null).show();
+                        event.getException().getMessage(), null);
                 progressBar.setVisibility(View.GONE);
                 break;
             default:
@@ -527,9 +527,9 @@ public class HistoryActivity extends AppCompatActivity implements
                 progressBar.setVisibility(View.VISIBLE);
                 break;
             case JsonFileWriterEvent.ERROR:
-                ErrorDialog.build(this,
+                ErrorDialog.show(this,
                         getString(R.string.upload_writing_failure_title),
-                        event.getException().getMessage(), null).show();
+                        event.getException().getMessage(), null);
                 progressBar.setVisibility(View.GONE);
                 break;
             default:
@@ -557,9 +557,9 @@ public class HistoryActivity extends AppCompatActivity implements
                 progressBar.setVisibility(View.GONE);
                 break;
             case UploadEvent.ERROR:
-                ErrorDialog.build(this, getString(
+                ErrorDialog.show(this, getString(
                         R.string.upload_failure_title), event.getMessage(),
-                        null).show();
+                        null);
                 progressBar.setVisibility(View.GONE);
                 break;
             default:

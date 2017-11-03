@@ -1,9 +1,10 @@
-package com.alkisum.android.cloudrun.utils;
+package com.alkisum.android.cloudrun.files;
 
 import com.alkisum.android.cloudlib.file.json.JsonFile;
 import com.alkisum.android.cloudrun.database.Db;
 import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.Session;
+import com.alkisum.android.cloudrun.utils.Format;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,9 +12,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * Class containing constant for Json files.
@@ -103,15 +102,15 @@ public final class Json {
     }
 
     /**
-     * Build a queue of JSON files from the given sessions.
+     * Build a list of JSON files from the given sessions.
      *
      * @param selectedSessions Selected sessions
-     * @return Queue of JSON files
+     * @return List of JSON files
      * @throws JSONException An error occurred while building the JSON object
      */
-    public static Queue<JsonFile> buildJsonFilesFromSessions(
+    public static List<JsonFile> buildJsonFilesFromSessions(
             final List<Session> selectedSessions) throws JSONException {
-        Queue<JsonFile> jsonFiles = new LinkedList<>();
+        List<JsonFile> jsonFiles = new ArrayList<>();
         for (Session session : selectedSessions) {
             String fileName = buildJsonFileName(session);
             JSONObject jsonObject = buildJsonFromSession(session);

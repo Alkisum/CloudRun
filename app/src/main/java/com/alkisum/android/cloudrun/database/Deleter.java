@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import com.alkisum.android.cloudrun.events.DeleteEvent;
 import com.alkisum.android.cloudrun.model.DaoSession;
 import com.alkisum.android.cloudrun.model.Session;
-import com.alkisum.android.cloudrun.utils.Sessions;
 
 import org.greenrobot.eventbus.EventBus;
 

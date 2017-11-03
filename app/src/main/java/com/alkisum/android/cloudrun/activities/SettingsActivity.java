@@ -109,7 +109,7 @@ public class SettingsActivity extends AppCompatActivity {
                     break;
                 case CloudPref.SAVE_CLOUD_INFO:
                     if (!sharedPreferences.getBoolean(
-                            CloudPref.SAVE_CLOUD_INFO, false)) {
+                            CloudPref.SAVE_CLOUD_INFO, true)) {
                         discardCloudInfo(sharedPreferences);
                     }
                     break;

@@ -28,7 +28,7 @@ import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.net.Uploader;
 import com.alkisum.android.cloudrun.utils.Format;
-import com.alkisum.android.cloudrun.utils.Sessions;
+import com.alkisum.android.cloudrun.database.Sessions;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
@@ -270,9 +270,9 @@ public class SessionActivity extends AppCompatActivity implements
                 new Uploader(getApplicationContext(), connectInfo, intent,
                         sessions, SUBSCRIBER_ID);
             } catch (JSONException e) {
-                ErrorDialog.build(this,
+                ErrorDialog.show(this,
                         getString(R.string.upload_failure_title),
-                        e.getMessage(), null).show();
+                        e.getMessage(), null);
             }
         }
 
@@ -300,9 +300,9 @@ public class SessionActivity extends AppCompatActivity implements
                 progressBar.setVisibility(View.VISIBLE);
                 break;
             case JsonFileWriterEvent.ERROR:
-                ErrorDialog.build(this,
+                ErrorDialog.show(this,
                         getString(R.string.upload_writing_failure_title),
-                        event.getException().getMessage(), null).show();
+                        event.getException().getMessage(), null);
                 progressBar.setVisibility(View.GONE);
                 break;
             default:
@@ -331,9 +331,9 @@ public class SessionActivity extends AppCompatActivity implements
                 progressBar.setVisibility(View.GONE);
                 break;
             case UploadEvent.ERROR:
-                ErrorDialog.build(SessionActivity.this, getString(
+                ErrorDialog.show(this, getString(
                         R.string.upload_failure_title), event.getMessage(),
-                        null).show();
+                        null);
                 progressBar.setVisibility(View.GONE);
                 break;
             default:

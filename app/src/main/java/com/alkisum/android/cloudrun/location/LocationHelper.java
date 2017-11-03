@@ -321,7 +321,7 @@ public class LocationHelper {
      * service on.
      */
     private void openLocationSettings() {
-        ErrorDialog.build(activity.get(),
+        ErrorDialog.show(activity.get(),
                 activity.get().getString(R.string.location_required_title),
                 activity.get().getString(R.string.location_required_message),
                 new DialogInterface.OnClickListener() {
@@ -333,7 +333,7 @@ public class LocationHelper {
                         activity.get().startActivityForResult(intent,
                                 REQUEST_LOCATION_MANUAL);
                     }
-                }).show();
+                });
     }
 
     /**

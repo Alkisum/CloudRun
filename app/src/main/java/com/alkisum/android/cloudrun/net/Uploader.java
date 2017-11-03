@@ -9,7 +9,7 @@ import com.alkisum.android.cloudlib.file.json.JsonFileWriter;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudlib.net.nextcloud.NcUploader;
 import com.alkisum.android.cloudrun.model.Session;
-import com.alkisum.android.cloudrun.utils.Json;
+import com.alkisum.android.cloudrun.files.Json;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -63,7 +63,8 @@ public class Uploader {
 
         // Execute the JsonFileWriter task to write JSON objects into temporary
         // JSON files
-        new JsonFileWriter(context, Json.buildJsonFilesFromSessions(sessions),
+        new JsonFileWriter(context.getCacheDir(),
+                Json.buildJsonFilesFromSessions(sessions),
                 new Integer[]{SUBSCRIBER_ID, subscriberId}).execute();
     }
 
@@ -79,7 +80,7 @@ public class Uploader {
         }
         switch (event.getResult()) {
             case JsonFileWriterEvent.OK:
-                ncUploader.start(event.getJsonFiles());
+                ncUploader.start(event.getCloudFiles());
                 break;
             case JsonFileWriterEvent.ERROR:
                 EventBus.getDefault().unregister(this);

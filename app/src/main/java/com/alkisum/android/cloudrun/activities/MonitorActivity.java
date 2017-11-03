@@ -355,8 +355,8 @@ public class MonitorActivity extends AppCompatActivity
         if (permissionsGranted) {
             init();
         } else {
-            ErrorDialog.build(this, getString(R.string.permission_title),
-                    errorMessage.toString(), mExit).show();
+            ErrorDialog.show(this, getString(R.string.permission_title),
+                    errorMessage.toString(), mExit);
         }
     }
 

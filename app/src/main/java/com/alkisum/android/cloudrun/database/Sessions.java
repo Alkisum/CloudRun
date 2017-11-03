@@ -1,6 +1,5 @@
-package com.alkisum.android.cloudrun.utils;
+package com.alkisum.android.cloudrun.database;
 
-import com.alkisum.android.cloudrun.database.Db;
 import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.model.SessionDao;

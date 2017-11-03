@@ -11,7 +11,7 @@ import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudlib.net.nextcloud.NcDownloader;
 import com.alkisum.android.cloudrun.database.Inserter;
 import com.alkisum.android.cloudrun.events.InsertEvent;
-import com.alkisum.android.cloudrun.utils.Json;
+import com.alkisum.android.cloudrun.files.Json;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -55,7 +55,8 @@ public class Downloader {
         this.subscriberId = subscriberId;
         NcDownloader ncDownloader = new NcDownloader(context, intent,
                 "CloudRunDownloader", "CloudRun download",
-                new Integer[]{SUBSCRIBER_ID, subscriberId});
+                new Integer[]{SUBSCRIBER_ID, subscriberId},
+                new String[]{JsonFile.FILE_EXT});
 
         ncDownloader.init(
                 connectInfo.getAddress(),
@@ -106,6 +107,7 @@ public class Downloader {
             case JsonFileReaderEvent.OK:
                 List<JSONObject> jsonObjects = new ArrayList<>();
                 for (JsonFile jsonFile : event.getJsonFiles()) {
+                    // TODO Json.isFileNameValid(jsonFile) useless (already filter in library)
                     if (Json.isFileNameValid(jsonFile)
                             && !Json.isSessionAlreadyInDb(jsonFile)) {
                         jsonObjects.add(jsonFile.getJsonObject());

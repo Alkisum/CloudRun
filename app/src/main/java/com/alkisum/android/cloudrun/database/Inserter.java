@@ -8,7 +8,7 @@ import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.DataPointDao;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.model.SessionDao;
-import com.alkisum.android.cloudrun.utils.Json;
+import com.alkisum.android.cloudrun.files.Json;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;

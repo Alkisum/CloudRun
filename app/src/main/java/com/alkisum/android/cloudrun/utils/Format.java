@@ -37,7 +37,7 @@ public final class Format {
     /**
      * Format for JSON file name.
      */
-    static final SimpleDateFormat DATE_TIME_JSON =
+    public static final SimpleDateFormat DATE_TIME_JSON =
             new SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.getDefault());
 
     /**
