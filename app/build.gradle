@@ -9,8 +9,8 @@ android {
         applicationId "com.alkisum.android.cloudrun"
         minSdkVersion 18
         targetSdkVersion 26
-        versionCode 11
-        versionName "3.2.dev"
+        versionCode 12
+        versionName "3.2"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
     }
     buildTypes {
