@@ -9,8 +9,8 @@ android {
         applicationId "com.alkisum.android.cloudrun"
         minSdkVersion 18
         targetSdkVersion 26
-        versionCode 12
-        versionName "3.2"
+        versionCode 13
+        versionName "3.2.dev"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
     }
     buildTypes {
@@ -31,9 +31,9 @@ dependencies {
     compile 'com.android.support:support-v13:26.1.0'
     compile 'com.android.support:design:26.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.google.android.gms:play-services-basement:11.4.2'
-    compile 'com.google.android.gms:play-services-location:11.4.2'
-    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'com.google.android.gms:play-services-basement:11.6.0'
+    compile 'com.google.android.gms:play-services-location:11.6.0'
+    compile 'org.greenrobot:eventbus:3.1.1'
     compile 'org.greenrobot:greendao:3.2.2'
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
