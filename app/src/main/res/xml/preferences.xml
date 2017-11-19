@@ -6,8 +6,20 @@
         android:title="Cloud">
 
         <SwitchPreference
-            android:key="saveCloudInfo"
-            android:title="Save connection information"/>
+            android:key="savePath"
+            android:title="Save remote path"/>
+
+        <SwitchPreference
+            android:key="saveAddress"
+            android:title="Save server address"/>
+
+        <SwitchPreference
+            android:key="saveUsername"
+            android:title="Save username"/>
+
+        <SwitchPreference
+            android:key="savePassword"
+            android:title="Save password"/>
 
     </PreferenceCategory>
 
