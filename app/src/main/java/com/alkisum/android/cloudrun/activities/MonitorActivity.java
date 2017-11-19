@@ -55,7 +55,7 @@ import butterknife.OnClick;
  * Main activity showing location values.
  *
  * @author Alkisum
- * @version 3.1
+ * @version 3.3
  * @since 1.0
  */
 public class MonitorActivity extends AppCompatActivity
@@ -356,21 +356,16 @@ public class MonitorActivity extends AppCompatActivity
             init();
         } else {
             ErrorDialog.show(this, getString(R.string.permission_title),
-                    errorMessage.toString(), mExit);
+                    errorMessage.toString(),
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialog,
+                                            final int which) {
+                            finish();
+                        }
+                    });
         }
     }
-
-    /**
-     * OnClickListener to exit the application.
-     */
-    private final DialogInterface.OnClickListener mExit =
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(final DialogInterface dialog,
-                                    final int which) {
-                    finish();
-                }
-            };
 
     @Override
     public final boolean onCreateOptionsMenu(final Menu menu) {
