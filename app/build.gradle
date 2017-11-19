@@ -10,7 +10,7 @@ android {
         minSdkVersion 18
         targetSdkVersion 26
         versionCode 13
-        versionName "3.3.dev"
+        versionName "3.3"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
     }
     buildTypes {
