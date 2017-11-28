@@ -26,6 +26,11 @@ CloudRun is an Android application allowing the user to track his running sessio
 + Add sessions manually
 
 
+## Screenshots
+
+![](/screenshots/cloudrun_monitor.png) ![](/screenshots/cloudrun_history.png) ![](/screenshots/cloudrun_session.png)
+
+
 ## Used libraries
 
 + [greenDAO](https://github.com/greenrobot/greenDAO)
