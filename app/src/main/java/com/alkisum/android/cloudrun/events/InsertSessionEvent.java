@@ -1,13 +1,13 @@
 package com.alkisum.android.cloudrun.events;
 
 /**
- * Class defining insert event for EventBus.
+ * Class defining insert session event for EventBus.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 3.0
  */
-public class InsertEvent {
+public class InsertSessionEvent {
 
     /**
      * Insert operation finished successfully.
@@ -31,21 +31,21 @@ public class InsertEvent {
     private Exception exception;
 
     /**
-     * InsertEvent constructor.
+     * InsertSessionEvent constructor.
      *
      * @param result Insert operation result
      */
-    public InsertEvent(final int result) {
+    public InsertSessionEvent(final int result) {
         this.result = result;
     }
 
     /**
-     * InsertEvent constructor.
+     * InsertSessionEvent constructor.
      *
      * @param result    Insert operation result
      * @param exception Exception thrown during insert operation
      */
-    public InsertEvent(final int result, final Exception exception) {
+    public InsertSessionEvent(final int result, final Exception exception) {
         this.result = result;
         this.exception = exception;
     }

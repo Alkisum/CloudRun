@@ -26,7 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.database.Recorder;
+import com.alkisum.android.cloudrun.database.SessionRecorder;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.DistanceEvent;
@@ -55,13 +55,13 @@ import butterknife.OnClick;
  * Main activity showing location values.
  *
  * @author Alkisum
- * @version 3.3
+ * @version 4.0
  * @since 1.0
  */
 public class MonitorActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         SharedPreferences.OnSharedPreferenceChangeListener,
-        Tile.TileListener, Recorder.RecorderListener {
+        Tile.TileListener, SessionRecorder.RecorderListener {
 
     /**
      * Request code for denied permissions.
@@ -124,9 +124,9 @@ public class MonitorActivity extends AppCompatActivity
     private LocationHelper locationHelper;
 
     /**
-     * Recorder instance to start and stop recording data.
+     * SessionRecorder instance to start and stop recording data.
      */
-    private Recorder recorder;
+    private SessionRecorder recorder;
 
     /**
      * Flag set to true if the session is currently running, false otherwise.
@@ -494,6 +494,10 @@ public class MonitorActivity extends AppCompatActivity
                                 recorder.getSession().getId());
                     }
                     startActivity(intent);
+                } else if (id == R.id.nav_routes) {
+                    Intent intent = new Intent(MonitorActivity.this,
+                            RoutesActivity.class);
+                    startActivity(intent);
                 } else if (id == R.id.nav_settings) {
                     Intent intent = new Intent(MonitorActivity.this,
                             SettingsActivity.class);
@@ -725,7 +729,7 @@ public class MonitorActivity extends AppCompatActivity
      * Start a session.
      */
     private void startSession() {
-        recorder = new Recorder(this);
+        recorder = new SessionRecorder(this);
         recorder.start();
         setLocked(true);
         updateActionButton(ACTION_START);

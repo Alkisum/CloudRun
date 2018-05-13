@@ -2,7 +2,7 @@ package com.alkisum.android.cloudrun.database;
 
 import android.os.AsyncTask;
 
-import com.alkisum.android.cloudrun.events.RestoreEvent;
+import com.alkisum.android.cloudrun.events.RestoreSessionEvent;
 import com.alkisum.android.cloudrun.model.DaoSession;
 import com.alkisum.android.cloudrun.model.DataPointDao;
 import com.alkisum.android.cloudrun.model.Session;
@@ -14,15 +14,15 @@ import org.greenrobot.eventbus.EventBus;
  * Class restoring the deleted sessions in the database.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 3.0
  */
-public class Restorer extends AsyncTask<Session, Void, Void> {
+public class SessionRestorer extends AsyncTask<Session, Void, Void> {
 
     /**
-     * Restorer constructor.
+     * SessionRestorer constructor.
      */
-    public Restorer() {
+    public SessionRestorer() {
     }
 
     @Override
@@ -39,6 +39,6 @@ public class Restorer extends AsyncTask<Session, Void, Void> {
 
     @Override
     protected final void onPostExecute(final Void param) {
-        EventBus.getDefault().post(new RestoreEvent());
+        EventBus.getDefault().post(new RestoreSessionEvent());
     }
 }

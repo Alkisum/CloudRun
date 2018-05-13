@@ -9,8 +9,8 @@ import com.alkisum.android.cloudlib.file.json.JsonFile;
 import com.alkisum.android.cloudlib.file.json.JsonFileReader;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudlib.net.nextcloud.NcDownloader;
-import com.alkisum.android.cloudrun.database.Inserter;
-import com.alkisum.android.cloudrun.events.InsertEvent;
+import com.alkisum.android.cloudrun.database.SessionInserter;
+import com.alkisum.android.cloudrun.events.InsertSessionEvent;
 import com.alkisum.android.cloudrun.files.Json;
 
 import org.greenrobot.eventbus.EventBus;
@@ -25,7 +25,7 @@ import java.util.List;
  * Class starting download operation and subscribing to download events.
  *
  * @author Alkisum
- * @version 3.1
+ * @version 4.0
  * @since 3.0
  */
 public class Downloader {
@@ -107,13 +107,12 @@ public class Downloader {
             case JsonFileReaderEvent.OK:
                 List<JSONObject> jsonObjects = new ArrayList<>();
                 for (JsonFile jsonFile : event.getJsonFiles()) {
-                    // TODO Json.isFileNameValid(jsonFile) useless (already filter in library)
                     if (Json.isFileNameValid(jsonFile)
                             && !Json.isSessionAlreadyInDb(jsonFile)) {
                         jsonObjects.add(jsonFile.getJsonObject());
                     }
                 }
-                new Inserter(jsonObjects).execute();
+                new SessionInserter(jsonObjects).execute();
                 break;
             case JsonFileReaderEvent.ERROR:
                 EventBus.getDefault().unregister(this);
@@ -129,12 +128,12 @@ public class Downloader {
      * @param event Inserter event
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public final void onInsertEvent(final InsertEvent event) {
+    public final void onInsertEvent(final InsertSessionEvent event) {
         switch (event.getResult()) {
-            case InsertEvent.OK:
+            case InsertSessionEvent.OK:
                 EventBus.getDefault().unregister(this);
                 break;
-            case InsertEvent.ERROR:
+            case InsertSessionEvent.ERROR:
                 EventBus.getDefault().unregister(this);
                 break;
             default:

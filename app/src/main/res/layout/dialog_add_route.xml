@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:padding="@dimen/dialog_padding">
+
+    <EditText
+        android:id="@+id/route_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/routes_hint_name"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:maxLines="1"/>
+
+</FrameLayout>

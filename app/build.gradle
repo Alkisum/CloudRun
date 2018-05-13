@@ -16,11 +16,16 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            applicationIdSuffix ".debug"
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
 }
 
 greendao {
-    schemaVersion 2
+    schemaVersion 3
 }
 
 dependencies {
@@ -40,5 +45,7 @@ dependencies {
     testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     implementation 'org.osmdroid:osmdroid-android:6.0.1'
     implementation 'com.wdullaer:materialdatetimepicker:3.6.0'
+    implementation 'com.google.code.gson:gson:2.8.4'
+    implementation 'com.github.nextcloud:android-library:1.0.40'
     implementation project(path: ':cloudlib')
 }

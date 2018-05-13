@@ -3,31 +3,30 @@ package com.alkisum.android.cloudrun.events;
 import com.alkisum.android.cloudlib.events.FilteredEvent;
 import com.alkisum.android.cloudrun.model.Session;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class defining delete event for EventBus.
+ * Class defining delete session event for EventBus.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 3.0
  */
-public class DeleteEvent extends FilteredEvent {
+public class DeleteSessionEvent extends FilteredEvent {
 
     /**
      * Deleted sessions.
      */
-    private List<Session> deletedSessions = new ArrayList<>();
+    private List<Session> deletedSessions;
 
     /**
-     * DeleteEvent constructor.
+     * DeleteSessionEvent constructor.
      *
      * @param subscriberIds   Subscriber ids allowed to process the events
      * @param deletedSessions Deleted sessions
      */
-    public DeleteEvent(final Integer[] subscriberIds,
-                       final List<Session> deletedSessions) {
+    public DeleteSessionEvent(final Integer[] subscriberIds,
+                              final List<Session> deletedSessions) {
         super(subscriberIds);
         this.deletedSessions = deletedSessions;
     }

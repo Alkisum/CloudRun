@@ -103,4 +103,11 @@
     <string name="about_title">About CloudRun</string>
     <string name="about_github">https://github.com/Alkisum/CloudRun/</string>
 
+    <!-- Routes -->
+    <string name="routes_title">Routes</string>
+    <string name="routes_no_route">No routes available</string>
+    <string name="routes_delete_snackbar">Routes deleted</string>
+    <string name="routes_add_dialog">Add new route</string>
+    <string name="routes_hint_name">Name</string>
+
 </resources>

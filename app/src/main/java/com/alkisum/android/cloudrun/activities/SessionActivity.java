@@ -21,14 +21,14 @@ import com.alkisum.android.cloudlib.net.ConnectDialog;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.database.Deleter;
+import com.alkisum.android.cloudrun.database.SessionDeleter;
+import com.alkisum.android.cloudrun.database.Sessions;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
-import com.alkisum.android.cloudrun.events.DeleteEvent;
+import com.alkisum.android.cloudrun.events.DeleteSessionEvent;
 import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.net.Uploader;
 import com.alkisum.android.cloudrun.utils.Format;
-import com.alkisum.android.cloudrun.database.Sessions;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
@@ -56,7 +56,7 @@ import butterknife.ButterKnife;
  * Activity showing session information.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 2.0
  */
 public class SessionActivity extends AppCompatActivity implements
@@ -240,6 +240,7 @@ public class SessionActivity extends AppCompatActivity implements
                 });
         IMapController mapController = mapView.getController();
         // Set zoom to max
+        // TODO Check deprecated method
         mapController.setZoom(19);
         // Set center with the start GeoPoint
         DataPoint dpStart = session.getDataPoints().get(0);
@@ -253,7 +254,7 @@ public class SessionActivity extends AppCompatActivity implements
      * Execute the task to delete the selected sessions.
      */
     private void deleteSession() {
-        new Deleter(new Integer[]{SUBSCRIBER_ID}).execute();
+        new SessionDeleter(new Integer[]{SUBSCRIBER_ID}).execute();
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -342,12 +343,12 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     /**
-     * Triggered on delete event.
+     * Triggered on delete session event.
      *
-     * @param event Delete event
+     * @param event DeleteSession event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onDeleteEvent(final DeleteEvent event) {
+    public final void onDeleteEvent(final DeleteSessionEvent event) {
         if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }

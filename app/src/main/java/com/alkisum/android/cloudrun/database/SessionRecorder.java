@@ -17,10 +17,10 @@ import org.greenrobot.eventbus.Subscribe;
  * Class recording GPS data.
  *
  * @author Alkisum
- * @version 3.1
+ * @version 4.0
  * @since 1.0
  */
-public class Recorder {
+public class SessionRecorder {
 
     /**
      * Listener for recorder.
@@ -53,11 +53,11 @@ public class Recorder {
     private long pauseDuration;
 
     /**
-     * Recorder constructor.
+     * SessionRecorder constructor.
      *
-     * @param callback Recorder listener
+     * @param callback SessionRecorder listener
      */
-    public Recorder(final RecorderListener callback) {
+    public SessionRecorder(final RecorderListener callback) {
         this.callback = callback;
     }
 

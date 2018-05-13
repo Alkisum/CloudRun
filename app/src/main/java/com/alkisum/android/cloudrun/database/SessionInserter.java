@@ -2,13 +2,13 @@ package com.alkisum.android.cloudrun.database;
 
 import android.os.AsyncTask;
 
-import com.alkisum.android.cloudrun.events.InsertEvent;
+import com.alkisum.android.cloudrun.events.InsertSessionEvent;
+import com.alkisum.android.cloudrun.files.Json;
 import com.alkisum.android.cloudrun.model.DaoSession;
 import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.DataPointDao;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.model.SessionDao;
-import com.alkisum.android.cloudrun.files.Json;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
@@ -23,10 +23,10 @@ import java.util.List;
  * Task to insert sessions in database from JSON objects.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 2.4
  */
-public class Inserter extends AsyncTask<Void, Void, Void> {
+public class SessionInserter extends AsyncTask<Void, Void, Void> {
 
     /**
      * List of JSON objects to read.
@@ -54,11 +54,11 @@ public class Inserter extends AsyncTask<Void, Void, Void> {
     private Exception exception;
 
     /**
-     * Inserter constructor.
+     * SessionInserter constructor.
      *
      * @param jsonObjects List of JSON objects to read
      */
-    public Inserter(final List<JSONObject> jsonObjects) {
+    public SessionInserter(final List<JSONObject> jsonObjects) {
         this.jsonObjects = jsonObjects;
         DaoSession daoSession = Db.getInstance().getDaoSession();
         sessionDao = daoSession.getSessionDao();
@@ -82,10 +82,11 @@ public class Inserter extends AsyncTask<Void, Void, Void> {
     @Override
     protected final void onPostExecute(final Void param) {
         if (exception == null) {
-            EventBus.getDefault().post(new InsertEvent(InsertEvent.OK));
+            EventBus.getDefault().post(new InsertSessionEvent(
+                    InsertSessionEvent.OK));
         } else {
-            EventBus.getDefault().post(new InsertEvent(InsertEvent.ERROR,
-                    exception));
+            EventBus.getDefault().post(new InsertSessionEvent(
+                    InsertSessionEvent.ERROR, exception));
         }
     }
 

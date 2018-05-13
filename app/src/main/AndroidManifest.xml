@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.alkisum.android.cloudrun">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.alkisum.android.cloudrun">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -9,48 +8,50 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
-        android:name="com.alkisum.android.cloudrun.app.CloudRunApp"
+        android:name=".app.CloudRunApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
-            android:name="com.alkisum.android.cloudrun.activities.MonitorActivity"
+            android:name=".activities.MonitorActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
-            android:name="com.alkisum.android.cloudrun.activities.MapActivity"
+            android:name=".activities.MapActivity"
             android:configChanges="orientation|screenSize"/>
         <activity
-            android:name="com.alkisum.android.cloudrun.activities.HistoryActivity"
+            android:name=".activities.HistoryActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"/>
         <activity
-            android:name="com.alkisum.android.cloudrun.activities.SessionActivity"
+            android:name=".activities.SessionActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"/>
         <activity
-            android:name="com.alkisum.android.cloudrun.activities.AddSessionActivity"
+            android:name=".activities.AddSessionActivity"
             android:configChanges="orientation|screenSize"/>
         <activity
-            android:name="com.alkisum.android.cloudrun.activities.SettingsActivity"
+            android:name=".activities.RoutesActivity"
             android:configChanges="orientation|screenSize"/>
         <activity
-            android:name="com.alkisum.android.cloudrun.activities.AboutActivity"
+            android:name=".activities.SettingsActivity"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name=".activities.AboutActivity"
             android:configChanges="orientation|screenSize"/>
 
-        <service android:name="com.alkisum.android.cloudrun.location.LocationUpdatesService"/>
-
+        <service android:name=".location.LocationUpdatesService"/>
     </application>
 
 </manifest>

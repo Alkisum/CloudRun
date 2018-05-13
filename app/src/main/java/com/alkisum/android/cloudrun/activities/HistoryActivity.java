@@ -24,16 +24,16 @@ import com.alkisum.android.cloudlib.net.ConnectDialog;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.adapters.HistoryListAdapter;
-import com.alkisum.android.cloudrun.database.Deleter;
-import com.alkisum.android.cloudrun.database.Restorer;
+import com.alkisum.android.cloudrun.database.SessionDeleter;
+import com.alkisum.android.cloudrun.database.SessionRestorer;
+import com.alkisum.android.cloudrun.database.Sessions;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
-import com.alkisum.android.cloudrun.events.DeleteEvent;
-import com.alkisum.android.cloudrun.events.InsertEvent;
-import com.alkisum.android.cloudrun.events.RestoreEvent;
+import com.alkisum.android.cloudrun.events.DeleteSessionEvent;
+import com.alkisum.android.cloudrun.events.InsertSessionEvent;
+import com.alkisum.android.cloudrun.events.RestoreSessionEvent;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.net.Downloader;
 import com.alkisum.android.cloudrun.net.Uploader;
-import com.alkisum.android.cloudrun.database.Sessions;
 import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
@@ -51,7 +51,7 @@ import butterknife.OnClick;
  * Activity listing the history of sessions.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 1.0
  */
 public class HistoryActivity extends AppCompatActivity implements
@@ -94,7 +94,7 @@ public class HistoryActivity extends AppCompatActivity implements
      * Result returned by SessionActivity when the session was deleted from the
      * SessionActivity.
      */
-    public static final int SESSION_DELETED = 627;
+    public static final int SESSION_DELETED = 354;
 
     /**
      * Toolbar.
@@ -367,7 +367,7 @@ public class HistoryActivity extends AppCompatActivity implements
      * Execute the task to delete the selected sessions.
      */
     private void deleteSessions() {
-        new Deleter(new Integer[]{SUBSCRIBER_ID}).execute();
+        new SessionDeleter(new Integer[]{SUBSCRIBER_ID}).execute();
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -378,7 +378,7 @@ public class HistoryActivity extends AppCompatActivity implements
      * @param sessions Sessions to restore
      */
     private void restoreSessions(final Session... sessions) {
-        new Restorer().execute(sessions);
+        new SessionRestorer().execute(sessions);
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -488,20 +488,20 @@ public class HistoryActivity extends AppCompatActivity implements
     }
 
     /**
-     * Triggered on inserter event.
+     * Triggered on insert session event.
      *
-     * @param event Inserter event
+     * @param event InsertSession event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onInsertEvent(final InsertEvent event) {
+    public final void onInsertSessionEvent(final InsertSessionEvent event) {
         switch (event.getResult()) {
-            case InsertEvent.OK:
+            case InsertSessionEvent.OK:
                 refreshList();
                 Snackbar.make(fab, R.string.download_success_snackbar,
                         Snackbar.LENGTH_LONG).show();
                 progressBar.setVisibility(View.GONE);
                 break;
-            case InsertEvent.ERROR:
+            case InsertSessionEvent.ERROR:
                 ErrorDialog.show(this,
                         getString(R.string.download_insert_failure_title),
                         event.getException().getMessage(), null);
@@ -568,12 +568,12 @@ public class HistoryActivity extends AppCompatActivity implements
     }
 
     /**
-     * Triggered on delete event.
+     * Triggered on delete session event.
      *
-     * @param event Delete event
+     * @param event DeleteSession event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onDeleteEvent(final DeleteEvent event) {
+    public final void onDeleteSessionEvent(final DeleteSessionEvent event) {
         if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
@@ -592,12 +592,12 @@ public class HistoryActivity extends AppCompatActivity implements
     }
 
     /**
-     * Triggered on restore event.
+     * Triggered on restore session event.
      *
-     * @param event Restore event
+     * @param event RestoreSession event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onRestoreEvent(final RestoreEvent event) {
+    public final void onRestoreSessionEvent(final RestoreSessionEvent event) {
         progressBar.setVisibility(View.GONE);
         refreshList();
     }
