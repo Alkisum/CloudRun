@@ -496,7 +496,7 @@ public class MonitorActivity extends AppCompatActivity
                     startActivity(intent);
                 } else if (id == R.id.nav_routes) {
                     Intent intent = new Intent(MonitorActivity.this,
-                            RoutesActivity.class);
+                            RouteListActivity.class);
                     startActivity(intent);
                 } else if (id == R.id.nav_settings) {
                     Intent intent = new Intent(MonitorActivity.this,

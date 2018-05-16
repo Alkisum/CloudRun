@@ -33,6 +33,17 @@ public final class Routes {
     }
 
     /**
+     * Load the route from the database according to the given ID.
+     *
+     * @param routeId Route id
+     * @return Route
+     */
+    public static Route getRouteById(final long routeId) {
+        RouteDao dao = Db.getInstance().getDaoSession().getRouteDao();
+        return dao.load(routeId);
+    }
+
+    /**
      * Load all the routes from the database and return only the selected
      * ones.
      *
@@ -49,6 +60,11 @@ public final class Routes {
         return selectedRoutes;
     }
 
+    /**
+     * Insert a route with the given name into the database.
+     *
+     * @param name Name of the route to insert
+     */
     public static void insertRoute(final String name) {
         RouteDao dao = Db.getInstance().getDaoSession().getRouteDao();
         Route route = new Route();

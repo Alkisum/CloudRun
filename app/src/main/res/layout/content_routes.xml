@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.alkisum.android.cloudrun.activities.RoutesActivity"
-    tools:showIn="@layout/activity_routes">
+    tools:context="com.alkisum.android.cloudrun.activities.RouteListActivity"
+    tools:showIn="@layout/activity_route_list">
 
     <ProgressBar
         android:id="@+id/routes_progressbar"

@@ -1,5 +1,6 @@
 package com.alkisum.android.cloudrun.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -43,11 +44,16 @@ import butterknife.OnClick;
  * @version 4.0
  * @since 4.0
  */
-public class RoutesActivity extends AppCompatActivity {
+public class RouteListActivity extends AppCompatActivity {
     /**
      * Subscriber id to use when receiving event.
      */
     private static final int SUBSCRIBER_ID = 716;
+
+    /**
+     * Request code for RouteActivity result.
+     */
+    private static final int ROUTE_REQUEST_CODE = 922;
 
     /**
      * Toolbar.
@@ -93,7 +99,7 @@ public class RoutesActivity extends AppCompatActivity {
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_routes);
+        setContentView(R.layout.activity_route_list);
         ButterKnife.bind(this);
 
         setGui();
@@ -138,10 +144,10 @@ public class RoutesActivity extends AppCompatActivity {
                     listAdapter.changeRouteSelectedState(position);
                     listAdapter.notifyDataSetInvalidated();
                 } else {
-                    /*Intent intent = new Intent(RoutesActivity.this,
-                            MarkerActivity.class);
-                    intent.putExtra(SessionActivity.ARG_ROUTE_ID, id);
-                    startActivityForResult(intent, ROUTE_REQUEST_CODE);*/
+                    Intent intent = new Intent(RouteListActivity.this,
+                            RouteActivity.class);
+                    intent.putExtra(RouteActivity.ARG_ROUTE_ID, id);
+                    startActivityForResult(intent, ROUTE_REQUEST_CODE);
                 }
             }
         });

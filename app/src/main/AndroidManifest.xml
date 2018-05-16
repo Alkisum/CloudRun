@@ -42,7 +42,7 @@
             android:name=".activities.AddSessionActivity"
             android:configChanges="orientation|screenSize"/>
         <activity
-            android:name=".activities.RoutesActivity"
+            android:name=".activities.RouteListActivity"
             android:configChanges="orientation|screenSize"/>
         <activity
             android:name=".activities.SettingsActivity"
@@ -52,6 +52,9 @@
             android:configChanges="orientation|screenSize"/>
 
         <service android:name=".location.LocationUpdatesService"/>
+
+        <activity android:name=".activities.RouteActivity">
+        </activity>
     </application>
 
 </manifest>
