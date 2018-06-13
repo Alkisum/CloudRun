@@ -15,4 +15,14 @@
         android:id="@+id/route_toolbar"
         style="@style/toolbar_transparent"/>
 
+    <ProgressBar
+        android:id="@+id/route_progressbar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/route_toolbar"
+        android:layout_marginTop="-7dp"
+        android:indeterminate="true"
+        android:visibility="gone"/>
+
 </android.support.constraint.ConstraintLayout>

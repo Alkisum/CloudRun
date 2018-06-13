@@ -71,4 +71,16 @@ public final class Routes {
         route.setName(name);
         dao.insert(route);
     }
+
+    /**
+     * Update the given route with the given name.
+     *
+     * @param route Route to update
+     * @param name  New route name
+     */
+    public static void updateRoute(final Route route, final String name) {
+        RouteDao dao = Db.getInstance().getDaoSession().getRouteDao();
+        route.setName(name);
+        dao.update(route);
+    }
 }

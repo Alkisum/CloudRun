@@ -26,6 +26,7 @@ import com.alkisum.android.cloudrun.events.DeleteRouteEvent;
 import com.alkisum.android.cloudrun.events.InsertRouteEvent;
 import com.alkisum.android.cloudrun.events.RestoreRouteEvent;
 import com.alkisum.android.cloudrun.model.Route;
+import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -54,6 +55,12 @@ public class RouteListActivity extends AppCompatActivity {
      * Request code for RouteActivity result.
      */
     private static final int ROUTE_REQUEST_CODE = 922;
+
+    /**
+     * Result returned by RouteActivity when the route was deleted from the
+     * RouteActivity.
+     */
+    public static final int ROUTE_DELETED = 958;
 
     /**
      * Toolbar.
@@ -109,6 +116,7 @@ public class RouteListActivity extends AppCompatActivity {
     public final void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
+        refreshList();
     }
 
     @Override
@@ -121,7 +129,7 @@ public class RouteListActivity extends AppCompatActivity {
      * Set the GUI.
      */
     private void setGui() {
-        toolbar.setTitle(R.string.routes_title);
+        toolbar.setTitle(R.string.route_title);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -185,7 +193,7 @@ public class RouteListActivity extends AppCompatActivity {
     @Override
     public final boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_routes, menu);
+        inflater.inflate(R.menu.menu_routelist, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -214,6 +222,27 @@ public class RouteListActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected final void onActivityResult(final int requestCode,
+                                          final int resultCode,
+                                          final Intent data) {
+        if (requestCode == ROUTE_REQUEST_CODE) {
+            if (resultCode == ROUTE_DELETED) {
+                String json = data.getStringExtra(RouteActivity.ARG_ROUTE_JSON);
+                final Route route = new Gson().fromJson(json, Route.class);
+                Snackbar.make(fab, R.string.route_delete_snackbar,
+                        Snackbar.LENGTH_LONG)
+                        .setAction(R.string.action_undo,
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(final View v) {
+                                        restoreRoutes(route);
+                                    }
+                                }).show();
+            }
         }
     }
 
@@ -304,7 +333,7 @@ public class RouteListActivity extends AppCompatActivity {
         }
         progressBar.setVisibility(View.GONE);
         refreshList();
-        Snackbar.make(fab, R.string.history_delete_snackbar,
+        Snackbar.make(fab, R.string.route_delete_snackbar,
                 Snackbar.LENGTH_LONG)
                 .setAction(R.string.action_undo, new View.OnClickListener() {
                     @Override

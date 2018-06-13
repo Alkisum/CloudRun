@@ -8,43 +8,46 @@ import android.widget.EditText;
 
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.database.Routes;
-import com.alkisum.android.cloudrun.events.InsertRouteEvent;
+import com.alkisum.android.cloudrun.events.UpdateRouteEvent;
+import com.alkisum.android.cloudrun.model.Route;
 
 import org.greenrobot.eventbus.EventBus;
 
 /**
- * Dialog to add a new route.
+ * Dialog to edit an existing route.
  *
  * @author Alkisum
  * @version 4.0
  * @since 4.0
  */
-public final class AddRouteDialog {
+public final class EditRouteDialog {
 
     /**
-     * AddRouteDialog constructor.
+     * EditRouteDialog constructor.
      */
-    private AddRouteDialog() {
+    private EditRouteDialog() {
 
     }
 
     /**
-     * Show dialog to create a new route.
+     * Show dialog to edit an existing route.
      *
      * @param context Context
+     * @param route   Route to edit
      */
-    public static void show(final Context context) {
+    public static void show(final Context context, final Route route) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         // set view
-        View view = View.inflate(context, R.layout.dialog_add_route, null);
+        View view = View.inflate(context, R.layout.dialog_edit_route, null);
         builder.setView(view);
 
         // set dialog title
-        builder.setTitle(R.string.route_add_dialog);
+        builder.setTitle(R.string.route_edit_dialog);
 
         // get edit text for route name
         final EditText routeName = view.findViewById(R.id.route_name);
+        routeName.setHint(route.getName());
 
         // positive button
         builder.setPositiveButton(android.R.string.ok,
@@ -52,8 +55,9 @@ public final class AddRouteDialog {
                     @Override
                     public void onClick(final DialogInterface dialog,
                                         final int which) {
-                        Routes.insertRoute(routeName.getText().toString());
-                        EventBus.getDefault().post(new InsertRouteEvent());
+                        Routes.updateRoute(route,
+                                routeName.getText().toString());
+                        EventBus.getDefault().post(new UpdateRouteEvent());
                     }
                 });
 
