@@ -12,12 +12,12 @@ import android.view.View;
 
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
+import com.alkisum.android.cloudrun.database.Sessions;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.GpsStatusEvent;
 import com.alkisum.android.cloudrun.location.Coordinate;
 import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.Session;
-import com.alkisum.android.cloudrun.database.Sessions;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -182,7 +182,7 @@ public class MapActivity extends AppCompatActivity {
         mapView.setMultiTouchControls(true);
 
         // Set zoom to max
-        mapView.getController().setZoom(19);
+        mapView.getController().setZoom(19d);
         setPosition(initPosition);
         setRoute();
         mapView.invalidate();
@@ -233,6 +233,8 @@ public class MapActivity extends AppCompatActivity {
         Drawable marker = ContextCompat.getDrawable(this,
                 R.drawable.ic_current_position_blue_24dp);
         overlayItem.setMarker(marker);
+        // TODO Test if center of icon is in center of geopoint
+        overlayItem.setMarkerHotspot(OverlayItem.HotspotPlace.CENTER);
 
         // Build ItemizedIconOverlay
         final ArrayList<OverlayItem> items = new ArrayList<>();

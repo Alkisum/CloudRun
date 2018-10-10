@@ -17,7 +17,7 @@ public class DeleteRouteEvent extends FilteredEvent {
     /**
      * Deleted routes.
      */
-    private List<Route> deletedRoutes;
+    private final List<Route> deletedRoutes;
 
     /**
      * DeleteRouteEvent constructor.

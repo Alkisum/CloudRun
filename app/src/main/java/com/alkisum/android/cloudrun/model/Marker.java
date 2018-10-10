@@ -15,8 +15,6 @@ public class Marker {
 
     private String label;
 
-    private Integer order;
-
     private Double latitude;
 
     private Double longitude;
@@ -35,12 +33,11 @@ public class Marker {
     @Generated(hash = 1808419515)
     private transient MarkerDao myDao;
 
-    @Generated(hash = 805258742)
-    public Marker(Long id, String label, Integer order, Double latitude,
-            Double longitude, long routeId) {
+    @Generated(hash = 2015615689)
+    public Marker(Long id, String label, Double latitude, Double longitude,
+            long routeId) {
         this.id = id;
         this.label = label;
-        this.order = order;
         this.latitude = latitude;
         this.longitude = longitude;
         this.routeId = routeId;
@@ -64,14 +61,6 @@ public class Marker {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    public Integer getOrder() {
-        return this.order;
-    }
-
-    public void setOrder(Integer order) {
-        this.order = order;
     }
 
     public Double getLatitude() {

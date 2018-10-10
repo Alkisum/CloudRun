@@ -17,7 +17,7 @@ public class DeleteSessionEvent extends FilteredEvent {
     /**
      * Deleted sessions.
      */
-    private List<Session> deletedSessions;
+    private final List<Session> deletedSessions;
 
     /**
      * DeleteSessionEvent constructor.

@@ -108,8 +108,14 @@
     <string name="route_title">Routes</string>
     <string name="route_no_route">No routes available</string>
     <string name="route_delete_snackbar">Routes deleted</string>
-    <string name="route_add_dialog">Add new route</string>
+    <string name="route_add_dialog">Add route</string>
     <string name="route_edit_dialog">Edit route</string>
     <string name="route_hint_name">Name</string>
+
+    <!-- Marker -->
+    <string name="marker_add_dialog">Add marker</string>
+    <string name="marker_edit_dialog">Edit marker</string>
+    <string name="marker_hint_label">Label</string>
+    <string name="marker_delete_snackbar">Markers deleted</string>
 
 </resources>

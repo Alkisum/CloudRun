@@ -240,8 +240,7 @@ public class SessionActivity extends AppCompatActivity implements
                 });
         IMapController mapController = mapView.getController();
         // Set zoom to max
-        // TODO Check deprecated method
-        mapController.setZoom(19);
+        mapController.setZoom(19d);
         // Set center with the start GeoPoint
         DataPoint dpStart = session.getDataPoints().get(0);
         mapController.setCenter(new GeoPoint(
