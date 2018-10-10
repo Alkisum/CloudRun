@@ -11,7 +11,7 @@ import com.alkisum.android.cloudrun.location.LocationHelper;
  * Class defining constants for SharedPreferences.
  *
  * @author Alkisum
- * @version 3.3
+ * @version 4.0
  * @since 1.0
  */
 public final class Pref {
@@ -60,6 +60,11 @@ public final class Pref {
      * Preference key for distance count.
      */
     public static final String DISTANCE_CNT = "distanceCnt";
+
+    /**
+     * Preference key for active routes.
+     */
+    public static final String ACTIVE_ROUTES = "activeRoutes";
 
     /**
      * CloudPref constructor.

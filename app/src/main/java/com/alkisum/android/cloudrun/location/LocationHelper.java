@@ -287,7 +287,6 @@ public class LocationHelper {
      */
     private void removeLocationUpdates() {
         try {
-            Log.e(TAG, "Remove location updates");
             fusedLocationClient.removeLocationUpdates(locationCallback);
         } catch (SecurityException e) {
             Log.e(TAG, e.getMessage());

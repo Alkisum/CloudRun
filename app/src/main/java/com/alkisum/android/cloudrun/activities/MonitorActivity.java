@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.database.SessionRecorder;
+import com.alkisum.android.cloudrun.dialogs.ActivateRoutesDialog;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.DistanceEvent;
@@ -400,6 +401,8 @@ public class MonitorActivity extends AppCompatActivity
             intent.putExtra(MapActivity.ARG_COORDINATE, lastCoordinate);
             intent.putExtra(MapActivity.ARG_GPS_STATUS, gpsStatusIconId);
             startActivity(intent);
+        } else if (id == R.id.action_routes) {
+            ActivateRoutesDialog.show(this);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -559,6 +562,8 @@ public class MonitorActivity extends AppCompatActivity
     @Subscribe
     public final void onCoordinateEvent(final CoordinateEvent event) {
         lastCoordinate = event.getValues();
+
+        // TODO checkDistanceWithMarkers(event.getValues());
     }
 
     /**
