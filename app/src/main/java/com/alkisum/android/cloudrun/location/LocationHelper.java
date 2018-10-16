@@ -19,11 +19,14 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.alkisum.android.cloudrun.R;
+import com.alkisum.android.cloudrun.database.Markers;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.DistanceEvent;
+import com.alkisum.android.cloudrun.events.MarkerAlertEvent;
 import com.alkisum.android.cloudrun.events.PaceEvent;
 import com.alkisum.android.cloudrun.events.SpeedEvent;
+import com.alkisum.android.cloudrun.model.Marker;
 import com.alkisum.android.cloudrun.utils.Pref;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -42,13 +45,14 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 /**
  * Helper class for location operations.
  *
  * @author Alkisum
- * @version 3.1
+ * @version 4.0
  * @since 3.1
  */
 public class LocationHelper {
@@ -141,12 +145,18 @@ public class LocationHelper {
     private boolean runningInForeground = false;
 
     /**
+     * MarkerNotifier instance.
+     */
+    private final MarkerNotifier markerNotifier;
+
+    /**
      * LocationHelper constructor.
      *
      * @param activity Activity
      */
     public LocationHelper(final Activity activity) {
         this.activity = new WeakReference<>(activity);
+        markerNotifier = new MarkerNotifier(activity);
         createLocationRequest();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(
                 activity);
@@ -179,6 +189,7 @@ public class LocationHelper {
      */
     public final void onDestroy() {
         removeLocationUpdates();
+        markerNotifier.onDestroy();
         if (bound) {
             service.stopSelf();
             activity.get().unbindService(serviceConnection);
@@ -364,6 +375,13 @@ public class LocationHelper {
                     location.getAltitude());
 
             EventBus.getDefault().post(new CoordinateEvent(coordinate));
+
+            // check for surrounding markers
+            List<Marker> markers = Markers.getSurroundingMarkers(
+                    activity.get().getApplicationContext(), coordinate);
+            if (!markers.isEmpty()) {
+                EventBus.getDefault().post(new MarkerAlertEvent(markers));
+            }
 
             if (lastCoordinate != null) {
 

@@ -1,8 +1,15 @@
 package com.alkisum.android.cloudrun.database;
 
+import android.content.Context;
+import android.location.Location;
+
+import com.alkisum.android.cloudrun.location.Coordinate;
 import com.alkisum.android.cloudrun.model.Marker;
 import com.alkisum.android.cloudrun.model.MarkerDao;
 import com.alkisum.android.cloudrun.model.Route;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility class for marker operations.
@@ -12,6 +19,11 @@ import com.alkisum.android.cloudrun.model.Route;
  * @since 4.0
  */
 public final class Markers {
+
+    /**
+     * Maximum distance a marker must be to trigger marker alert (in meter).
+     */
+    private static final int MARKER_DISTANCE = 10;
 
     /**
      * Markers constructor.
@@ -71,5 +83,77 @@ public final class Markers {
             }
         }
         return null;
+    }
+
+    /**
+     * Retrieve all markers from active routes.
+     *
+     * @param context Context
+     * @return List of active marker
+     */
+    public static List<Marker> getActiveMarkers(final Context context) {
+        List<Marker> markers = new ArrayList<>();
+        List<Route> routes = Routes.getActiveRoutes(context);
+        for (Route route : routes) {
+            markers.addAll(route.getMarkers());
+        }
+        return markers;
+    }
+
+    /**
+     * Check distance between current location and each active marker.
+     *
+     * @param context Context
+     * @param current Current location
+     * @return List of markers located within {@link Markers#MARKER_DISTANCE}
+     */
+    public static List<Marker> getSurroundingMarkers(final Context context,
+                                                     final Coordinate current) {
+        List<Marker> surroundingMarkers = new ArrayList<>();
+
+        // check distance to each active marker
+        for (Marker marker : getActiveMarkers(context)) {
+            if (distanceToMarker(current, marker) < MARKER_DISTANCE) {
+                surroundingMarkers.add(marker);
+            }
+        }
+
+        return surroundingMarkers;
+    }
+
+    /**
+     * Calculate the distance between the current location and the given marker.
+     *
+     * @param current Current location
+     * @param marker  Marker
+     * @return Distance between the 2 locations
+     */
+    private static float distanceToMarker(final Coordinate current,
+                                          final Marker marker) {
+        Location currentLocation = new Location("Current");
+        currentLocation.setLatitude(current.getLatitude());
+        currentLocation.setLongitude(current.getLongitude());
+
+        Location markerLocation = new Location("Marker");
+        markerLocation.setLatitude(marker.getLatitude());
+        markerLocation.setLongitude(marker.getLongitude());
+
+        return currentLocation.distanceTo(markerLocation);
+    }
+
+    /**
+     * Convert the given marker to a coordinate.
+     * The coordinate time is set to the current time.
+     * The elevation is set to 0.
+     *
+     * @param marker Marker to convert
+     * @return Converted marker
+     */
+    public static Coordinate toCoordinate(final Marker marker) {
+        return new Coordinate(
+                System.currentTimeMillis(),
+                marker.getLatitude(),
+                marker.getLongitude(),
+                0);
     }
 }

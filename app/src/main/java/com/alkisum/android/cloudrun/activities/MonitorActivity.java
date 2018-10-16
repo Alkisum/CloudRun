@@ -562,8 +562,6 @@ public class MonitorActivity extends AppCompatActivity
     @Subscribe
     public final void onCoordinateEvent(final CoordinateEvent event) {
         lastCoordinate = event.getValues();
-
-        // TODO checkDistanceWithMarkers(event.getValues());
     }
 
     /**

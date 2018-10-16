@@ -12,12 +12,15 @@ import android.view.View;
 
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
+import com.alkisum.android.cloudrun.database.Markers;
 import com.alkisum.android.cloudrun.database.Sessions;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.GpsStatusEvent;
 import com.alkisum.android.cloudrun.location.Coordinate;
 import com.alkisum.android.cloudrun.model.DataPoint;
+import com.alkisum.android.cloudrun.model.Marker;
 import com.alkisum.android.cloudrun.model.Session;
+import com.alkisum.android.cloudrun.ui.GpsStatus;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -31,7 +34,6 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polyline;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -41,7 +43,7 @@ import butterknife.ButterKnife;
  * Activity showing current location and tracking session on map.
  *
  * @author Alkisum
- * @version 3.1
+ * @version 4.0
  * @since 3.0
  */
 public class MapActivity extends AppCompatActivity {
@@ -83,9 +85,19 @@ public class MapActivity extends AppCompatActivity {
     private Coordinate lastPosition;
 
     /**
-     * List to store the overlays locally.
+     * List to store the position overlay.
      */
-    private List<Overlay> overlays;
+    private Overlay positionOverlay;
+
+    /**
+     * List to store the route overlays locally.
+     */
+    private List<Overlay> routeOverlays = new ArrayList<>();
+
+    /**
+     * List to store the marker overlays locally.
+     */
+    private List<Overlay> markerOverlays = new ArrayList<>();
 
     /**
      * View containing the OSM.
@@ -100,14 +112,23 @@ public class MapActivity extends AppCompatActivity {
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
 
-        if (getIntent().hasExtra(ARG_SESSION_ID)
-                && getIntent().getExtras() != null) {
+        if (getIntent().hasExtra(ARG_SESSION_ID)) {
             long sessionId = getIntent().getExtras().getLong(ARG_SESSION_ID);
             session = Sessions.getSessionById(sessionId);
         }
+
+        if (!getIntent().hasExtra(ARG_COORDINATE)) {
+            throw new IllegalArgumentException("A coordinate is mandatory to "
+                    + "create the MapActivity");
+        }
         Coordinate initPosition = getIntent().getParcelableExtra(
                 ARG_COORDINATE);
-        gpsStatusIconId = getIntent().getExtras().getInt(ARG_GPS_STATUS);
+
+        if (getIntent().hasExtra(ARG_GPS_STATUS)) {
+            gpsStatusIconId = getIntent().getExtras().getInt(ARG_GPS_STATUS);
+        } else {
+            gpsStatusIconId = GpsStatus.getLastIcon();
+        }
 
         Toolbar toolbar = findViewById(R.id.map_toolbar);
         toolbar.setTitle(R.string.app_name);
@@ -120,6 +141,7 @@ public class MapActivity extends AppCompatActivity {
             }
         });
 
+        mapView.setBuiltInZoomControls(false);
         mapView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(final View v, final MotionEvent event) {
@@ -128,7 +150,7 @@ public class MapActivity extends AppCompatActivity {
             }
         });
 
-        initMap(initPosition);
+        this.initMap(initPosition);
     }
 
     @Override
@@ -162,8 +184,8 @@ public class MapActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_gps) {
             focused = true;
-            setPosition(lastPosition);
-            mapView.invalidate();
+            this.setPosition(lastPosition);
+            this.applyOverlays();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -174,8 +196,6 @@ public class MapActivity extends AppCompatActivity {
      * @param initPosition Current position when initializing the map
      */
     private void initMap(final Coordinate initPosition) {
-        overlays = new ArrayList<>();
-
         Configuration.getInstance().setUserAgentValue(
                 BuildConfig.APPLICATION_ID);
         mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
@@ -183,9 +203,11 @@ public class MapActivity extends AppCompatActivity {
 
         // Set zoom to max
         mapView.getController().setZoom(19d);
-        setPosition(initPosition);
-        setRoute();
-        mapView.invalidate();
+
+        this.setPosition(initPosition);
+        this.setRoute();
+        this.setMarkers();
+        this.applyOverlays();
     }
 
     /**
@@ -195,9 +217,9 @@ public class MapActivity extends AppCompatActivity {
      */
     @Subscribe
     public final void onCoordinateEvent(final CoordinateEvent event) {
-        setPosition(event.getValues());
-        setRoute();
-        mapView.invalidate();
+        this.setPosition(event.getValues());
+        this.setRoute();
+        this.applyOverlays();
     }
 
     /**
@@ -233,47 +255,12 @@ public class MapActivity extends AppCompatActivity {
         Drawable marker = ContextCompat.getDrawable(this,
                 R.drawable.ic_current_position_blue_24dp);
         overlayItem.setMarker(marker);
-        // TODO Test if center of icon is in center of geopoint
         overlayItem.setMarkerHotspot(OverlayItem.HotspotPlace.CENTER);
 
         // Build ItemizedIconOverlay
         final ArrayList<OverlayItem> items = new ArrayList<>();
         items.add(overlayItem);
-        ItemizedIconOverlay currentLocationOverlay = new ItemizedIconOverlay<>(
-                this, items,
-                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-                    @Override
-                    public boolean onItemSingleTapUp(final int index,
-                                                     final OverlayItem item) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onItemLongPress(final int index,
-                                                   final OverlayItem item) {
-                        return false;
-                    }
-                });
-
-        // Add ItemizedIconOverlay to map's overlays (index 0)
-        if (overlays.isEmpty()) {
-            this.overlays.add(currentLocationOverlay);
-        } else {
-            this.overlays.set(0, currentLocationOverlay);
-        }
-
-        setOverlays();
-    }
-
-    /**
-     * Set the overlays to the map view. Reverse the local overlay list
-     * to draw the marker on top of the route.
-     */
-    private void setOverlays() {
-        Collections.reverse(overlays);
-        mapView.getOverlays().clear();
-        mapView.getOverlays().addAll(overlays);
-        Collections.reverse(overlays);
+        positionOverlay = new ItemizedIconOverlay<>(this, items, null);
     }
 
     /**
@@ -297,13 +284,48 @@ public class MapActivity extends AppCompatActivity {
         polyline.setPoints(route);
         polyline.setWidth(10f);
 
-        // Add polyline to overlays (index 1)
-        if (overlays.size() == 1) {
-            overlays.add(polyline);
-        } else if (overlays.size() > 1) {
-            overlays.set(1, polyline);
-        }
+        // Add polyline to overlays
+        routeOverlays.add(polyline);
+    }
 
-        setOverlays();
+    /**
+     * Add active markers to map.
+     */
+    private void setMarkers() {
+        // get active markers
+        List<Marker> markers = Markers.getActiveMarkers(this);
+
+        for (Marker marker : markers) {
+            // create OverlayItem
+            OverlayItem overlayItem = new OverlayItem("", "",
+                    new GeoPoint(marker.getLatitude(), marker.getLongitude()));
+
+            // create marker
+            Drawable drawable = ContextCompat.getDrawable(this,
+                    R.drawable.ic_place_red_24dp);
+            overlayItem.setMarker(drawable);
+            overlayItem.setMarkerHotspot(
+                    OverlayItem.HotspotPlace.BOTTOM_CENTER);
+
+            // build ItemizedIconOverlay
+            final ArrayList<OverlayItem> items = new ArrayList<>();
+            items.add(overlayItem);
+            Overlay itemizedIconOverlay = new ItemizedIconOverlay<>(
+                    this, items, null);
+
+            // add marker to local list of overlays
+            markerOverlays.add(itemizedIconOverlay);
+        }
+    }
+
+    /**
+     * Set the overlays to the map view.
+     */
+    private void applyOverlays() {
+        mapView.getOverlays().clear();
+        mapView.getOverlays().addAll(routeOverlays);
+        mapView.getOverlays().addAll(markerOverlays);
+        mapView.getOverlays().add(positionOverlay);
+        mapView.invalidate();
     }
 }

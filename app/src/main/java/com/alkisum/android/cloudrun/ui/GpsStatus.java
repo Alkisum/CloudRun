@@ -16,7 +16,7 @@ import org.greenrobot.eventbus.Subscribe;
  * Class to handle the GPS status view show on toolbars.
  *
  * @author Alkisum
- * @version 3.1
+ * @version 4.0
  * @since 3.0
  */
 public class GpsStatus {
@@ -42,9 +42,14 @@ public class GpsStatus {
     private final EventBus eventBus;
 
     /**
+     * Last GPS status icon.
+     */
+    private static int lastIcon = R.drawable.ic_gps_off_white_24dp;
+
+    /**
      * GpsStatus constructor.
      *
-     * @param context  Context
+     * @param context Context
      */
     public GpsStatus(final Context context) {
         this.context = context;
@@ -69,28 +74,40 @@ public class GpsStatus {
     }
 
     /**
-     * Task checking for the GPS status and sending callback with icon according
-     * to the GPS status.
+     * Task sending callback with icon according to the GPS status.
      */
     private final Runnable gpsStatusTask = new Runnable() {
         @Override
         public void run() {
             gpsStatusHandler.postDelayed(this,
                     LocationHelper.LOCATION_REQUEST_INTERVAL * 2);
-            if (!LocationUtils.isLocationEnabled(context)) {
-                eventBus.post(new GpsStatusEvent(
-                        R.drawable.ic_gps_off_white_24dp));
-
-            } else if (newGpsDataReceived) {
-                eventBus.post(new GpsStatusEvent(
-                        R.drawable.ic_gps_fixed_white_24dp));
-            } else {
-                eventBus.post(new GpsStatusEvent(
-                        R.drawable.ic_gps_not_fixed_white_24dp));
-            }
+            lastIcon = getIcon();
+            eventBus.post(new GpsStatusEvent(lastIcon));
             newGpsDataReceived = false;
         }
     };
+
+    /**
+     * Check GPS status and return GPS status icon accordingly.
+     *
+     * @return Drawable id
+     */
+    public final int getIcon() {
+        if (!LocationUtils.isLocationEnabled(context)) {
+            return R.drawable.ic_gps_off_white_24dp;
+        } else if (newGpsDataReceived) {
+            return R.drawable.ic_gps_fixed_white_24dp;
+        } else {
+            return R.drawable.ic_gps_not_fixed_white_24dp;
+        }
+    }
+
+    /**
+     * @return Last GPS status icon
+     */
+    public static int getLastIcon() {
+        return lastIcon;
+    }
 
     /**
      * Triggered when new coordinates are received.

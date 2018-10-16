@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Class defining coordinates (time, latitude, longitude and elevation).
  *
  * @author Alkisum
- * @version 3.1
+ * @version 4.0
  * @since 1.0
  */
 public class Coordinate implements Parcelable {
@@ -40,7 +40,7 @@ public class Coordinate implements Parcelable {
      * @param longitude Longitude
      * @param elevation Elevation
      */
-    Coordinate(final long time, final double latitude, final double longitude,
+    public Coordinate(final long time, final double latitude, final double longitude,
                final double elevation) {
         this.time = time;
         this.latitude = latitude;

@@ -51,24 +51,6 @@ public final class Routes {
     }
 
     /**
-     * Load the routes from the database according to the given IDs.
-     *
-     * @param routeIds Route ids
-     * @return Routes
-     */
-    public static List<Route> getRoutesById(final long[] routeIds) {
-        RouteDao dao = Db.getInstance().getDaoSession().getRouteDao();
-        List<Route> routes = new ArrayList<>();
-        for (long routeId : routeIds) {
-            Route route = dao.load(routeId);
-            if (route != null) {
-                routes.add(route);
-            }
-        }
-        return routes;
-    }
-
-    /**
      * Load all the routes from the database and return only the selected
      * ones.
      *
@@ -83,6 +65,36 @@ public final class Routes {
             }
         }
         return selectedRoutes;
+    }
+
+    /**
+     * Load the active routes by reading the preferences.
+     *
+     * @param context Context
+     * @return List of active routes
+     */
+    static List<Route> getActiveRoutes(final Context context) {
+        List<Route> activeRoutes = new ArrayList<>();
+
+        // get active route ids from preferences
+        Set<String> activeRoutesPref = PreferenceManager
+                .getDefaultSharedPreferences(context)
+                .getStringSet(Pref.ACTIVE_ROUTES, null);
+
+        // return empty list if preference not set
+        if (activeRoutesPref == null) {
+            return activeRoutes;
+        }
+
+        // get all routes by ids read in preferences
+        for (String routeId : activeRoutesPref) {
+            Route route = getRouteById(Long.parseLong(routeId));
+            if (route != null) {
+                activeRoutes.add(route);
+            }
+        }
+
+        return activeRoutes;
     }
 
     /**
