@@ -2,11 +2,13 @@ package com.alkisum.android.cloudrun.database;
 
 import android.content.Context;
 import android.location.Location;
+import android.preference.PreferenceManager;
 
 import com.alkisum.android.cloudrun.location.Coordinate;
 import com.alkisum.android.cloudrun.model.Marker;
 import com.alkisum.android.cloudrun.model.MarkerDao;
 import com.alkisum.android.cloudrun.model.Route;
+import com.alkisum.android.cloudrun.utils.Pref;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +23,11 @@ import java.util.List;
 public final class Markers {
 
     /**
-     * Maximum distance a marker must be to trigger marker alert (in meter).
+     * Maximum distance a marker must be, to trigger marker alert (in meter).
+     * This preference is a string to allow the user to use a EditTextPreference
+     * in the SettingsActivity.
      */
-    private static final int MARKER_DISTANCE = 10;
+    public static final String DISTANCE_TO_MARKER_DEFAULT = "20";
 
     /**
      * Markers constructor.
@@ -105,7 +109,8 @@ public final class Markers {
      *
      * @param context Context
      * @param current Current location
-     * @return List of markers located within {@link Markers#MARKER_DISTANCE}
+     * @return List of markers located within
+     * {@link com.alkisum.android.cloudrun.utils.Pref#DISTANCE_TO_MARKER}
      */
     public static List<Marker> getSurroundingMarkers(final Context context,
                                                      final Coordinate current) {
@@ -113,7 +118,8 @@ public final class Markers {
 
         // check distance to each active marker
         for (Marker marker : getActiveMarkers(context)) {
-            if (distanceToMarker(current, marker) < MARKER_DISTANCE) {
+            if (distanceToMarker(current, marker)
+                    <= getDistanceToMarkerPref(context)) {
                 surroundingMarkers.add(marker);
             }
         }
@@ -155,5 +161,21 @@ public final class Markers {
                 marker.getLatitude(),
                 marker.getLongitude(),
                 0);
+    }
+
+    /**
+     * Get distance to marker from preferences.
+     *
+     * @param context Context
+     * @return Distance to marker set in preferences
+     */
+    private static int getDistanceToMarkerPref(final Context context) {
+        String s = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(Pref.DISTANCE_TO_MARKER, DISTANCE_TO_MARKER_DEFAULT);
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return Integer.parseInt(DISTANCE_TO_MARKER_DEFAULT);
+        }
     }
 }

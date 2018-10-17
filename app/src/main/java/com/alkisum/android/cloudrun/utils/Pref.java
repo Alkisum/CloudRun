@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.alkisum.android.cloudlib.utils.CloudPref;
+import com.alkisum.android.cloudrun.database.Markers;
 import com.alkisum.android.cloudrun.location.LocationHelper;
 
 /**
@@ -67,6 +68,11 @@ public final class Pref {
     public static final String ACTIVE_ROUTES = "activeRoutes";
 
     /**
+     * Preference key for distance to marker.
+     */
+    public static final String DISTANCE_TO_MARKER = "distanceToMarker";
+
+    /**
      * CloudPref constructor.
      */
     private Pref() {
@@ -103,6 +109,10 @@ public final class Pref {
         }
         if (!sharedPref.contains(DISTANCE_CNT)) {
             editor.putInt(DISTANCE_CNT, LocationHelper.DISTANCE_CNT_DEFAULT);
+        }
+        if (!sharedPref.contains(DISTANCE_TO_MARKER)) {
+            editor.putString(DISTANCE_TO_MARKER,
+                    Markers.DISTANCE_TO_MARKER_DEFAULT);
         }
         editor.apply();
     }

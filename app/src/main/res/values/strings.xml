@@ -100,6 +100,7 @@
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="distance_cnt_summary">&#160;measurements</string>
+    <string name="distance_to_marker_summary">&#160;meters</string>
 
     <!-- About -->
     <string name="about_title">About CloudRun</string>

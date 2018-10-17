@@ -33,9 +33,14 @@
         <com.alkisum.android.cloudrun.ui.NumberPickerPreference
             android:key="distanceCnt"
             android:title="Speed calculation"
-            app:minValue="1"
             app:maxValue="100"
+            app:minValue="1"
             app:wrapSelectorWheel="false"/>
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="distanceToMarker"
+            android:title="Distance to marker alert"/>
 
     </PreferenceCategory>
 

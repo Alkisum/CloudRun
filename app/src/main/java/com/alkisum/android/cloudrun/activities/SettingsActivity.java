@@ -3,6 +3,7 @@ package com.alkisum.android.cloudrun.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.view.View;
 
 import com.alkisum.android.cloudlib.utils.CloudPref;
 import com.alkisum.android.cloudrun.R;
+import com.alkisum.android.cloudrun.database.Markers;
 import com.alkisum.android.cloudrun.location.LocationHelper;
 import com.alkisum.android.cloudrun.ui.NumberPickerPreference;
 import com.alkisum.android.cloudrun.utils.Pref;
@@ -19,7 +21,7 @@ import com.alkisum.android.cloudrun.utils.Pref;
  * Activity showing the application settings.
  *
  * @author Alkisum
- * @version 3.3
+ * @version 4.0
  * @since 1.1
  */
 public class SettingsActivity extends AppCompatActivity {
@@ -57,19 +59,30 @@ public class SettingsActivity extends AppCompatActivity {
          */
         private NumberPickerPreference npDistanceCnt;
 
+        /**
+         * EditTextPreference for the distance to marker.
+         */
+        private EditTextPreference etpDistanceToMarker;
+
         @Override
         public final void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
             addPreferencesFromResource(R.xml.preferences);
 
-            // Distance count
+            // distance count
             npDistanceCnt = (NumberPickerPreference) findPreference(
                     Pref.DISTANCE_CNT);
             npDistanceCnt.setSummary(npDistanceCnt.getValue()
                     + getString(R.string.distance_cnt_summary));
 
-            // About
+            // distance to marker
+            etpDistanceToMarker = (EditTextPreference) findPreference(
+                    Pref.DISTANCE_TO_MARKER);
+            etpDistanceToMarker.setSummary(etpDistanceToMarker.getText()
+                    + getString(R.string.distance_to_marker_summary));
+
+            // about
             Preference aboutPreference = findPreference(Pref.ABOUT);
             aboutPreference.setOnPreferenceClickListener(
                     new Preference.OnPreferenceClickListener() {
@@ -102,10 +115,18 @@ public class SettingsActivity extends AppCompatActivity {
                 final SharedPreferences sharedPreferences, final String key) {
             switch (key) {
                 case Pref.DISTANCE_CNT:
-                    int value = sharedPreferences.getInt(Pref.DISTANCE_CNT,
+                    int distanceCnt = sharedPreferences.getInt(
+                            Pref.DISTANCE_CNT,
                             LocationHelper.DISTANCE_CNT_DEFAULT);
-                    npDistanceCnt.setSummary(value + getString(
+                    npDistanceCnt.setSummary(distanceCnt + getString(
                             R.string.distance_cnt_summary));
+                    break;
+                case Pref.DISTANCE_TO_MARKER:
+                    String distanceToMarker = sharedPreferences.getString(
+                            Pref.DISTANCE_TO_MARKER,
+                            Markers.DISTANCE_TO_MARKER_DEFAULT);
+                    etpDistanceToMarker.setSummary(distanceToMarker
+                            + getString(R.string.distance_to_marker_summary));
                     break;
                 case CloudPref.SAVE_ADDRESS:
                     if (!sharedPreferences.getBoolean(CloudPref.SAVE_ADDRESS,
