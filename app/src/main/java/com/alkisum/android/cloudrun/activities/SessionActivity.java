@@ -140,7 +140,8 @@ public class SessionActivity extends AppCompatActivity implements
      */
     private void setGui() {
         Toolbar toolbar = findViewById(R.id.session_toolbar);
-        toolbar.setTitle(Format.DATE_TIME_HISTORY.format(session.getStart()));
+        toolbar.setTitle(Format.getDateTimeHistory().format(
+                session.getStart()));
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

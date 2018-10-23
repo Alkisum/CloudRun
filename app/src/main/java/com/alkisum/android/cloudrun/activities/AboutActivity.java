@@ -20,7 +20,7 @@ import java.util.Date;
  * Activity listing information about the application.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 1.2
  */
 public class AboutActivity extends AppCompatActivity {
@@ -64,7 +64,7 @@ public class AboutActivity extends AppCompatActivity {
 
             // Build date
             Preference datePreference = findPreference(Pref.BUILD_DATE);
-            datePreference.setSummary(Format.DATE_BUILD.format(
+            datePreference.setSummary(Format.getDateBuild().format(
                     new Date(BuildConfig.TIMESTAMP)));
 
             // Github

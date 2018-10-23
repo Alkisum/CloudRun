@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
  * List adapter for AddSessionActivity.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 2.0
  */
 public class AddSessionListAdapter extends BaseAdapter {
@@ -112,14 +112,14 @@ public class AddSessionListAdapter extends BaseAdapter {
                 holder.icon.setImageResource(
                         R.drawable.ic_date_range_accent_24dp);
                 holder.label.setText(R.string.add_session_date);
-                holder.value.setText(Format.DATE_ADD_SESSION.format(
+                holder.value.setText(Format.getDateAddSession().format(
                         session.getStart()));
                 break;
             case TIME:
                 holder.icon.setImageResource(
                         R.drawable.ic_access_time_accent_24dp);
                 holder.label.setText(R.string.add_session_time);
-                holder.value.setText(Format.TIME_ADD_SESSION.format(
+                holder.value.setText(Format.getTimeAddSession().format(
                         session.getStart()));
                 break;
             case DURATION:

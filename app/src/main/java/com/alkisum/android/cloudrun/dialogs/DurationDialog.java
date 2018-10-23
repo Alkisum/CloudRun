@@ -16,7 +16,7 @@ import com.alkisum.android.cloudrun.R;
  * Dialog to set the duration.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 2.0
  */
 
@@ -80,9 +80,14 @@ public class DurationDialog extends DialogFragment {
     @NonNull
     @Override
     public final Dialog onCreateDialog(final Bundle savedInstanceState) {
-        final int hour = getArguments().getInt(ARG_HOUR);
-        final int minute = getArguments().getInt(ARG_MINUTE);
-        final int second = getArguments().getInt(ARG_SECOND);
+        int hour = 0;
+        int minute = 0;
+        int second = 0;
+        if (getArguments() != null) {
+            hour = getArguments().getInt(ARG_HOUR);
+            minute = getArguments().getInt(ARG_MINUTE);
+            second = getArguments().getInt(ARG_SECOND);
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 

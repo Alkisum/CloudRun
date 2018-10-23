@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  * Utility class to format values.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 1.0
  */
 public final class Format {
@@ -35,34 +35,46 @@ public final class Format {
     private static final String PACE = "%02d:%02d";
 
     /**
-     * Format for JSON file name.
+     * Format constructor.
      */
-    public static final SimpleDateFormat DATE_TIME_JSON =
-            new SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.getDefault());
+    private Format() {
+
+    }
 
     /**
-     * Format for date time in history list.
+     * @return Format for JSON file name
      */
-    public static final SimpleDateFormat DATE_TIME_HISTORY =
-            new SimpleDateFormat("EEE. MMM. dd, yyyy", Locale.getDefault());
+    public static SimpleDateFormat getDateTimeJson() {
+        return new SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.getDefault());
+    }
 
     /**
-     * Format for date when adding a session.
+     * @return Format for date time in history list
      */
-    public static final SimpleDateFormat DATE_ADD_SESSION =
-            new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    public static SimpleDateFormat getDateTimeHistory() {
+        return new SimpleDateFormat("EEE. MMM. dd, yyyy", Locale.getDefault());
+    }
 
     /**
-     * Format for time when adding a session.
+     * @return Format for date when adding a session
      */
-    public static final SimpleDateFormat TIME_ADD_SESSION =
-            new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+    public static SimpleDateFormat getDateAddSession() {
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    }
 
     /**
-     * Format for build date.
+     * @return Format for time when adding a session
      */
-    public static final SimpleDateFormat DATE_BUILD =
-            new SimpleDateFormat("MMM. dd, yyyy", Locale.getDefault());
+    public static SimpleDateFormat getTimeAddSession() {
+        return new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+    }
+
+    /**
+     * @return Format for build date
+     */
+    public static SimpleDateFormat getDateBuild() {
+        return new SimpleDateFormat("MMM. dd, yyyy", Locale.getDefault());
+    }
 
     /**
      * Format duration.
@@ -213,12 +225,5 @@ public final class Format {
     private static float round(final float d, final int decimalPlace) {
         return BigDecimal.valueOf(d).setScale(decimalPlace,
                 BigDecimal.ROUND_HALF_UP).floatValue();
-    }
-
-    /**
-     * Format constructor.
-     */
-    private Format() {
-
     }
 }

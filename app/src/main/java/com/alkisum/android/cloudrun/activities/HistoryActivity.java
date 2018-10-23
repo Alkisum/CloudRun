@@ -1,5 +1,6 @@
 package com.alkisum.android.cloudrun.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -340,6 +341,7 @@ public class HistoryActivity extends AppCompatActivity implements
      * Called when the Back button is pressed. If enabled, the edit mode must be
      * disable, otherwise the activity should be finished.
      */
+    @SuppressLint("RestrictedApi")
     private void disableEditMode() {
         fab.setVisibility(View.VISIBLE);
         listAdapter.disableEditMode();
@@ -353,6 +355,7 @@ public class HistoryActivity extends AppCompatActivity implements
      *
      * @param position Position of the item that has been pressed long
      */
+    @SuppressLint("RestrictedApi")
     private void enableEditMode(final int position) {
         if (!listAdapter.isEditMode()) {
             fab.setVisibility(View.GONE);
@@ -585,8 +588,7 @@ public class HistoryActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(final View v) {
                         List<Session> sessions = event.getDeletedSessions();
-                        restoreSessions(sessions.toArray(
-                                new Session[sessions.size()]));
+                        restoreSessions(sessions.toArray(new Session[0]));
                     }
                 }).show();
     }

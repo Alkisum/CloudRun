@@ -1,5 +1,6 @@
 package com.alkisum.android.cloudrun.activities;
 
+import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -92,12 +93,12 @@ public class MapActivity extends AppCompatActivity {
     /**
      * List to store the route overlays locally.
      */
-    private List<Overlay> routeOverlays = new ArrayList<>();
+    private final List<Overlay> routeOverlays = new ArrayList<>();
 
     /**
      * List to store the marker overlays locally.
      */
-    private List<Overlay> markerOverlays = new ArrayList<>();
+    private final List<Overlay> markerOverlays = new ArrayList<>();
 
     /**
      * View containing the OSM.
@@ -105,6 +106,7 @@ public class MapActivity extends AppCompatActivity {
     @BindView(R.id.map)
     MapView mapView;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -18,7 +18,7 @@ import java.util.List;
  * Class containing constant for Json files.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 2.0
  */
 public final class Json {
@@ -126,7 +126,7 @@ public final class Json {
      * @return File name
      */
     private static String buildJsonFileName(final Session session) {
-        return FILE_PREFIX + Format.DATE_TIME_JSON.format(
+        return FILE_PREFIX + Format.getDateTimeJson().format(
                 new Date(session.getStart())) + JsonFile.FILE_EXT;
     }
 

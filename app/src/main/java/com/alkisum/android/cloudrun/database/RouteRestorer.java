@@ -23,7 +23,7 @@ public class RouteRestorer extends AsyncTask<Route, Void, Void> {
      * RouteRestorer constructor.
      */
     public RouteRestorer() {
-        
+
     }
 
     @Override

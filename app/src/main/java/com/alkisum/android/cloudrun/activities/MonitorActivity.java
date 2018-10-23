@@ -315,7 +315,7 @@ public class MonitorActivity extends AppCompatActivity
                 deniedPermissions.add(permission);
             }
         }
-        return deniedPermissions.toArray(new String[deniedPermissions.size()]);
+        return deniedPermissions.toArray(new String[0]);
     }
 
     @Override

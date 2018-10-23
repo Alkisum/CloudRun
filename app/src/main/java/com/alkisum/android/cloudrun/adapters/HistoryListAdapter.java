@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
  * Adapter for History ListView.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 1.0
  */
 public class HistoryListAdapter extends BaseAdapter {
@@ -177,7 +177,7 @@ public class HistoryListAdapter extends BaseAdapter {
         final ViewHolder holder = (ViewHolder) view.getTag();
 
         // Set values
-        holder.dateTime.setText(Format.DATE_TIME_HISTORY.format(
+        holder.dateTime.setText(Format.getDateTimeHistory().format(
                 new Date(session.getStart())));
         if (session.getEnd() != null) {
             long duration = session.getDuration();

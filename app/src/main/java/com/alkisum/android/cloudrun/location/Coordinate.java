@@ -40,8 +40,8 @@ public class Coordinate implements Parcelable {
      * @param longitude Longitude
      * @param elevation Elevation
      */
-    public Coordinate(final long time, final double latitude, final double longitude,
-               final double elevation) {
+    public Coordinate(final long time, final double latitude,
+                      final double longitude, final double elevation) {
         this.time = time;
         this.latitude = latitude;
         this.longitude = longitude;

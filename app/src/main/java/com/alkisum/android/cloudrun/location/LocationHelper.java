@@ -154,7 +154,7 @@ public class LocationHelper {
     /**
      * Set of markers for which the user has already been notified.
      */
-    private Set<Marker> notifiedMarkers = new HashSet<>();
+    private final Set<Marker> notifiedMarkers = new HashSet<>();
 
     /**
      * LocationHelper constructor.

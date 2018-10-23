@@ -17,7 +17,7 @@ import java.util.List;
  * Singleton class handling database.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 1.0
  */
 public final class Db {
@@ -63,15 +63,13 @@ public final class Db {
      * Initialize database.
      *
      * @param context Context
-     * @return Database instance
      */
-    public Db init(final Context context) {
+    public void init(final Context context) {
         DaoMaster.OpenHelper helper = new DbOpenHelper(
                 context.getApplicationContext(), NAME, null);
         SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
-        return this;
     }
 
     /**

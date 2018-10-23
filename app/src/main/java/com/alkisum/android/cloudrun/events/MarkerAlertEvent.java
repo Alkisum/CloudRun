@@ -16,7 +16,7 @@ public class MarkerAlertEvent {
     /**
      * Detected markers.
      */
-    private List<Marker> markers;
+    private final List<Marker> markers;
 
     /**
      * MarkerAlertEvent constructor.

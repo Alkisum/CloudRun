@@ -29,7 +29,7 @@ import java.util.List;
  * @version 4.0
  * @since 4.0
  */
-public class MarkerNotifier {
+class MarkerNotifier {
 
     /**
      * The identifier for the notification.

@@ -1,5 +1,6 @@
 package com.alkisum.android.cloudrun.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -259,6 +260,7 @@ public class RouteListActivity extends AppCompatActivity {
      * Called when the Back button is pressed. If enabled, the edit mode must be
      * disable, otherwise the activity should be finished.
      */
+    @SuppressLint("RestrictedApi")
     private void disableEditMode() {
         fab.setVisibility(View.VISIBLE);
         listAdapter.disableEditMode();
@@ -272,6 +274,7 @@ public class RouteListActivity extends AppCompatActivity {
      *
      * @param position Position of the item that has been pressed long
      */
+    @SuppressLint("RestrictedApi")
     private void enableEditMode(final int position) {
         if (!listAdapter.isEditMode()) {
             fab.setVisibility(View.GONE);
@@ -339,7 +342,7 @@ public class RouteListActivity extends AppCompatActivity {
                     @Override
                     public void onClick(final View v) {
                         List<Route> routes = event.getDeletedRoutes();
-                        restoreRoutes(routes.toArray(new Route[routes.size()]));
+                        restoreRoutes(routes.toArray(new Route[0]));
                     }
                 }).show();
     }

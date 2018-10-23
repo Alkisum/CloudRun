@@ -16,7 +16,7 @@ import com.alkisum.android.cloudrun.R;
  * Dialog to set the distance.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.0
  * @since 2.0
  */
 
@@ -65,7 +65,10 @@ public class DistanceDialog extends DialogFragment {
     @NonNull
     @Override
     public final Dialog onCreateDialog(final Bundle savedInstanceState) {
-        final float distance = getArguments().getFloat(ARG_DISTANCE);
+        float distance = 0;
+        if (getArguments() != null) {
+            distance = getArguments().getFloat(ARG_DISTANCE);
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 

@@ -92,7 +92,7 @@ public class GpsStatus {
      *
      * @return Drawable id
      */
-    public final int getIcon() {
+    private int getIcon() {
         if (!LocationUtils.isLocationEnabled(context)) {
             return R.drawable.ic_gps_off_white_24dp;
         } else if (newGpsDataReceived) {

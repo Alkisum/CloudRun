@@ -16,10 +16,10 @@
         android:layout_height="wrap_content"
         android:indeterminate="true"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/guideline"/>
+        app:layout_constraintBottom_toTopOf="@+id/routes_guideline"/>
 
     <android.support.constraint.Guideline
-        android:id="@id/guideline"
+        android:id="@id/routes_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
