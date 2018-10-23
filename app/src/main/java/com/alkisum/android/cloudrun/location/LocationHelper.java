@@ -44,9 +44,11 @@ import com.google.android.gms.tasks.Task;
 import org.greenrobot.eventbus.EventBus;
 
 import java.lang.ref.WeakReference;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 /**
  * Helper class for location operations.
@@ -148,6 +150,11 @@ public class LocationHelper {
      * MarkerNotifier instance.
      */
     private final MarkerNotifier markerNotifier;
+
+    /**
+     * Set of markers for which the user has already been notified.
+     */
+    private Set<Marker> notifiedMarkers = new HashSet<>();
 
     /**
      * LocationHelper constructor.
@@ -373,15 +380,8 @@ public class LocationHelper {
             Coordinate coordinate = new Coordinate(location.getTime(),
                     location.getLatitude(), location.getLongitude(),
                     location.getAltitude());
-
             EventBus.getDefault().post(new CoordinateEvent(coordinate));
-
-            // check for surrounding markers
-            List<Marker> markers = Markers.getSurroundingMarkers(
-                    activity.get().getApplicationContext(), coordinate);
-            if (!markers.isEmpty()) {
-                EventBus.getDefault().post(new MarkerAlertEvent(markers));
-            }
+            handleMarkers(coordinate);
 
             if (lastCoordinate != null) {
 
@@ -409,6 +409,34 @@ public class LocationHelper {
             }
             lastCoordinate = coordinate;
             lastLocationMillis = locationMillis;
+        }
+    }
+
+    /**
+     * Get surrounding markers from the given coordinate and notify the user
+     * only once.
+     *
+     * @param coordinate Current location
+     */
+    private void handleMarkers(final Coordinate coordinate) {
+        // get active markers
+        List<Marker> activeMarkers = Markers.getActiveMarkers(activity.get());
+
+        // get surrounding markers
+        List<Marker> surroundingMarkers = Markers.getSurroundingMarkers(
+                activity.get().getApplicationContext(), coordinate);
+
+        for (Marker activeMarker : activeMarkers) {
+            if (surroundingMarkers.contains(activeMarker)
+                    && !notifiedMarkers.contains(activeMarker)) {
+                // first time being close to the marker
+                notifiedMarkers.add(activeMarker);
+                EventBus.getDefault().post(
+                        new MarkerAlertEvent(surroundingMarkers));
+            } else if (!surroundingMarkers.contains(activeMarker)) {
+                // not close to the marker anymore
+                notifiedMarkers.remove(activeMarker);
+            }
         }
     }
 
