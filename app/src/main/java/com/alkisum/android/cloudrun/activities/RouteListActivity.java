@@ -130,7 +130,6 @@ public class RouteListActivity extends AppCompatActivity {
      * Set the GUI.
      */
     private void setGui() {
-        toolbar.setTitle(R.string.route_title);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

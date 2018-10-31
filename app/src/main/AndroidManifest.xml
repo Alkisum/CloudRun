@@ -10,12 +10,12 @@
     <application
         android:name=".app.CloudRunApp"
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:fullBackupContent="@xml/backup_descriptor">
+        android:theme="@style/AppTheme">
         <activity
             android:name=".activities.MonitorActivity"
             android:configChanges="orientation|screenSize"
@@ -24,7 +24,7 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
@@ -32,32 +32,46 @@
         <activity
             android:name=".activities.MapActivity"
             android:configChanges="orientation|screenSize"
-            android:launchMode="singleTask"/>
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:parentActivityName=".activities.MonitorActivity"/>
         <activity
             android:name=".activities.HistoryActivity"
             android:configChanges="orientation|screenSize"
-            android:launchMode="singleTask"/>
+            android:label="@string/history_title"
+            android:launchMode="singleTask"
+            android:parentActivityName=".activities.MonitorActivity"/>
         <activity
             android:name=".activities.SessionActivity"
             android:configChanges="orientation|screenSize"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTask"
+            android:parentActivityName=".activities.HistoryActivity"/>
         <activity
             android:name=".activities.AddSessionActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:label="@string/add_session_title"
+            android:parentActivityName=".activities.HistoryActivity"/>
         <activity
             android:name=".activities.RouteListActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:label="@string/route_title"
+            android:parentActivityName=".activities.MonitorActivity"/>
+        <activity
+            android:name=".activities.RouteActivity"
+            android:configChanges="orientation|screenSize"
+            android:parentActivityName=".activities.RouteListActivity"/>
         <activity
             android:name=".activities.SettingsActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:label="@string/settings_title"
+            android:parentActivityName=".activities.MonitorActivity"/>
         <activity
             android:name=".activities.AboutActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:label="@string/about_title"
+            android:parentActivityName=".activities.SettingsActivity"/>
 
         <service android:name=".location.LocationUpdatesService"/>
-
-        <activity android:name=".activities.RouteActivity">
-        </activity>
     </application>
 
 </manifest>

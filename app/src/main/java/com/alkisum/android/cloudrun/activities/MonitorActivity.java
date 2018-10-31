@@ -419,7 +419,6 @@ public class MonitorActivity extends AppCompatActivity
      */
     private void setGui() {
         Toolbar toolbar = findViewById(R.id.monitor_toolbar);
-        toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
 
         drawerToggle = new ActionBarDrawerToggle(

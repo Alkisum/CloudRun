@@ -143,13 +143,9 @@ public class SessionActivity extends AppCompatActivity implements
         toolbar.setTitle(Format.getDateTimeHistory().format(
                 session.getStart()));
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                finish();
-            }
-        });
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         initTiles();
 

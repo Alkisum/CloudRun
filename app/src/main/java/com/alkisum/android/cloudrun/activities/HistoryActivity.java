@@ -212,7 +212,6 @@ public class HistoryActivity extends AppCompatActivity implements
      * Set the GUI.
      */
     private void setGui() {
-        toolbar.setTitle(R.string.history_title);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

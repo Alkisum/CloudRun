@@ -133,15 +133,10 @@ public class MapActivity extends AppCompatActivity {
         }
 
         Toolbar toolbar = findViewById(R.id.map_toolbar);
-        toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                finish();
-            }
-        });
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         mapView.setBuiltInZoomControls(false);
         mapView.setOnTouchListener(new View.OnTouchListener() {

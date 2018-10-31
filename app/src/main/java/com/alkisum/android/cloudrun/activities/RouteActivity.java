@@ -124,17 +124,10 @@ public class RouteActivity extends AppCompatActivity {
 
         // set toolbar
         Toolbar toolbar = findViewById(R.id.route_toolbar);
-        toolbar.setTitle(route.getName());
         setSupportActionBar(toolbar);
-        // TODO set parent activity in manifest (do it for every activity,
-        // TODO see CloudNotes)
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                finish();
-            }
-        });
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         // initialize map
         this.initMap();

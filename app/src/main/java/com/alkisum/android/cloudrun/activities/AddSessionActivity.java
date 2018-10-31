@@ -78,16 +78,10 @@ public class AddSessionActivity extends AppCompatActivity implements
      */
     private void setGui() {
         Toolbar toolbar = findViewById(R.id.add_session_toolbar);
-        toolbar.setTitle(getString(R.string.add_session_title));
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
-        toolbar.setNavigationOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        onBackPressed();
-                    }
-                });
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         Calendar now = Calendar.getInstance();
         session = new Session();
