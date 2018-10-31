@@ -10,7 +10,7 @@ import com.alkisum.android.cloudlib.file.json.JsonFileReader;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudlib.net.nextcloud.NcDownloader;
 import com.alkisum.android.cloudrun.database.SessionInserter;
-import com.alkisum.android.cloudrun.events.InsertSessionEvent;
+import com.alkisum.android.cloudrun.events.SessionInsertedEvent;
 import com.alkisum.android.cloudrun.files.Json;
 
 import org.greenrobot.eventbus.EventBus;
@@ -123,17 +123,17 @@ public class Downloader {
     }
 
     /**
-     * Triggered on inserter event.
+     * Triggered on session inserted event.
      *
-     * @param event Inserter event
+     * @param event Session inserted event
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public final void onInsertEvent(final InsertSessionEvent event) {
+    public final void onSessionInsertedEvent(final SessionInsertedEvent event) {
         switch (event.getResult()) {
-            case InsertSessionEvent.OK:
+            case SessionInsertedEvent.OK:
                 EventBus.getDefault().unregister(this);
                 break;
-            case InsertSessionEvent.ERROR:
+            case SessionInsertedEvent.ERROR:
                 EventBus.getDefault().unregister(this);
                 break;
             default:

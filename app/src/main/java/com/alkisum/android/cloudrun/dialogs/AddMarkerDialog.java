@@ -8,7 +8,7 @@ import android.widget.EditText;
 
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.database.Markers;
-import com.alkisum.android.cloudrun.events.InsertMarkerEvent;
+import com.alkisum.android.cloudrun.events.MarkerInsertedEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -58,7 +58,7 @@ public final class AddMarkerDialog {
                                         final int which) {
                         Markers.insertMarker(markerLabel.getText().toString(),
                                 latitude, longitude, routeId);
-                        EventBus.getDefault().post(new InsertMarkerEvent());
+                        EventBus.getDefault().post(new MarkerInsertedEvent());
                     }
                 });
 

@@ -6,13 +6,13 @@ import com.alkisum.android.cloudrun.model.Route;
 import java.util.List;
 
 /**
- * Class defining delete route event for EventBus.
+ * Class defining route deleted event for EventBus.
  *
  * @author Alkisum
  * @version 4.0
  * @since 4.0
  */
-public class DeleteRouteEvent extends FilteredEvent {
+public class RouteDeletedEvent extends FilteredEvent {
 
     /**
      * Deleted routes.
@@ -20,13 +20,13 @@ public class DeleteRouteEvent extends FilteredEvent {
     private final List<Route> deletedRoutes;
 
     /**
-     * DeleteRouteEvent constructor.
+     * RouteDeletedEvent constructor.
      *
      * @param subscriberIds Subscriber ids allowed to process the events
      * @param deletedRoutes Deleted routes
      */
-    public DeleteRouteEvent(final Integer[] subscriberIds,
-                            final List<Route> deletedRoutes) {
+    public RouteDeletedEvent(final Integer[] subscriberIds,
+                             final List<Route> deletedRoutes) {
         super(subscriberIds);
         this.deletedRoutes = deletedRoutes;
     }

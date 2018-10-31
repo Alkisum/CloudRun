@@ -2,7 +2,7 @@ package com.alkisum.android.cloudrun.database;
 
 import android.os.AsyncTask;
 
-import com.alkisum.android.cloudrun.events.DeleteMarkerEvent;
+import com.alkisum.android.cloudrun.events.MarkerDeletedEvent;
 import com.alkisum.android.cloudrun.model.DaoSession;
 import com.alkisum.android.cloudrun.model.Marker;
 
@@ -33,6 +33,6 @@ public class MarkerDeleter extends AsyncTask<Marker, Void, Marker[]> {
 
     @Override
     protected final void onPostExecute(final Marker[] markers) {
-        EventBus.getDefault().post(new DeleteMarkerEvent(markers));
+        EventBus.getDefault().post(new MarkerDeletedEvent(markers));
     }
 }

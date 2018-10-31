@@ -2,7 +2,7 @@ package com.alkisum.android.cloudrun.database;
 
 import android.os.AsyncTask;
 
-import com.alkisum.android.cloudrun.events.DeleteSessionEvent;
+import com.alkisum.android.cloudrun.events.SessionDeletedEvent;
 import com.alkisum.android.cloudrun.model.DaoSession;
 import com.alkisum.android.cloudrun.model.Session;
 
@@ -46,7 +46,7 @@ public class SessionDeleter extends AsyncTask<Void, Void, List<Session>> {
 
     @Override
     protected final void onPostExecute(final List<Session> sessions) {
-        EventBus.getDefault().post(new DeleteSessionEvent(subscriberIds,
+        EventBus.getDefault().post(new SessionDeletedEvent(subscriberIds,
                 sessions));
     }
 }

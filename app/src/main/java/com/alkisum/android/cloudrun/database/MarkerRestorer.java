@@ -2,7 +2,7 @@ package com.alkisum.android.cloudrun.database;
 
 import android.os.AsyncTask;
 
-import com.alkisum.android.cloudrun.events.RestoreMarkerEvent;
+import com.alkisum.android.cloudrun.events.MarkerRestoredEvent;
 import com.alkisum.android.cloudrun.model.DaoSession;
 import com.alkisum.android.cloudrun.model.Marker;
 import com.alkisum.android.cloudrun.model.MarkerDao;
@@ -35,6 +35,6 @@ public class MarkerRestorer extends AsyncTask<Marker, Void, Void> {
 
     @Override
     protected final void onPostExecute(final Void param) {
-        EventBus.getDefault().post(new RestoreMarkerEvent());
+        EventBus.getDefault().post(new MarkerRestoredEvent());
     }
 }

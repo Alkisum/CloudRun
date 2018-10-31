@@ -2,7 +2,7 @@ package com.alkisum.android.cloudrun.database;
 
 import android.os.AsyncTask;
 
-import com.alkisum.android.cloudrun.events.RestoreRouteEvent;
+import com.alkisum.android.cloudrun.events.RouteRestoredEvent;
 import com.alkisum.android.cloudrun.model.DaoSession;
 import com.alkisum.android.cloudrun.model.MarkerDao;
 import com.alkisum.android.cloudrun.model.Route;
@@ -40,6 +40,6 @@ public class RouteRestorer extends AsyncTask<Route, Void, Void> {
 
     @Override
     protected final void onPostExecute(final Void param) {
-        EventBus.getDefault().post(new RestoreRouteEvent());
+        EventBus.getDefault().post(new RouteRestoredEvent());
     }
 }

@@ -2,7 +2,7 @@ package com.alkisum.android.cloudrun.database;
 
 import android.os.AsyncTask;
 
-import com.alkisum.android.cloudrun.events.RestoreSessionEvent;
+import com.alkisum.android.cloudrun.events.SessionRestoredEvent;
 import com.alkisum.android.cloudrun.model.DaoSession;
 import com.alkisum.android.cloudrun.model.DataPointDao;
 import com.alkisum.android.cloudrun.model.Session;
@@ -39,6 +39,6 @@ public class SessionRestorer extends AsyncTask<Session, Void, Void> {
 
     @Override
     protected final void onPostExecute(final Void param) {
-        EventBus.getDefault().post(new RestoreSessionEvent());
+        EventBus.getDefault().post(new SessionRestoredEvent());
     }
 }

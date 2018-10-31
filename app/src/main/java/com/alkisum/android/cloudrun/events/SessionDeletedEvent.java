@@ -6,13 +6,13 @@ import com.alkisum.android.cloudrun.model.Session;
 import java.util.List;
 
 /**
- * Class defining delete session event for EventBus.
+ * Class defining session deleted event for EventBus.
  *
  * @author Alkisum
  * @version 4.0
  * @since 3.0
  */
-public class DeleteSessionEvent extends FilteredEvent {
+public class SessionDeletedEvent extends FilteredEvent {
 
     /**
      * Deleted sessions.
@@ -20,13 +20,13 @@ public class DeleteSessionEvent extends FilteredEvent {
     private final List<Session> deletedSessions;
 
     /**
-     * DeleteSessionEvent constructor.
+     * SessionDeletedEvent constructor.
      *
      * @param subscriberIds   Subscriber ids allowed to process the events
      * @param deletedSessions Deleted sessions
      */
-    public DeleteSessionEvent(final Integer[] subscriberIds,
-                              final List<Session> deletedSessions) {
+    public SessionDeletedEvent(final Integer[] subscriberIds,
+                               final List<Session> deletedSessions) {
         super(subscriberIds);
         this.deletedSessions = deletedSessions;
     }

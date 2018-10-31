@@ -23,9 +23,9 @@ import com.alkisum.android.cloudrun.database.RouteDeleter;
 import com.alkisum.android.cloudrun.database.RouteRestorer;
 import com.alkisum.android.cloudrun.database.Routes;
 import com.alkisum.android.cloudrun.dialogs.AddRouteDialog;
-import com.alkisum.android.cloudrun.events.DeleteRouteEvent;
-import com.alkisum.android.cloudrun.events.InsertRouteEvent;
-import com.alkisum.android.cloudrun.events.RestoreRouteEvent;
+import com.alkisum.android.cloudrun.events.RouteDeletedEvent;
+import com.alkisum.android.cloudrun.events.RouteInsertedEvent;
+import com.alkisum.android.cloudrun.events.RouteRestoredEvent;
 import com.alkisum.android.cloudrun.model.Route;
 import com.google.gson.Gson;
 
@@ -324,12 +324,12 @@ public class RouteListActivity extends AppCompatActivity {
     }
 
     /**
-     * Triggered on delete route event.
+     * Triggered on route deleted event.
      *
-     * @param event DeleteRoute event
+     * @param event Route deleted event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onDeleteRouteEvent(final DeleteRouteEvent event) {
+    public final void onRouteDeletedEvent(final RouteDeletedEvent event) {
         if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
@@ -347,22 +347,22 @@ public class RouteListActivity extends AppCompatActivity {
     }
 
     /**
-     * Triggered on insert route event.
+     * Triggered on route inserted event.
      *
-     * @param event InsertRoute event
+     * @param event Route inserted event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onInsertRouteEvent(final InsertRouteEvent event) {
+    public final void onRouteInsertedEvent(final RouteInsertedEvent event) {
         refreshList();
     }
 
     /**
-     * Triggered on restore route event.
+     * Triggered on route restored event.
      *
-     * @param event RestoreRoute event
+     * @param event Route restored event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onRestoreRouteEvent(final RestoreRouteEvent event) {
+    public final void onRouteRestoredEvent(final RouteRestoredEvent event) {
         progressBar.setVisibility(View.GONE);
         refreshList();
     }

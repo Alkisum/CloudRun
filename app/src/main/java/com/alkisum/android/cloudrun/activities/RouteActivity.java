@@ -29,12 +29,12 @@ import com.alkisum.android.cloudrun.database.Routes;
 import com.alkisum.android.cloudrun.dialogs.AddMarkerDialog;
 import com.alkisum.android.cloudrun.dialogs.EditMarkerDialog;
 import com.alkisum.android.cloudrun.dialogs.EditRouteDialog;
-import com.alkisum.android.cloudrun.events.DeleteMarkerEvent;
-import com.alkisum.android.cloudrun.events.DeleteRouteEvent;
-import com.alkisum.android.cloudrun.events.InsertMarkerEvent;
+import com.alkisum.android.cloudrun.events.MarkerDeletedEvent;
+import com.alkisum.android.cloudrun.events.MarkerInsertedEvent;
+import com.alkisum.android.cloudrun.events.MarkerRestoredEvent;
 import com.alkisum.android.cloudrun.events.MarkerUpdatedEvent;
-import com.alkisum.android.cloudrun.events.RestoreMarkerEvent;
-import com.alkisum.android.cloudrun.events.UpdateRouteEvent;
+import com.alkisum.android.cloudrun.events.RouteDeletedEvent;
+import com.alkisum.android.cloudrun.events.RouteUpdatedEvent;
 import com.alkisum.android.cloudrun.model.Marker;
 import com.alkisum.android.cloudrun.model.Route;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -413,23 +413,23 @@ public class RouteActivity extends AppCompatActivity {
     }
 
     /**
-     * Triggered on update route event.
+     * Triggered on route updated event.
      *
-     * @param event UpdateRoute event
+     * @param event Route updated event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onUpdateRouteEvent(final UpdateRouteEvent event) {
+    public final void onRouteUpdatedEvent(final RouteUpdatedEvent event) {
         Toolbar toolbar = findViewById(R.id.route_toolbar);
         toolbar.setTitle(route.getName());
     }
 
     /**
-     * Triggered on delete route event.
+     * Triggered on route deleted event.
      *
-     * @param event DeleteRoute event
+     * @param event Route deleted event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onDeleteRouteEvent(final DeleteRouteEvent event) {
+    public final void onRouteDeletedEvent(final RouteDeletedEvent event) {
         if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
@@ -441,22 +441,22 @@ public class RouteActivity extends AppCompatActivity {
     }
 
     /**
-     * Triggered on insert marker event.
+     * Triggered on marker inserted event.
      *
-     * @param event InsertMarker event
+     * @param event Marker inserted event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onInsertMarkerEvent(final InsertMarkerEvent event) {
+    public final void onMarkerInsertedEvent(final MarkerInsertedEvent event) {
         refreshMarkers();
     }
 
     /**
-     * Triggered on delete marker event.
+     * Triggered on marker deleted event.
      *
-     * @param event DeleteMarker event
+     * @param event Marker deleted event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onDeleteMarkerEvent(final DeleteMarkerEvent event) {
+    public final void onMarkerDeletedEvent(final MarkerDeletedEvent event) {
         progressBar.setVisibility(View.GONE);
         refreshMarkers();
 
@@ -472,12 +472,12 @@ public class RouteActivity extends AppCompatActivity {
     }
 
     /**
-     * Triggered on restore marker event.
+     * Triggered on marker restored event.
      *
-     * @param event RestoreMarker event
+     * @param event Marker restored event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onRestoreMarkerEvent(final RestoreMarkerEvent event) {
+    public final void onMarkerRestoredEvent(final MarkerRestoredEvent event) {
         progressBar.setVisibility(View.GONE);
         refreshMarkers();
     }
@@ -485,7 +485,7 @@ public class RouteActivity extends AppCompatActivity {
     /**
      * Triggered on marker updated event.
      *
-     * @param event MarkerUpdated event
+     * @param event Marker updated event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public final void onMarkerUpdatedEvent(final MarkerUpdatedEvent event) {

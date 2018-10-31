@@ -2,7 +2,7 @@ package com.alkisum.android.cloudrun.database;
 
 import android.os.AsyncTask;
 
-import com.alkisum.android.cloudrun.events.InsertSessionEvent;
+import com.alkisum.android.cloudrun.events.SessionInsertedEvent;
 import com.alkisum.android.cloudrun.files.Json;
 import com.alkisum.android.cloudrun.model.DaoSession;
 import com.alkisum.android.cloudrun.model.DataPoint;
@@ -82,11 +82,11 @@ public class SessionInserter extends AsyncTask<Void, Void, Void> {
     @Override
     protected final void onPostExecute(final Void param) {
         if (exception == null) {
-            EventBus.getDefault().post(new InsertSessionEvent(
-                    InsertSessionEvent.OK));
+            EventBus.getDefault().post(new SessionInsertedEvent(
+                    SessionInsertedEvent.OK));
         } else {
-            EventBus.getDefault().post(new InsertSessionEvent(
-                    InsertSessionEvent.ERROR, exception));
+            EventBus.getDefault().post(new SessionInsertedEvent(
+                    SessionInsertedEvent.ERROR, exception));
         }
     }
 

@@ -63,7 +63,7 @@ class MarkerNotifier {
     /**
      * Triggered when a surrounding marker has been detected.
      *
-     * @param event MarkerAlert event
+     * @param event Marker alert event
      */
     @Subscribe
     public final void onMarkerAlertEvent(final MarkerAlertEvent event) {

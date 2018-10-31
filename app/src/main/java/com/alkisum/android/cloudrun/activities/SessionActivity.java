@@ -24,7 +24,7 @@ import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.database.SessionDeleter;
 import com.alkisum.android.cloudrun.database.Sessions;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
-import com.alkisum.android.cloudrun.events.DeleteSessionEvent;
+import com.alkisum.android.cloudrun.events.SessionDeletedEvent;
 import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.net.Uploader;
@@ -339,12 +339,12 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     /**
-     * Triggered on delete session event.
+     * Triggered on session deleted event.
      *
-     * @param event DeleteSession event
+     * @param event Session deleted event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onDeleteEvent(final DeleteSessionEvent event) {
+    public final void onSessionDeletedEvent(final SessionDeletedEvent event) {
         if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }

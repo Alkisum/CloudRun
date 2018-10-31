@@ -2,7 +2,7 @@ package com.alkisum.android.cloudrun.database;
 
 import android.os.AsyncTask;
 
-import com.alkisum.android.cloudrun.events.DeleteRouteEvent;
+import com.alkisum.android.cloudrun.events.RouteDeletedEvent;
 import com.alkisum.android.cloudrun.model.DaoSession;
 import com.alkisum.android.cloudrun.model.Route;
 
@@ -46,6 +46,6 @@ public class RouteDeleter extends AsyncTask<Void, Void, List<Route>> {
 
     @Override
     protected final void onPostExecute(final List<Route> routes) {
-        EventBus.getDefault().post(new DeleteRouteEvent(subscriberIds, routes));
+        EventBus.getDefault().post(new RouteDeletedEvent(subscriberIds, routes));
     }
 }

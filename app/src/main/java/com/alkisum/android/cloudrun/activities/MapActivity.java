@@ -220,9 +220,9 @@ public class MapActivity extends AppCompatActivity {
     }
 
     /**
-     * Triggered when new coordinates are received.
+     * Triggered on GPS status event.
      *
-     * @param event Coordinate event
+     * @param event GPS status event
      */
     @Subscribe
     public final void onGpsStatusEvent(final GpsStatusEvent event) {
