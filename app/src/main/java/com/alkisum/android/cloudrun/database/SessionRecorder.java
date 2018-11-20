@@ -4,6 +4,7 @@ import android.os.Handler;
 
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.DistanceEvent;
+import com.alkisum.android.cloudrun.events.SessionActionEvent;
 import com.alkisum.android.cloudrun.location.Coordinate;
 import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.DataPointDao;
@@ -53,18 +54,25 @@ public class SessionRecorder {
     private long pauseDuration;
 
     /**
+     * Flag set to true when the session is running, false otherwise.
+     */
+    private boolean running;
+
+    /**
      * SessionRecorder constructor.
      *
      * @param callback SessionRecorder listener
      */
     public SessionRecorder(final RecorderListener callback) {
         this.callback = callback;
+        eventBus = EventBus.getDefault();
+        eventBus.register(this);
     }
 
     /**
      * Start recording: insert new session.
      */
-    public final void start() {
+    private void start() {
         session = new Session();
         session.setStart(System.currentTimeMillis());
         session.setDuration(0L);
@@ -75,24 +83,23 @@ public class SessionRecorder {
 
         durationHandler.postDelayed(durationTask, 1000);
 
-        eventBus = EventBus.getDefault();
-        eventBus.register(this);
+        running = true;
     }
 
     /**
      * Resume the recorder.
      */
-    public final void resume() {
+    private void resume() {
         pauseDuration += System.currentTimeMillis() - pauseStart;
         durationHandler.postDelayed(durationTask, 1000);
-        eventBus.register(this);
+        running = true;
     }
 
     /**
      * Pause the recorder.
      */
-    public final void pause() {
-        eventBus.unregister(this);
+    private void pause() {
+        running = false;
         durationHandler.removeCallbacks(durationTask);
         pauseStart = System.currentTimeMillis();
     }
@@ -100,9 +107,10 @@ public class SessionRecorder {
     /**
      * Stop recording: update current session.
      */
-    public final void stop() {
-        eventBus.unregister(this);
+    private void stop() {
+        running = false;
 
+        eventBus.unregister(this);
         durationHandler.removeCallbacks(durationTask);
 
         session.setEnd(System.currentTimeMillis());
@@ -125,12 +133,40 @@ public class SessionRecorder {
     };
 
     /**
+     * Called when a session action has been performed.
+     *
+     * @param event Session action event
+     */
+    @Subscribe
+    public final void onSessionActionEvent(final SessionActionEvent event) {
+        switch (event.getAction()) {
+            case SessionActionEvent.START:
+                start();
+                break;
+            case SessionActionEvent.RESUME:
+                resume();
+                break;
+            case SessionActionEvent.PAUSE:
+                pause();
+                break;
+            case SessionActionEvent.STOP:
+                stop();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
      * Triggered when a new distance is calculated. Add distance to session.
      *
      * @param event Distance event
      */
     @Subscribe
     public final void onDistanceEvent(final DistanceEvent event) {
+        if (!running) {
+            return;
+        }
         Float currentDistance = session.getDistance();
         float newDistance = currentDistance + event.getValue();
         session.setDistance(newDistance);
@@ -146,6 +182,9 @@ public class SessionRecorder {
      */
     @Subscribe
     public final void onCoordinateEvent(final CoordinateEvent event) {
+        if (!running) {
+            return;
+        }
         Coordinate c = event.getValues();
         DataPoint dataPoint = new DataPoint(null, c.getTime(),
                 c.getLatitude(), c.getLongitude(), c.getElevation(),

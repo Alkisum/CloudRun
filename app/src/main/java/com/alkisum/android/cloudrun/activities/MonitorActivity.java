@@ -33,6 +33,7 @@ import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.DistanceEvent;
 import com.alkisum.android.cloudrun.events.GpsStatusEvent;
 import com.alkisum.android.cloudrun.events.PaceEvent;
+import com.alkisum.android.cloudrun.events.SessionActionEvent;
 import com.alkisum.android.cloudrun.events.SpeedEvent;
 import com.alkisum.android.cloudrun.location.Coordinate;
 import com.alkisum.android.cloudrun.location.LocationHelper;
@@ -649,9 +650,12 @@ public class MonitorActivity extends AppCompatActivity
     @OnClick(R.id.monitor_button_start)
     public final void onStartButtonClicked() {
         if (!sessionRunning) {
-            startSession();
+            // create recorder before posting the event
+            // recorder also subscribes to SessionActionEvent
+            recorder = new SessionRecorder(this);
+            eventBus.post(new SessionActionEvent(SessionActionEvent.START));
         } else {
-            resumeSession();
+            eventBus.post(new SessionActionEvent(SessionActionEvent.RESUME));
         }
     }
 
@@ -661,7 +665,7 @@ public class MonitorActivity extends AppCompatActivity
     @OnClick(R.id.monitor_button_pause)
     public final void onPauseButtonClicked() {
         if (sessionRunning) {
-            pauseSession();
+            eventBus.post(new SessionActionEvent(SessionActionEvent.PAUSE));
         }
     }
 
@@ -671,7 +675,7 @@ public class MonitorActivity extends AppCompatActivity
     @OnClick(R.id.monitor_button_stop)
     public final void onStopButtonClicked() {
         if (sessionRunning) {
-            stopSession();
+            eventBus.post(new SessionActionEvent(SessionActionEvent.STOP));
         }
     }
 
@@ -728,11 +732,34 @@ public class MonitorActivity extends AppCompatActivity
     }
 
     /**
+     * Called when a session action has been performed.
+     *
+     * @param event Session action event
+     */
+    @Subscribe
+    public final void onSessionActionEvent(final SessionActionEvent event) {
+        switch (event.getAction()) {
+            case SessionActionEvent.START:
+                startSession();
+                break;
+            case SessionActionEvent.RESUME:
+                resumeSession();
+                break;
+            case SessionActionEvent.PAUSE:
+                pauseSession();
+                break;
+            case SessionActionEvent.STOP:
+                stopSession();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
      * Start a session.
      */
     private void startSession() {
-        recorder = new SessionRecorder(this);
-        recorder.start();
         setLocked(true);
         updateActionButton(ACTION_START);
         textGpsAccuracy.setText("");
@@ -749,7 +776,6 @@ public class MonitorActivity extends AppCompatActivity
         updateActionButton(ACTION_RESUME);
         textGpsAccuracy.setText("");
         sessionPaused = false;
-        recorder.resume();
     }
 
     /**
@@ -763,14 +789,13 @@ public class MonitorActivity extends AppCompatActivity
         stopwatchBlinkHandler.post(stopwatchBlinkTask);
         updateActionButton(ACTION_PAUSE);
         sessionPaused = true;
-        recorder.pause();
     }
 
     /**
      * Stop the current session.
      */
     private void stopSession() {
-        recorder.stop();
+        setLocked(false);
 
         if (lockTimeoutOn) {
             lockTimeoutHandler.removeCallbacks(lockTimeoutTask);
