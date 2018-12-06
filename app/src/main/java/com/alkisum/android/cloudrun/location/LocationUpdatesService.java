@@ -199,10 +199,9 @@ public class LocationUpdatesService extends Service {
         }
 
         notificationBuilder = new NotificationCompat.Builder(
-                this, "CloudRunLocation");
-        notificationBuilder.setContentIntent(activityPendingIntent);
-        notificationBuilder.setSmallIcon(
-                R.drawable.ic_directions_run_white_24dp);
+                this, "CloudRunLocation")
+                .setContentIntent(activityPendingIntent)
+                .setSmallIcon(R.drawable.ic_directions_run_white_24dp);
 
         // add actions to intent filter
         this.addIntentFilterActions();
