@@ -408,13 +408,21 @@ public class HistoryActivity extends AppCompatActivity implements
     public final void onSubmit(final int operation,
                                final ConnectInfo connectInfo) {
         if (operation == DOWNLOAD_OPERATION) {
-            new Downloader(getApplicationContext(), connectInfo,
-                    new Intent(this, HistoryActivity.class), SUBSCRIBER_ID);
+            new Downloader<>(
+                    getApplicationContext(),
+                    connectInfo,
+                    new Intent(this, HistoryActivity.class),
+                    SUBSCRIBER_ID,
+                    Session.class,
+                    Session.Json.FILE_REGEX);
         } else if (operation == UPLOAD_OPERATION) {
             try {
-                new Uploader(getApplicationContext(), connectInfo,
+                new Uploader(
+                        getApplicationContext(),
+                        connectInfo,
                         new Intent(this, HistoryActivity.class),
-                        Sessions.getSelectedSessions(), SUBSCRIBER_ID);
+                        Sessions.getSelectedSessions(),
+                        SUBSCRIBER_ID);
             } catch (JSONException e) {
                 ErrorDialog.show(this,
                         getString(R.string.upload_failure_title),

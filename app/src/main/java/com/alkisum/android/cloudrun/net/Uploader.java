@@ -8,7 +8,6 @@ import com.alkisum.android.cloudlib.events.UploadEvent;
 import com.alkisum.android.cloudlib.file.json.JsonFileWriter;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudlib.net.nextcloud.NcUploader;
-import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.files.Json;
 
 import org.greenrobot.eventbus.EventBus;
@@ -22,7 +21,7 @@ import java.util.List;
  * Subscriber for background logic upload operations.
  *
  * @author Alkisum
- * @version 3.1
+ * @version 4.0
  * @since 3.0
  */
 public class Uploader {
@@ -43,12 +42,13 @@ public class Uploader {
      * @param context      Context
      * @param connectInfo  Connection information
      * @param intent       Intent for notification
-     * @param sessions     List of session to upload
+     * @param entities     List of entities to upload
      * @param subscriberId Subscriber id allowed to process the events
      * @throws JSONException An error occurred while building the JSON object
      */
     public Uploader(final Context context, final ConnectInfo connectInfo,
-                    final Intent intent, final List<Session> sessions,
+                    final Intent intent,
+                    final List<? extends Jsonable> entities,
                     final int subscriberId) throws JSONException {
         EventBus.getDefault().register(this);
 
@@ -64,7 +64,7 @@ public class Uploader {
         // Execute the JsonFileWriter task to write JSON objects into temporary
         // JSON files
         new JsonFileWriter(context.getCacheDir(),
-                Json.buildJsonFilesFromSessions(sessions),
+                Json.buildJsonFiles(entities),
                 new Integer[]{SUBSCRIBER_ID, subscriberId}).execute();
     }
 

@@ -3,7 +3,6 @@ package com.alkisum.android.cloudrun.database;
 import android.os.AsyncTask;
 
 import com.alkisum.android.cloudrun.events.SessionInsertedEvent;
-import com.alkisum.android.cloudrun.files.Json;
 import com.alkisum.android.cloudrun.model.DaoSession;
 import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.DataPointDao;
@@ -100,7 +99,7 @@ public class SessionInserter extends AsyncTask<Void, Void, Void> {
      */
     private void buildSessionFromJson(final JSONObject jsonBase)
             throws JSONException {
-        int version = jsonBase.getInt(Json.VERSION);
+        int version = jsonBase.getInt(Session.Json.VERSION);
         switch (version) {
             case 1:
                 fromVersion1(jsonBase);
@@ -120,30 +119,30 @@ public class SessionInserter extends AsyncTask<Void, Void, Void> {
      * @throws JSONException An error occurred while parsing the JSON object
      */
     private void fromVersion1(final JSONObject jsonBase) throws JSONException {
-        JSONObject jsonSession = jsonBase.getJSONObject(Json.SESSION);
+        JSONObject jsonSession = jsonBase.getJSONObject(Session.Json.SESSION);
         Session session = new Session();
-        long start = jsonSession.getLong(Json.SESSION_START);
-        long end = jsonSession.getLong(Json.SESSION_END);
+        long start = jsonSession.getLong(Session.Json.SESSION_START);
+        long end = jsonSession.getLong(Session.Json.SESSION_END);
         session.setStart(start);
         session.setEnd(end);
         session.setDuration(end - start);
         session.setDistance(BigDecimal.valueOf(jsonSession.getDouble(
-                Json.SESSION_DISTANCE)).floatValue());
+                Session.Json.SESSION_DISTANCE)).floatValue());
         sessionDao.insert(session);
 
         JSONArray jsonDataPoints = jsonBase.getJSONArray(
-                Json.DATAPOINTS);
+                Session.Json.DATAPOINTS);
         for (int i = 0; i < jsonDataPoints.length(); i++) {
             JSONObject jsonDataPoint = jsonDataPoints.getJSONObject(i);
             DataPoint dataPoint = new DataPoint();
             dataPoint.setTime(jsonDataPoint.getLong(
-                    Json.DATAPOINT_TIME));
+                    Session.Json.DATAPOINT_TIME));
             dataPoint.setLatitude(jsonDataPoint.getDouble(
-                    Json.DATAPOINT_LATITUDE));
+                    Session.Json.DATAPOINT_LATITUDE));
             dataPoint.setLongitude(jsonDataPoint.getDouble(
-                    Json.DATAPOINT_LONGITUDE));
+                    Session.Json.DATAPOINT_LONGITUDE));
             dataPoint.setElevation(jsonDataPoint.getDouble(
-                    Json.DATAPOINT_ELEVATION));
+                    Session.Json.DATAPOINT_ELEVATION));
             dataPoint.setSession(session);
             dataPoints.add(dataPoint);
         }
@@ -157,28 +156,28 @@ public class SessionInserter extends AsyncTask<Void, Void, Void> {
      * @throws JSONException An error occurred while parsing the JSON object
      */
     private void fromVersion2(final JSONObject jsonBase) throws JSONException {
-        JSONObject jsonSession = jsonBase.getJSONObject(Json.SESSION);
+        JSONObject jsonSession = jsonBase.getJSONObject(Session.Json.SESSION);
         Session session = new Session();
-        session.setStart(jsonSession.getLong(Json.SESSION_START));
-        session.setEnd(jsonSession.getLong(Json.SESSION_END));
-        session.setDuration(jsonSession.getLong(Json.SESSION_DURATION));
+        session.setStart(jsonSession.getLong(Session.Json.SESSION_START));
+        session.setEnd(jsonSession.getLong(Session.Json.SESSION_END));
+        session.setDuration(jsonSession.getLong(Session.Json.SESSION_DURATION));
         session.setDistance(BigDecimal.valueOf(jsonSession.getDouble(
-                Json.SESSION_DISTANCE)).floatValue());
+                Session.Json.SESSION_DISTANCE)).floatValue());
         sessionDao.insert(session);
 
         JSONArray jsonDataPoints = jsonBase.getJSONArray(
-                Json.DATAPOINTS);
+                Session.Json.DATAPOINTS);
         for (int i = 0; i < jsonDataPoints.length(); i++) {
             JSONObject jsonDataPoint = jsonDataPoints.getJSONObject(i);
             DataPoint dataPoint = new DataPoint();
             dataPoint.setTime(jsonDataPoint.getLong(
-                    Json.DATAPOINT_TIME));
+                    Session.Json.DATAPOINT_TIME));
             dataPoint.setLatitude(jsonDataPoint.getDouble(
-                    Json.DATAPOINT_LATITUDE));
+                    Session.Json.DATAPOINT_LATITUDE));
             dataPoint.setLongitude(jsonDataPoint.getDouble(
-                    Json.DATAPOINT_LONGITUDE));
+                    Session.Json.DATAPOINT_LONGITUDE));
             dataPoint.setElevation(jsonDataPoint.getDouble(
-                    Json.DATAPOINT_ELEVATION));
+                    Session.Json.DATAPOINT_ELEVATION));
             dataPoint.setSession(session);
             dataPoints.add(dataPoint);
         }

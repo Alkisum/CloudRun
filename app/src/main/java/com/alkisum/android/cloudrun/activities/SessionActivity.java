@@ -27,6 +27,7 @@ import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.SessionDeletedEvent;
 import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.Session;
+import com.alkisum.android.cloudrun.net.Jsonable;
 import com.alkisum.android.cloudrun.net.Uploader;
 import com.alkisum.android.cloudrun.utils.Format;
 import com.google.gson.ExclusionStrategy;
@@ -262,7 +263,7 @@ public class SessionActivity extends AppCompatActivity implements
             try {
                 Intent intent = new Intent(this, SessionActivity.class);
                 intent.putExtra(ARG_SESSION_ID, session.getId());
-                List<Session> sessions = new ArrayList<>();
+                List<Jsonable> sessions = new ArrayList<>();
                 sessions.add(session);
                 new Uploader(getApplicationContext(), connectInfo, intent,
                         sessions, SUBSCRIBER_ID);

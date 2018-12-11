@@ -24,11 +24,12 @@ import java.util.List;
 /**
  * Class starting download operation and subscribing to download events.
  *
+ * @param <T> Jsonable
  * @author Alkisum
  * @version 4.0
  * @since 3.0
  */
-public class Downloader {
+public class Downloader<T extends Jsonable> {
 
     /**
      * Subscriber id to use when receiving event.
@@ -41,18 +42,35 @@ public class Downloader {
     private final Integer subscriberId;
 
     /**
+     * Jsonable class.
+     */
+    private final Class<T> jsonableClass;
+
+    /**
+     * Regex to use on names when checking downloaded file.
+     */
+    private final String fileNameRegex;
+
+    /**
      * Downloader constructor.
      *
-     * @param context      Context
-     * @param connectInfo  Connection information
-     * @param intent       Intent for notification
-     * @param subscriberId Subscriber id allowed to process the events
+     * @param context       Context
+     * @param connectInfo   Connection information
+     * @param intent        Intent for notification
+     * @param subscriberId  Subscriber id allowed to process the events
+     * @param jsonableClass Jsonable class
+     * @param fileNameRegex Regex to use on names when checking downloaded file
      */
     public Downloader(final Context context, final ConnectInfo connectInfo,
-                      final Intent intent, final Integer subscriberId) {
+                      final Intent intent, final Integer subscriberId,
+                      final Class<T> jsonableClass,
+                      final String fileNameRegex) {
         EventBus.getDefault().register(this);
 
         this.subscriberId = subscriberId;
+        this.jsonableClass = jsonableClass;
+        this.fileNameRegex = fileNameRegex;
+
         NcDownloader ncDownloader = new NcDownloader(context, intent,
                 "CloudRunDownloader", "CloudRun download",
                 new Integer[]{SUBSCRIBER_ID, subscriberId},
@@ -63,7 +81,7 @@ public class Downloader {
                 connectInfo.getPath(),
                 connectInfo.getUsername(),
                 connectInfo.getPassword());
-        ncDownloader.setExcludeFileNames(Json.getSessionJsonFileNames());
+        ncDownloader.setExcludeFileNames(Json.getJsonFileNames(jsonableClass));
         ncDownloader.start();
     }
 
@@ -107,8 +125,8 @@ public class Downloader {
             case JsonFileReaderEvent.OK:
                 List<JSONObject> jsonObjects = new ArrayList<>();
                 for (JsonFile jsonFile : event.getJsonFiles()) {
-                    if (Json.isFileNameValid(jsonFile)
-                            && !Json.isSessionAlreadyInDb(jsonFile)) {
+                    if (Json.isFileNameValid(jsonFile, fileNameRegex)
+                            && !Json.isAlreadyInDb(jsonFile, jsonableClass)) {
                         jsonObjects.add(jsonFile.getJsonObject());
                     }
                 }
