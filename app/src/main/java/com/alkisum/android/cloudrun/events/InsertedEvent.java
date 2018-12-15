@@ -1,13 +1,15 @@
 package com.alkisum.android.cloudrun.events;
 
+import com.alkisum.android.cloudrun.net.Insertable;
+
 /**
- * Class defining session inserted event for EventBus.
+ * Class defining inserted event for EventBus.
  *
  * @author Alkisum
  * @version 4.0
  * @since 3.0
  */
-public class SessionInsertedEvent {
+public class InsertedEvent {
 
     /**
      * Insert operation finished successfully.
@@ -18,6 +20,11 @@ public class SessionInsertedEvent {
      * Insert operation finished with errors.
      */
     public static final int ERROR = 1;
+
+    /**
+     * Insertable entity inserted.
+     */
+    private final Insertable insertable;
 
     /**
      * Insert operation result.
@@ -31,23 +38,35 @@ public class SessionInsertedEvent {
     private Exception exception;
 
     /**
-     * SessionInsertedEvent constructor.
+     * InsertedEvent constructor.
      *
-     * @param result Insert operation result
+     * @param insertable Insertable entity inserted
+     * @param result     Insert operation result
      */
-    public SessionInsertedEvent(final int result) {
+    public InsertedEvent(final Insertable insertable, final int result) {
+        this.insertable = insertable;
         this.result = result;
     }
 
     /**
-     * SessionInsertedEvent constructor.
+     * InsertedEvent constructor.
      *
-     * @param result    Insert operation result
-     * @param exception Exception thrown during insert operation
+     * @param insertable Insertable entity inserted
+     * @param result     Insert operation result
+     * @param exception  Exception thrown during insert operation
      */
-    public SessionInsertedEvent(final int result, final Exception exception) {
+    public InsertedEvent(final Insertable insertable,
+                         final int result, final Exception exception) {
+        this.insertable = insertable;
         this.result = result;
         this.exception = exception;
+    }
+
+    /**
+     * @return Insertable entity inserted
+     */
+    public Insertable getInsertable() {
+        return this.insertable;
     }
 
     /**

@@ -29,8 +29,8 @@ import com.alkisum.android.cloudrun.database.SessionDeleter;
 import com.alkisum.android.cloudrun.database.SessionRestorer;
 import com.alkisum.android.cloudrun.database.Sessions;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
+import com.alkisum.android.cloudrun.events.InsertedEvent;
 import com.alkisum.android.cloudrun.events.SessionDeletedEvent;
-import com.alkisum.android.cloudrun.events.SessionInsertedEvent;
 import com.alkisum.android.cloudrun.events.SessionRestoredEvent;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.net.Downloader;
@@ -414,7 +414,7 @@ public class HistoryActivity extends AppCompatActivity implements
                     new Intent(this, HistoryActivity.class),
                     SUBSCRIBER_ID,
                     Session.class,
-                    Session.Json.FILE_REGEX);
+                    Sessions.Json.FILE_REGEX);
         } else if (operation == UPLOAD_OPERATION) {
             try {
                 new Uploader(
@@ -498,20 +498,23 @@ public class HistoryActivity extends AppCompatActivity implements
     }
 
     /**
-     * Triggered on session inserted event.
+     * Triggered on inserted event.
      *
-     * @param event Session inserted event
+     * @param event inserted event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onSessionInsertedEvent(final SessionInsertedEvent event) {
+    public final void onInsertedEvent(final InsertedEvent event) {
+        if (!(event.getInsertable() instanceof Session)) {
+            return;
+        }
         switch (event.getResult()) {
-            case SessionInsertedEvent.OK:
+            case InsertedEvent.OK:
                 refreshList();
                 Snackbar.make(fab, R.string.download_success_snackbar,
                         Snackbar.LENGTH_LONG).show();
                 progressBar.setVisibility(View.GONE);
                 break;
-            case SessionInsertedEvent.ERROR:
+            case InsertedEvent.ERROR:
                 ErrorDialog.show(this,
                         getString(R.string.download_insert_failure_title),
                         event.getException().getMessage(), null);

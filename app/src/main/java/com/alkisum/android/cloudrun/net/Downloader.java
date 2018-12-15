@@ -9,8 +9,8 @@ import com.alkisum.android.cloudlib.file.json.JsonFile;
 import com.alkisum.android.cloudlib.file.json.JsonFileReader;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudlib.net.nextcloud.NcDownloader;
-import com.alkisum.android.cloudrun.database.SessionInserter;
-import com.alkisum.android.cloudrun.events.SessionInsertedEvent;
+import com.alkisum.android.cloudrun.database.Inserter;
+import com.alkisum.android.cloudrun.events.InsertedEvent;
 import com.alkisum.android.cloudrun.files.Json;
 
 import org.greenrobot.eventbus.EventBus;
@@ -115,14 +115,18 @@ public class Downloader<T extends Jsonable> {
      * Triggered on JSON file reader event.
      *
      * @param event JSON file reader event
+     * @throws InstantiationException The entity cannot be instantiated
+     * @throws IllegalAccessException The entity cannot be instantiated
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public final void onJsonFileReaderEvent(final JsonFileReaderEvent event) {
+    public final void onJsonFileReaderEvent(final JsonFileReaderEvent event)
+            throws InstantiationException, IllegalAccessException {
         if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
         switch (event.getResult()) {
             case JsonFileReaderEvent.OK:
+                // get JSON objects from reader
                 List<JSONObject> jsonObjects = new ArrayList<>();
                 for (JsonFile jsonFile : event.getJsonFiles()) {
                     if (Json.isFileNameValid(jsonFile, fileNameRegex)
@@ -130,7 +134,14 @@ public class Downloader<T extends Jsonable> {
                         jsonObjects.add(jsonFile.getJsonObject());
                     }
                 }
-                new SessionInserter(jsonObjects).execute();
+
+                // convert JSON objects into entities and insert them into db
+                if (Insertable.class.isAssignableFrom(jsonableClass)) {
+                    Insertable insertable = (Insertable)
+                            jsonableClass.newInstance();
+                    new Inserter(insertable).execute(
+                            jsonObjects.toArray(new JSONObject[0]));
+                }
                 break;
             case JsonFileReaderEvent.ERROR:
                 EventBus.getDefault().unregister(this);
@@ -141,17 +152,17 @@ public class Downloader<T extends Jsonable> {
     }
 
     /**
-     * Triggered on session inserted event.
+     * Triggered on inserted event.
      *
-     * @param event Session inserted event
+     * @param event Inserted event
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public final void onSessionInsertedEvent(final SessionInsertedEvent event) {
+    public final void onInsertedEvent(final InsertedEvent event) {
         switch (event.getResult()) {
-            case SessionInsertedEvent.OK:
+            case InsertedEvent.OK:
                 EventBus.getDefault().unregister(this);
                 break;
-            case SessionInsertedEvent.ERROR:
+            case InsertedEvent.ERROR:
                 EventBus.getDefault().unregister(this);
                 break;
             default:
