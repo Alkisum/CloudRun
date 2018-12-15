@@ -1,7 +1,8 @@
-package com.alkisum.android.cloudrun.database;
+package com.alkisum.android.cloudrun.tasks;
 
 import android.os.Handler;
 
+import com.alkisum.android.cloudrun.database.Db;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.DistanceEvent;
 import com.alkisum.android.cloudrun.events.SessionActionEvent;

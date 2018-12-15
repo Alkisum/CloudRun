@@ -21,10 +21,10 @@ import android.widget.ProgressBar;
 
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.database.MarkerDeleter;
-import com.alkisum.android.cloudrun.database.MarkerRestorer;
+import com.alkisum.android.cloudrun.tasks.MarkerDeleter;
+import com.alkisum.android.cloudrun.tasks.MarkerRestorer;
 import com.alkisum.android.cloudrun.database.Markers;
-import com.alkisum.android.cloudrun.database.RouteDeleter;
+import com.alkisum.android.cloudrun.tasks.RouteDeleter;
 import com.alkisum.android.cloudrun.database.Routes;
 import com.alkisum.android.cloudrun.dialogs.AddMarkerDialog;
 import com.alkisum.android.cloudrun.dialogs.EditMarkerDialog;

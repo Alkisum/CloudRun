@@ -1,6 +1,6 @@
 package com.alkisum.android.cloudrun.events;
 
-import com.alkisum.android.cloudrun.net.Insertable;
+import com.alkisum.android.cloudrun.interfaces.Insertable;
 
 /**
  * Class defining inserted event for EventBus.

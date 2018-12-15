@@ -9,6 +9,7 @@ import com.alkisum.android.cloudlib.file.json.JsonFileWriter;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudlib.net.nextcloud.NcUploader;
 import com.alkisum.android.cloudrun.files.Json;
+import com.alkisum.android.cloudrun.interfaces.Jsonable;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

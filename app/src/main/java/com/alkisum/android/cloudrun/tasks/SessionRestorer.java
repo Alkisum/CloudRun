@@ -1,7 +1,8 @@
-package com.alkisum.android.cloudrun.database;
+package com.alkisum.android.cloudrun.tasks;
 
 import android.os.AsyncTask;
 
+import com.alkisum.android.cloudrun.database.Db;
 import com.alkisum.android.cloudrun.events.SessionRestoredEvent;
 import com.alkisum.android.cloudrun.model.DaoSession;
 import com.alkisum.android.cloudrun.model.DataPointDao;

@@ -2,8 +2,8 @@ package com.alkisum.android.cloudrun.model;
 
 import com.alkisum.android.cloudlib.file.json.JsonFile;
 import com.alkisum.android.cloudrun.database.Sessions;
-import com.alkisum.android.cloudrun.net.Insertable;
-import com.alkisum.android.cloudrun.net.Jsonable;
+import com.alkisum.android.cloudrun.interfaces.Insertable;
+import com.alkisum.android.cloudrun.interfaces.Jsonable;
 import com.alkisum.android.cloudrun.utils.Format;
 
 import org.greenrobot.greendao.DaoException;

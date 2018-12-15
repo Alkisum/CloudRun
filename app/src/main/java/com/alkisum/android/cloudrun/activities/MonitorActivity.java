@@ -26,7 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.database.SessionRecorder;
+import com.alkisum.android.cloudrun.tasks.SessionRecorder;
 import com.alkisum.android.cloudrun.dialogs.ActivateRoutesDialog;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;

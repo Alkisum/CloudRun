@@ -2,7 +2,7 @@ package com.alkisum.android.cloudrun.files;
 
 import com.alkisum.android.cloudlib.file.json.JsonFile;
 import com.alkisum.android.cloudrun.database.Db;
-import com.alkisum.android.cloudrun.net.Jsonable;
+import com.alkisum.android.cloudrun.interfaces.Jsonable;
 
 import org.json.JSONException;
 import org.json.JSONObject;

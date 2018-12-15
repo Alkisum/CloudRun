@@ -1,9 +1,9 @@
-package com.alkisum.android.cloudrun.database;
+package com.alkisum.android.cloudrun.tasks;
 
 import android.os.AsyncTask;
 
 import com.alkisum.android.cloudrun.events.InsertedEvent;
-import com.alkisum.android.cloudrun.net.Insertable;
+import com.alkisum.android.cloudrun.interfaces.Insertable;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
