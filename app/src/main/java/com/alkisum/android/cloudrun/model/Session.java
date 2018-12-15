@@ -2,6 +2,7 @@ package com.alkisum.android.cloudrun.model;
 
 import com.alkisum.android.cloudlib.file.json.JsonFile;
 import com.alkisum.android.cloudrun.database.Sessions;
+import com.alkisum.android.cloudrun.interfaces.Deletable;
 import com.alkisum.android.cloudrun.interfaces.Insertable;
 import com.alkisum.android.cloudrun.interfaces.Jsonable;
 import com.alkisum.android.cloudrun.utils.Format;
@@ -20,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-public class Session implements Jsonable, Insertable {
+public class Session implements Jsonable, Insertable, Deletable {
 
     @Id(autoincrement = true)
     private Long id;
@@ -208,6 +209,17 @@ public class Session implements Jsonable, Insertable {
             default:
                 break;
         }
+    }
+
+    @Override
+    public List<? extends Deletable> deleteSelected() {
+        List<Session> sessions = Sessions.getSelectedSessions();
+        for (Session session : sessions) {
+            this.daoSession.getDataPointDao().deleteInTx(
+                    session.getDataPoints());
+            session.delete();
+        }
+        return sessions;
     }
 
     /** called by internal mechanisms, do not call yourself. */

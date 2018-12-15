@@ -25,16 +25,16 @@ import com.alkisum.android.cloudlib.net.ConnectDialog;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.adapters.HistoryListAdapter;
-import com.alkisum.android.cloudrun.tasks.SessionDeleter;
-import com.alkisum.android.cloudrun.tasks.SessionRestorer;
 import com.alkisum.android.cloudrun.database.Sessions;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
+import com.alkisum.android.cloudrun.events.DeletedEvent;
 import com.alkisum.android.cloudrun.events.InsertedEvent;
-import com.alkisum.android.cloudrun.events.SessionDeletedEvent;
 import com.alkisum.android.cloudrun.events.SessionRestoredEvent;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.net.Downloader;
 import com.alkisum.android.cloudrun.net.Uploader;
+import com.alkisum.android.cloudrun.tasks.Deleter;
+import com.alkisum.android.cloudrun.tasks.SessionRestorer;
 import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
@@ -369,7 +369,8 @@ public class HistoryActivity extends AppCompatActivity implements
      * Execute the task to delete the selected sessions.
      */
     private void deleteSessions() {
-        new SessionDeleter(new Integer[]{SUBSCRIBER_ID}).execute();
+        new Deleter(new Integer[]{SUBSCRIBER_ID},
+                new Session()).execute();
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -586,8 +587,9 @@ public class HistoryActivity extends AppCompatActivity implements
      * @param event Session deleted event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onSessionDeletedEvent(final SessionDeletedEvent event) {
-        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+    public final void onDeletedEvent(final DeletedEvent event) {
+        if (!(event.getDeletable() instanceof Session)
+                && !event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
         progressBar.setVisibility(View.GONE);
@@ -597,7 +599,7 @@ public class HistoryActivity extends AppCompatActivity implements
                 .setAction(R.string.action_undo, new View.OnClickListener() {
                     @Override
                     public void onClick(final View v) {
-                        List<Session> sessions = event.getDeletedSessions();
+                        List<Session> sessions = event.getDeletedEntities();
                         restoreSessions(sessions.toArray(new Session[0]));
                     }
                 }).show();
