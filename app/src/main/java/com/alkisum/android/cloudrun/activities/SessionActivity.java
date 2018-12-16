@@ -22,7 +22,7 @@ import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.tasks.Deleter;
-import com.alkisum.android.cloudrun.database.Sessions;
+import com.alkisum.android.cloudrun.utils.Sessions;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.DeletedEvent;
 import com.alkisum.android.cloudrun.model.DataPoint;

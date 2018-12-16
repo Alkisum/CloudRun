@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.database.Markers;
+import com.alkisum.android.cloudrun.utils.Markers;
 import com.alkisum.android.cloudrun.events.MarkerUpdatedEvent;
 import com.alkisum.android.cloudrun.model.Marker;
 

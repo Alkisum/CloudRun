@@ -2,7 +2,7 @@ package com.alkisum.android.cloudrun.model;
 
 import com.alkisum.android.cloudlib.file.json.JsonFile;
 import com.alkisum.android.cloudrun.database.Db;
-import com.alkisum.android.cloudrun.database.Sessions;
+import com.alkisum.android.cloudrun.utils.Sessions;
 import com.alkisum.android.cloudrun.interfaces.Deletable;
 import com.alkisum.android.cloudrun.interfaces.Insertable;
 import com.alkisum.android.cloudrun.interfaces.Jsonable;

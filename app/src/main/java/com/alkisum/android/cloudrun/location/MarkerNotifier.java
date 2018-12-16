@@ -11,7 +11,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.activities.MapActivity;
-import com.alkisum.android.cloudrun.database.Markers;
+import com.alkisum.android.cloudrun.utils.Markers;
 import com.alkisum.android.cloudrun.events.MarkerAlertEvent;
 import com.alkisum.android.cloudrun.model.Marker;
 import com.google.android.gms.location.LocationCallback;

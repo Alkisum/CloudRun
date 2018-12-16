@@ -18,7 +18,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.activities.MonitorActivity;
-import com.alkisum.android.cloudrun.database.Sessions;
+import com.alkisum.android.cloudrun.utils.Sessions;
 import com.alkisum.android.cloudrun.events.SessionActionEvent;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.utils.Format;

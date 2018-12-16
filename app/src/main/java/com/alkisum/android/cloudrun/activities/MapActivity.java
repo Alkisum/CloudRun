@@ -13,8 +13,8 @@ import android.view.View;
 
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.database.Markers;
-import com.alkisum.android.cloudrun.database.Sessions;
+import com.alkisum.android.cloudrun.utils.Markers;
+import com.alkisum.android.cloudrun.utils.Sessions;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.GpsStatusEvent;
 import com.alkisum.android.cloudrun.location.Coordinate;

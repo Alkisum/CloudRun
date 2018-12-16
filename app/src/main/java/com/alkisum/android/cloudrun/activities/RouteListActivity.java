@@ -21,7 +21,7 @@ import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.adapters.RoutesListAdapter;
 import com.alkisum.android.cloudrun.tasks.RouteDeleter;
 import com.alkisum.android.cloudrun.tasks.RouteRestorer;
-import com.alkisum.android.cloudrun.database.Routes;
+import com.alkisum.android.cloudrun.utils.Routes;
 import com.alkisum.android.cloudrun.dialogs.AddRouteDialog;
 import com.alkisum.android.cloudrun.events.RouteDeletedEvent;
 import com.alkisum.android.cloudrun.events.RouteInsertedEvent;

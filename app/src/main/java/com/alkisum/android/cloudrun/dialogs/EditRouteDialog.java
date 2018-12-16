@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.database.Routes;
+import com.alkisum.android.cloudrun.utils.Routes;
 import com.alkisum.android.cloudrun.events.RouteUpdatedEvent;
 import com.alkisum.android.cloudrun.model.Route;
 

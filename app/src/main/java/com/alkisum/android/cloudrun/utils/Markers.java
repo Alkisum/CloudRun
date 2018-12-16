@@ -1,14 +1,14 @@
-package com.alkisum.android.cloudrun.database;
+package com.alkisum.android.cloudrun.utils;
 
 import android.content.Context;
 import android.location.Location;
 import android.preference.PreferenceManager;
 
+import com.alkisum.android.cloudrun.database.Db;
 import com.alkisum.android.cloudrun.location.Coordinate;
 import com.alkisum.android.cloudrun.model.Marker;
 import com.alkisum.android.cloudrun.model.MarkerDao;
 import com.alkisum.android.cloudrun.model.Route;
-import com.alkisum.android.cloudrun.utils.Pref;
 
 import java.util.ArrayList;
 import java.util.List;

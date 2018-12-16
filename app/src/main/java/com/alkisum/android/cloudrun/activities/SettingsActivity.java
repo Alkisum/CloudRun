@@ -11,7 +11,7 @@ import android.support.v7.widget.Toolbar;
 
 import com.alkisum.android.cloudlib.utils.CloudPref;
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.database.Markers;
+import com.alkisum.android.cloudrun.utils.Markers;
 import com.alkisum.android.cloudrun.location.LocationHelper;
 import com.alkisum.android.cloudrun.ui.NumberPickerPreference;
 import com.alkisum.android.cloudrun.utils.Pref;

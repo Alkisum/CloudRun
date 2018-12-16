@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.alkisum.android.cloudlib.utils.CloudPref;
-import com.alkisum.android.cloudrun.database.Markers;
 import com.alkisum.android.cloudrun.location.LocationHelper;
 
 /**

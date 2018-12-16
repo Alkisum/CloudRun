@@ -19,7 +19,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.database.Markers;
+import com.alkisum.android.cloudrun.utils.Markers;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.DistanceEvent;

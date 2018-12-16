@@ -6,7 +6,7 @@ import android.content.DialogInterface;
 import android.preference.PreferenceManager;
 
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.database.Routes;
+import com.alkisum.android.cloudrun.utils.Routes;
 import com.alkisum.android.cloudrun.model.Route;
 import com.alkisum.android.cloudrun.utils.Pref;
 

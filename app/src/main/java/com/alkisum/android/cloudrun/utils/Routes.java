@@ -1,12 +1,12 @@
-package com.alkisum.android.cloudrun.database;
+package com.alkisum.android.cloudrun.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.alkisum.android.cloudrun.database.Db;
 import com.alkisum.android.cloudrun.model.Route;
 import com.alkisum.android.cloudrun.model.RouteDao;
-import com.alkisum.android.cloudrun.utils.Pref;
 
 import java.util.ArrayList;
 import java.util.Iterator;
