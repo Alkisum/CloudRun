@@ -1,10 +1,12 @@
 package com.alkisum.android.cloudrun.model;
 
 import com.alkisum.android.cloudlib.file.json.JsonFile;
+import com.alkisum.android.cloudrun.database.Db;
 import com.alkisum.android.cloudrun.database.Sessions;
 import com.alkisum.android.cloudrun.interfaces.Deletable;
 import com.alkisum.android.cloudrun.interfaces.Insertable;
 import com.alkisum.android.cloudrun.interfaces.Jsonable;
+import com.alkisum.android.cloudrun.interfaces.Restorable;
 import com.alkisum.android.cloudrun.utils.Format;
 
 import org.greenrobot.greendao.DaoException;
@@ -21,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-public class Session implements Jsonable, Insertable, Deletable {
+public class Session implements Jsonable, Insertable, Deletable, Restorable {
 
     @Id(autoincrement = true)
     private Long id;
@@ -213,13 +215,31 @@ public class Session implements Jsonable, Insertable, Deletable {
 
     @Override
     public List<? extends Deletable> deleteSelected() {
+        // get DAO
+        DataPointDao dataPointDao = Db.getInstance().getDaoSession()
+                .getDataPointDao();
+
+        // delete selected sessions and datapoints
         List<Session> sessions = Sessions.getSelectedSessions();
         for (Session session : sessions) {
-            this.daoSession.getDataPointDao().deleteInTx(
-                    session.getDataPoints());
+            dataPointDao.deleteInTx(session.getDataPoints());
             session.delete();
         }
         return sessions;
+    }
+
+    @Override
+    public void restore(final Restorable[] restorables) {
+        // get DAOs
+        DaoSession daoSession = Db.getInstance().getDaoSession();
+        SessionDao sessionDao = daoSession.getSessionDao();
+        DataPointDao dataPointDao = daoSession.getDataPointDao();
+
+        // restore sessions and datapoints
+        for (Restorable restorable : restorables) {
+            sessionDao.insert((Session) restorable);
+            dataPointDao.insertInTx(((Session) restorable).getDataPoints());
+        }
     }
 
     /** called by internal mechanisms, do not call yourself. */

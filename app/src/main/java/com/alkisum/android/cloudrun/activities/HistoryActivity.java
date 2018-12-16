@@ -29,12 +29,13 @@ import com.alkisum.android.cloudrun.database.Sessions;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.DeletedEvent;
 import com.alkisum.android.cloudrun.events.InsertedEvent;
-import com.alkisum.android.cloudrun.events.SessionRestoredEvent;
+import com.alkisum.android.cloudrun.events.RestoredEvent;
+import com.alkisum.android.cloudrun.interfaces.Restorable;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.net.Downloader;
 import com.alkisum.android.cloudrun.net.Uploader;
 import com.alkisum.android.cloudrun.tasks.Deleter;
-import com.alkisum.android.cloudrun.tasks.SessionRestorer;
+import com.alkisum.android.cloudrun.tasks.Restorer;
 import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
@@ -380,8 +381,8 @@ public class HistoryActivity extends AppCompatActivity implements
      *
      * @param sessions Sessions to restore
      */
-    private void restoreSessions(final Session... sessions) {
-        new SessionRestorer().execute(sessions);
+    private void restoreSessions(final Restorable... sessions) {
+        new Restorer(new Session()).execute(sessions);
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -586,32 +587,49 @@ public class HistoryActivity extends AppCompatActivity implements
      *
      * @param event Session deleted event
      */
+    @SuppressWarnings("unchecked")
     @Subscribe(threadMode = ThreadMode.MAIN)
     public final void onDeletedEvent(final DeletedEvent event) {
         if (!(event.getDeletable() instanceof Session)
-                && !event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+                || !event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
         progressBar.setVisibility(View.GONE);
         refreshList();
-        Snackbar.make(fab, R.string.history_delete_snackbar,
-                Snackbar.LENGTH_LONG)
-                .setAction(R.string.action_undo, new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        List<Session> sessions = event.getDeletedEntities();
-                        restoreSessions(sessions.toArray(new Session[0]));
-                    }
-                }).show();
+
+        // create snackbar
+        Snackbar snackbar = Snackbar.make(fab, R.string.history_delete_snackbar,
+                Snackbar.LENGTH_LONG);
+
+        // if the deleted entities are restorable, show UNDO action
+        if (Restorable.class.isAssignableFrom(
+                event.getDeletable().getClass())) {
+            // cast deletable entities to restorable entities
+            final List<? extends Restorable> sessions =
+                    (List<? extends Restorable>) event.getDeletedEntities();
+            snackbar.setAction(R.string.action_undo,
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(final View v) {
+                            // restore sessions
+                            restoreSessions(sessions.toArray(
+                                    new Restorable[0]));
+                        }
+                    });
+        }
+        snackbar.show();
     }
 
     /**
-     * Triggered on session restored event.
+     * Triggered on restored event.
      *
-     * @param event Session restored event
+     * @param event Restored event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onSessionRestoredEvent(final SessionRestoredEvent event) {
+    public final void onRestoredEvent(final RestoredEvent event) {
+        if (!(event.getRestorable() instanceof Session)) {
+            return;
+        }
         progressBar.setVisibility(View.GONE);
         refreshList();
     }

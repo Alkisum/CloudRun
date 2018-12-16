@@ -251,7 +251,7 @@ public class SessionActivity extends AppCompatActivity implements
      * Execute the task to delete the selected sessions.
      */
     private void deleteSession() {
-        new Deleter(new Integer[]{SUBSCRIBER_ID}).execute();
+        new Deleter(new Integer[]{SUBSCRIBER_ID}, new Session()).execute();
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
