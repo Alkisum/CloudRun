@@ -58,6 +58,7 @@ public final class EditRouteDialog {
                         Routes.updateRoute(route,
                                 routeName.getText().toString());
                         EventBus.getDefault().post(new RefreshEvent());
+                        dialog.dismiss();
                     }
                 });
 

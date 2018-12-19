@@ -54,6 +54,7 @@ public final class AddRouteDialog {
                                         final int which) {
                         Routes.insertRoute(routeName.getText().toString());
                         EventBus.getDefault().post(new RefreshEvent());
+                        dialog.dismiss();
                     }
                 });
 

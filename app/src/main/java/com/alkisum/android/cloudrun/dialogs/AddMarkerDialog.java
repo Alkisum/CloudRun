@@ -59,6 +59,7 @@ public final class AddMarkerDialog {
                         Markers.insertMarker(markerLabel.getText().toString(),
                                 latitude, longitude, routeId);
                         EventBus.getDefault().post(new RefreshEvent());
+                        dialog.dismiss();
                     }
                 });
 

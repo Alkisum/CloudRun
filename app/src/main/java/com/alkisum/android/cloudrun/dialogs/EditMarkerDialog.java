@@ -58,6 +58,7 @@ public final class EditMarkerDialog {
                         Markers.updateMarker(marker,
                                 markerLabel.getText().toString());
                         EventBus.getDefault().post(new RefreshEvent());
+                        dialog.dismiss();
                     }
                 });
 
