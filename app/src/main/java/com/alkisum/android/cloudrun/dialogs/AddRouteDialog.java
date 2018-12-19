@@ -7,8 +7,8 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.alkisum.android.cloudrun.R;
+import com.alkisum.android.cloudrun.events.RefreshEvent;
 import com.alkisum.android.cloudrun.utils.Routes;
-import com.alkisum.android.cloudrun.events.RouteInsertedEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -53,7 +53,7 @@ public final class AddRouteDialog {
                     public void onClick(final DialogInterface dialog,
                                         final int which) {
                         Routes.insertRoute(routeName.getText().toString());
-                        EventBus.getDefault().post(new RouteInsertedEvent());
+                        EventBus.getDefault().post(new RefreshEvent());
                     }
                 });
 

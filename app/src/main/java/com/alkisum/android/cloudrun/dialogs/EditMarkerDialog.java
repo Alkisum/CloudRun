@@ -7,9 +7,9 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.utils.Markers;
-import com.alkisum.android.cloudrun.events.MarkerUpdatedEvent;
+import com.alkisum.android.cloudrun.events.RefreshEvent;
 import com.alkisum.android.cloudrun.model.Marker;
+import com.alkisum.android.cloudrun.utils.Markers;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -57,7 +57,7 @@ public final class EditMarkerDialog {
                                         final int which) {
                         Markers.updateMarker(marker,
                                 markerLabel.getText().toString());
-                        EventBus.getDefault().post(new MarkerUpdatedEvent());
+                        EventBus.getDefault().post(new RefreshEvent());
                     }
                 });
 

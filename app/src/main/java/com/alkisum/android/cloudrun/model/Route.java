@@ -1,5 +1,10 @@
 package com.alkisum.android.cloudrun.model;
 
+import com.alkisum.android.cloudrun.database.Db;
+import com.alkisum.android.cloudrun.interfaces.Deletable;
+import com.alkisum.android.cloudrun.interfaces.Restorable;
+import com.alkisum.android.cloudrun.utils.Routes;
+
 import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
@@ -10,7 +15,7 @@ import org.greenrobot.greendao.annotation.Transient;
 import java.util.List;
 
 @Entity
-public class Route {
+public class Route implements Deletable, Restorable {
 
     @Id(autoincrement = true)
     private Long id;
@@ -127,6 +132,34 @@ public class Route {
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    @Override
+    public List<? extends Deletable> deleteSelected() {
+        // get DAO
+        MarkerDao markerDao = Db.getInstance().getDaoSession().getMarkerDao();
+
+        // delete selected routes and markers
+        List<Route> routes = Routes.getSelectedRoutes();
+        for (Route route : routes) {
+            markerDao.deleteInTx(route.getMarkers());
+            route.delete();
+        }
+        return routes;
+    }
+
+    @Override
+    public void restore(Restorable[] restorables) {
+        // get DAOs
+        DaoSession daoSession = Db.getInstance().getDaoSession();
+        RouteDao routeDao = daoSession.getRouteDao();
+        MarkerDao markerDao = daoSession.getMarkerDao();
+
+        // restore routes and markers
+        for (Restorable restorable : restorables) {
+            routeDao.insert((Route) restorable);
+            markerDao.insertInTx(((Route) restorable).getMarkers());
+        }
     }
 
     /** called by internal mechanisms, do not call yourself. */

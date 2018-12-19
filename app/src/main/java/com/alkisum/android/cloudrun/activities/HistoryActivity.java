@@ -583,9 +583,9 @@ public class HistoryActivity extends AppCompatActivity implements
     }
 
     /**
-     * Triggered on session deleted event.
+     * Triggered on deleted event.
      *
-     * @param event Session deleted event
+     * @param event Deleted event
      */
     @SuppressWarnings("unchecked")
     @Subscribe(threadMode = ThreadMode.MAIN)

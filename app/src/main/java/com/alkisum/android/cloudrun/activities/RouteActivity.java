@@ -21,22 +21,20 @@ import android.widget.ProgressBar;
 
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.tasks.MarkerDeleter;
-import com.alkisum.android.cloudrun.tasks.MarkerRestorer;
-import com.alkisum.android.cloudrun.utils.Markers;
-import com.alkisum.android.cloudrun.tasks.RouteDeleter;
-import com.alkisum.android.cloudrun.utils.Routes;
 import com.alkisum.android.cloudrun.dialogs.AddMarkerDialog;
 import com.alkisum.android.cloudrun.dialogs.EditMarkerDialog;
 import com.alkisum.android.cloudrun.dialogs.EditRouteDialog;
+import com.alkisum.android.cloudrun.events.DeletedEvent;
 import com.alkisum.android.cloudrun.events.MarkerDeletedEvent;
-import com.alkisum.android.cloudrun.events.MarkerInsertedEvent;
 import com.alkisum.android.cloudrun.events.MarkerRestoredEvent;
-import com.alkisum.android.cloudrun.events.MarkerUpdatedEvent;
-import com.alkisum.android.cloudrun.events.RouteDeletedEvent;
-import com.alkisum.android.cloudrun.events.RouteUpdatedEvent;
+import com.alkisum.android.cloudrun.events.RefreshEvent;
 import com.alkisum.android.cloudrun.model.Marker;
 import com.alkisum.android.cloudrun.model.Route;
+import com.alkisum.android.cloudrun.tasks.Deleter;
+import com.alkisum.android.cloudrun.tasks.MarkerDeleter;
+import com.alkisum.android.cloudrun.tasks.MarkerRestorer;
+import com.alkisum.android.cloudrun.utils.Markers;
+import com.alkisum.android.cloudrun.utils.Routes;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -385,7 +383,7 @@ public class RouteActivity extends AppCompatActivity {
      * Execute the task to delete the selected routes.
      */
     private void deleteRoute() {
-        new RouteDeleter(new Integer[]{SUBSCRIBER_ID}).execute();
+        new Deleter(new Integer[]{SUBSCRIBER_ID}, new Route()).execute();
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -413,24 +411,26 @@ public class RouteActivity extends AppCompatActivity {
     }
 
     /**
-     * Triggered on route updated event.
+     * Triggered on refresh event.
      *
-     * @param event Route updated event
+     * @param event Refresh event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onRouteUpdatedEvent(final RouteUpdatedEvent event) {
+    public final void onRefreshEvent(final RefreshEvent event) {
         Toolbar toolbar = findViewById(R.id.route_toolbar);
         toolbar.setTitle(route.getName());
+        refreshMarkers();
     }
 
     /**
-     * Triggered on route deleted event.
+     * Triggered on deleted event.
      *
-     * @param event Route deleted event
+     * @param event Deleted event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onRouteDeletedEvent(final RouteDeletedEvent event) {
-        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+    public final void onDeletedEvent(final DeletedEvent event) {
+        if (!(event.getDeletable() instanceof Route)
+                || !event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
 
@@ -438,16 +438,6 @@ public class RouteActivity extends AppCompatActivity {
         intent.putExtra(ARG_ROUTE_JSON, new Gson().toJson(route));
         setResult(RouteListActivity.ROUTE_DELETED, intent);
         finish();
-    }
-
-    /**
-     * Triggered on marker inserted event.
-     *
-     * @param event Marker inserted event
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onMarkerInsertedEvent(final MarkerInsertedEvent event) {
-        refreshMarkers();
     }
 
     /**

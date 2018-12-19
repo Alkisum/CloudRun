@@ -19,14 +19,15 @@ import android.widget.TextView;
 
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.adapters.RoutesListAdapter;
-import com.alkisum.android.cloudrun.tasks.RouteDeleter;
-import com.alkisum.android.cloudrun.tasks.RouteRestorer;
-import com.alkisum.android.cloudrun.utils.Routes;
 import com.alkisum.android.cloudrun.dialogs.AddRouteDialog;
-import com.alkisum.android.cloudrun.events.RouteDeletedEvent;
-import com.alkisum.android.cloudrun.events.RouteInsertedEvent;
-import com.alkisum.android.cloudrun.events.RouteRestoredEvent;
+import com.alkisum.android.cloudrun.events.DeletedEvent;
+import com.alkisum.android.cloudrun.events.RefreshEvent;
+import com.alkisum.android.cloudrun.events.RestoredEvent;
+import com.alkisum.android.cloudrun.interfaces.Restorable;
 import com.alkisum.android.cloudrun.model.Route;
+import com.alkisum.android.cloudrun.tasks.Deleter;
+import com.alkisum.android.cloudrun.tasks.Restorer;
+import com.alkisum.android.cloudrun.utils.Routes;
 import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
@@ -288,7 +289,7 @@ public class RouteListActivity extends AppCompatActivity {
      * Execute the task to delete the selected routes.
      */
     private void deleteRoutes() {
-        new RouteDeleter(new Integer[]{SUBSCRIBER_ID}).execute();
+        new Deleter(new Integer[]{SUBSCRIBER_ID}, new Route()).execute();
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -298,8 +299,8 @@ public class RouteListActivity extends AppCompatActivity {
      *
      * @param routes Routes to restore
      */
-    private void restoreRoutes(final Route... routes) {
-        new RouteRestorer().execute(routes);
+    private void restoreRoutes(final Restorable... routes) {
+        new Restorer(new Route()).execute(routes);
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -324,45 +325,62 @@ public class RouteListActivity extends AppCompatActivity {
     }
 
     /**
-     * Triggered on route deleted event.
+     * Triggered on deleted event.
      *
-     * @param event Route deleted event
+     * @param event Deleted event
      */
+    @SuppressWarnings("unchecked")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onRouteDeletedEvent(final RouteDeletedEvent event) {
-        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+    public final void onDeletedEvent(final DeletedEvent event) {
+        if (!(event.getDeletable() instanceof Route)
+                || !event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
         progressBar.setVisibility(View.GONE);
         refreshList();
-        Snackbar.make(fab, R.string.route_delete_snackbar,
-                Snackbar.LENGTH_LONG)
-                .setAction(R.string.action_undo, new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        List<Route> routes = event.getDeletedRoutes();
-                        restoreRoutes(routes.toArray(new Route[0]));
-                    }
-                }).show();
+
+        // create snackbar
+        Snackbar snackbar = Snackbar.make(fab, R.string.route_delete_snackbar,
+                Snackbar.LENGTH_LONG);
+
+        // if the deleted entities are restorable, show UNDO action
+        if (Restorable.class.isAssignableFrom(
+                event.getDeletable().getClass())) {
+            // cast deletable entities to restorable entities
+            final List<? extends Restorable> routes =
+                    (List<? extends Restorable>) event.getDeletedEntities();
+            snackbar.setAction(R.string.action_undo,
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(final View v) {
+                            // restore routes
+                            restoreRoutes(routes.toArray(new Restorable[0]));
+                        }
+                    });
+        }
+        snackbar.show();
     }
 
     /**
-     * Triggered on route inserted event.
+     * Triggered on refresh event.
      *
-     * @param event Route inserted event
+     * @param event Refresh event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onRouteInsertedEvent(final RouteInsertedEvent event) {
+    public final void onRefreshEvent(final RefreshEvent event) {
         refreshList();
     }
 
     /**
-     * Triggered on route restored event.
+     * Triggered on restored event.
      *
-     * @param event Route restored event
+     * @param event Restored event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onRouteRestoredEvent(final RouteRestoredEvent event) {
+    public final void onRestoredEvent(final RestoredEvent event) {
+        if (!(event.getRestorable() instanceof Route)) {
+            return;
+        }
         progressBar.setVisibility(View.GONE);
         refreshList();
     }

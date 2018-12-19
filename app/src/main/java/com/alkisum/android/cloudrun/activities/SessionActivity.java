@@ -340,13 +340,14 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     /**
-     * Triggered on session deleted event.
+     * Triggered on deleted event.
      *
-     * @param event Session deleted event
+     * @param event Deleted event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onSessionDeletedEvent(final DeletedEvent event) {
-        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+    public final void onDeletedEvent(final DeletedEvent event) {
+        if (!(event.getDeletable() instanceof Session)
+                || !event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
 

@@ -7,9 +7,9 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.utils.Routes;
-import com.alkisum.android.cloudrun.events.RouteUpdatedEvent;
+import com.alkisum.android.cloudrun.events.RefreshEvent;
 import com.alkisum.android.cloudrun.model.Route;
+import com.alkisum.android.cloudrun.utils.Routes;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -57,7 +57,7 @@ public final class EditRouteDialog {
                                         final int which) {
                         Routes.updateRoute(route,
                                 routeName.getText().toString());
-                        EventBus.getDefault().post(new RouteUpdatedEvent());
+                        EventBus.getDefault().post(new RefreshEvent());
                     }
                 });
 
