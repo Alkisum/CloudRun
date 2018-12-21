@@ -25,14 +25,15 @@ import com.alkisum.android.cloudrun.dialogs.AddMarkerDialog;
 import com.alkisum.android.cloudrun.dialogs.EditMarkerDialog;
 import com.alkisum.android.cloudrun.dialogs.EditRouteDialog;
 import com.alkisum.android.cloudrun.events.DeletedEvent;
-import com.alkisum.android.cloudrun.events.MarkerDeletedEvent;
-import com.alkisum.android.cloudrun.events.MarkerRestoredEvent;
 import com.alkisum.android.cloudrun.events.RefreshEvent;
+import com.alkisum.android.cloudrun.events.RestoredEvent;
+import com.alkisum.android.cloudrun.interfaces.Deletable;
+import com.alkisum.android.cloudrun.interfaces.Restorable;
 import com.alkisum.android.cloudrun.model.Marker;
 import com.alkisum.android.cloudrun.model.Route;
 import com.alkisum.android.cloudrun.tasks.Deleter;
-import com.alkisum.android.cloudrun.tasks.MarkerDeleter;
-import com.alkisum.android.cloudrun.tasks.MarkerRestorer;
+import com.alkisum.android.cloudrun.tasks.Restorer;
+import com.alkisum.android.cloudrun.utils.Deletables;
 import com.alkisum.android.cloudrun.utils.Markers;
 import com.alkisum.android.cloudrun.utils.Routes;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -383,7 +384,9 @@ public class RouteActivity extends AppCompatActivity {
      * Execute the task to delete the selected routes.
      */
     private void deleteRoute() {
-        new Deleter(new Integer[]{SUBSCRIBER_ID}, new Route()).execute();
+        Deletable[] routes = Routes.getSelectedRoutes().toArray(
+                new Deletable[0]);
+        new Deleter(new Integer[]{SUBSCRIBER_ID}, new Route()).execute(routes);
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -394,7 +397,7 @@ public class RouteActivity extends AppCompatActivity {
      * @param marker Marker to delete
      */
     private void deleteMarker(final Marker marker) {
-        new MarkerDeleter().execute(marker);
+        new Deleter(new Integer[]{SUBSCRIBER_ID}, new Marker()).execute(marker);
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -404,8 +407,8 @@ public class RouteActivity extends AppCompatActivity {
      *
      * @param markers Markers to restore
      */
-    private void restoreMarkers(final Marker... markers) {
-        new MarkerRestorer().execute(markers);
+    private void restoreMarkers(final Restorable... markers) {
+        new Restorer(new Marker()).execute(markers);
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -429,45 +432,53 @@ public class RouteActivity extends AppCompatActivity {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public final void onDeletedEvent(final DeletedEvent event) {
-        if (!(event.getDeletable() instanceof Route)
-                || !event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
             return;
         }
+        if (event.getDeletable() instanceof Route) {
+            // handle Route entities
+            Intent intent = new Intent();
+            intent.putExtra(ARG_ROUTE_JSON, new Gson().toJson(route));
+            setResult(RouteListActivity.ROUTE_DELETED, intent);
+            finish();
 
-        Intent intent = new Intent();
-        intent.putExtra(ARG_ROUTE_JSON, new Gson().toJson(route));
-        setResult(RouteListActivity.ROUTE_DELETED, intent);
-        finish();
+        } else if (event.getDeletable() instanceof Marker) {
+            // handle Marker entities
+            progressBar.setVisibility(View.GONE);
+            refreshMarkers();
+
+            // create snackbar
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.route_layout),
+                    R.string.marker_delete_snackbar, Snackbar.LENGTH_LONG);
+
+            // if the deleted entities are restorable, show UNDO action
+            if (Restorable.class.isAssignableFrom(
+                    event.getDeletable().getClass())) {
+                // convert deletable entities to restorable entities
+                final Restorable[] markers = Deletables.toRestorables(
+                        event.getDeletedEntities());
+                snackbar.setAction(R.string.action_undo,
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(final View v) {
+                                restoreMarkers(markers);
+                            }
+                        });
+            }
+            snackbar.show();
+        }
     }
 
     /**
-     * Triggered on marker deleted event.
+     * Triggered on restored event.
      *
-     * @param event Marker deleted event
+     * @param event Restored event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onMarkerDeletedEvent(final MarkerDeletedEvent event) {
-        progressBar.setVisibility(View.GONE);
-        refreshMarkers();
-
-        Snackbar.make(findViewById(R.id.route_layout),
-                R.string.marker_delete_snackbar,
-                Snackbar.LENGTH_LONG)
-                .setAction(R.string.action_undo, new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        restoreMarkers(event.getDeletedMarkers());
-                    }
-                }).show();
-    }
-
-    /**
-     * Triggered on marker restored event.
-     *
-     * @param event Marker restored event
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onMarkerRestoredEvent(final MarkerRestoredEvent event) {
+    public final void onRestoredEvent(final RestoredEvent event) {
+        if (!(event.getRestorable() instanceof Marker)) {
+            return;
+        }
         progressBar.setVisibility(View.GONE);
         refreshMarkers();
     }

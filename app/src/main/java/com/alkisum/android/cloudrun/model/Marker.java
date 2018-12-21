@@ -1,14 +1,18 @@
 package com.alkisum.android.cloudrun.model;
 
+import com.alkisum.android.cloudrun.database.Db;
+import com.alkisum.android.cloudrun.interfaces.Deletable;
+import com.alkisum.android.cloudrun.interfaces.Restorable;
+
+import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToOne;
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.DaoException;
 
 @Entity
-public class Marker {
+public class Marker implements Deletable, Restorable {
 
     @Id(autoincrement = true)
     private Long id;
@@ -157,6 +161,26 @@ public class Marker {
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    @Override
+    public Deletable[] deleteEntities(Deletable... deletables) {
+        // delete
+        for (Deletable deletable : deletables) {
+            ((Marker) deletable).delete();
+        }
+        return deletables;
+    }
+
+    @Override
+    public void restore(Restorable[] restorables) {
+        // get DAO
+        MarkerDao markerDao = Db.getInstance().getDaoSession().getMarkerDao();
+
+        // restore markers
+        for (Restorable restorable : restorables) {
+            markerDao.insert((Marker) restorable);
+        }
     }
 
     /** called by internal mechanisms, do not call yourself. */

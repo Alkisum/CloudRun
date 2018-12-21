@@ -21,15 +21,16 @@ import com.alkisum.android.cloudlib.net.ConnectDialog;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.tasks.Deleter;
-import com.alkisum.android.cloudrun.utils.Sessions;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.DeletedEvent;
+import com.alkisum.android.cloudrun.interfaces.Deletable;
+import com.alkisum.android.cloudrun.interfaces.Jsonable;
 import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.Session;
-import com.alkisum.android.cloudrun.interfaces.Jsonable;
 import com.alkisum.android.cloudrun.net.Uploader;
+import com.alkisum.android.cloudrun.tasks.Deleter;
 import com.alkisum.android.cloudrun.utils.Format;
+import com.alkisum.android.cloudrun.utils.Sessions;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
@@ -251,7 +252,10 @@ public class SessionActivity extends AppCompatActivity implements
      * Execute the task to delete the selected sessions.
      */
     private void deleteSession() {
-        new Deleter(new Integer[]{SUBSCRIBER_ID}, new Session()).execute();
+        Deletable[] sessions = Sessions.getSelectedSessions().toArray(
+                new Deletable[0]);
+        new Deleter(new Integer[]{SUBSCRIBER_ID},
+                new Session()).execute(sessions);
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }

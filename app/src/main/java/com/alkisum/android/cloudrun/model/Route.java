@@ -3,7 +3,6 @@ package com.alkisum.android.cloudrun.model;
 import com.alkisum.android.cloudrun.database.Db;
 import com.alkisum.android.cloudrun.interfaces.Deletable;
 import com.alkisum.android.cloudrun.interfaces.Restorable;
-import com.alkisum.android.cloudrun.utils.Routes;
 
 import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
@@ -135,17 +134,16 @@ public class Route implements Deletable, Restorable {
     }
 
     @Override
-    public List<? extends Deletable> deleteSelected() {
+    public Deletable[] deleteEntities(Deletable... deletables) {
         // get DAO
         MarkerDao markerDao = Db.getInstance().getDaoSession().getMarkerDao();
 
         // delete selected routes and markers
-        List<Route> routes = Routes.getSelectedRoutes();
-        for (Route route : routes) {
-            markerDao.deleteInTx(route.getMarkers());
-            route.delete();
+        for (Deletable deletable : deletables) {
+            markerDao.deleteInTx(((Route)deletable).getMarkers());
+            ((Route)deletable).delete();
         }
-        return routes;
+        return deletables;
     }
 
     @Override

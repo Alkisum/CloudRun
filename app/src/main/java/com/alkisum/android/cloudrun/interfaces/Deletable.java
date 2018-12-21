@@ -1,7 +1,5 @@
 package com.alkisum.android.cloudrun.interfaces;
 
-import java.util.List;
-
 /**
  * Interface for entities able to be deleted from the database.
  *
@@ -12,9 +10,10 @@ import java.util.List;
 public interface Deletable {
 
     /**
-     * Delete the selected entities.
+     * Delete the given entities.
      *
+     * @param deletables Entities to delete
      * @return List of deleted entities
      */
-    List<? extends Deletable> deleteSelected();
+    Deletable[] deleteEntities(Deletable... deletables);
 }

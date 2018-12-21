@@ -3,8 +3,6 @@ package com.alkisum.android.cloudrun.events;
 import com.alkisum.android.cloudlib.events.FilteredEvent;
 import com.alkisum.android.cloudrun.interfaces.Deletable;
 
-import java.util.List;
-
 /**
  * Class defining deleted event for EventBus.
  *
@@ -22,7 +20,7 @@ public class DeletedEvent extends FilteredEvent {
     /**
      * Deleted entities.
      */
-    private final List<? extends Deletable> deletedEntities;
+    private final Deletable[] deletedEntities;
 
     /**
      * DeletedEvent constructor.
@@ -33,7 +31,7 @@ public class DeletedEvent extends FilteredEvent {
      */
     public DeletedEvent(final Integer[] subscriberIds,
                         final Deletable deletable,
-                        final List<? extends Deletable> deletedEntities) {
+                        final Deletable[] deletedEntities) {
         super(subscriberIds);
         this.deletable = deletable;
         this.deletedEntities = deletedEntities;
@@ -49,7 +47,7 @@ public class DeletedEvent extends FilteredEvent {
     /**
      * @return Deleted entities
      */
-    public final List<? extends Deletable> getDeletedEntities() {
+    public final Deletable[] getDeletedEntities() {
         return deletedEntities;
     }
 }

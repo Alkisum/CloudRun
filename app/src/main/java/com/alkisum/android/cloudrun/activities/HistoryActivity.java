@@ -25,17 +25,19 @@ import com.alkisum.android.cloudlib.net.ConnectDialog;
 import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.adapters.HistoryListAdapter;
-import com.alkisum.android.cloudrun.utils.Sessions;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.DeletedEvent;
 import com.alkisum.android.cloudrun.events.InsertedEvent;
 import com.alkisum.android.cloudrun.events.RestoredEvent;
+import com.alkisum.android.cloudrun.interfaces.Deletable;
 import com.alkisum.android.cloudrun.interfaces.Restorable;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.net.Downloader;
 import com.alkisum.android.cloudrun.net.Uploader;
 import com.alkisum.android.cloudrun.tasks.Deleter;
 import com.alkisum.android.cloudrun.tasks.Restorer;
+import com.alkisum.android.cloudrun.utils.Deletables;
+import com.alkisum.android.cloudrun.utils.Sessions;
 import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
@@ -370,8 +372,10 @@ public class HistoryActivity extends AppCompatActivity implements
      * Execute the task to delete the selected sessions.
      */
     private void deleteSessions() {
+        Deletable[] sessions = Sessions.getSelectedSessions().toArray(
+                new Deletable[0]);
         new Deleter(new Integer[]{SUBSCRIBER_ID},
-                new Session()).execute();
+                new Session()).execute(sessions);
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -604,16 +608,15 @@ public class HistoryActivity extends AppCompatActivity implements
         // if the deleted entities are restorable, show UNDO action
         if (Restorable.class.isAssignableFrom(
                 event.getDeletable().getClass())) {
-            // cast deletable entities to restorable entities
-            final List<? extends Restorable> sessions =
-                    (List<? extends Restorable>) event.getDeletedEntities();
+            // convert deletable entities to restorable entities
+            final Restorable[] sessions = Deletables.toRestorables(
+                    event.getDeletedEntities());
             snackbar.setAction(R.string.action_undo,
                     new View.OnClickListener() {
                         @Override
                         public void onClick(final View v) {
                             // restore sessions
-                            restoreSessions(sessions.toArray(
-                                    new Restorable[0]));
+                            restoreSessions(sessions);
                         }
                     });
         }

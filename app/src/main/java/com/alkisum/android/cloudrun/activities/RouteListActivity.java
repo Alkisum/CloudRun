@@ -23,10 +23,12 @@ import com.alkisum.android.cloudrun.dialogs.AddRouteDialog;
 import com.alkisum.android.cloudrun.events.DeletedEvent;
 import com.alkisum.android.cloudrun.events.RefreshEvent;
 import com.alkisum.android.cloudrun.events.RestoredEvent;
+import com.alkisum.android.cloudrun.interfaces.Deletable;
 import com.alkisum.android.cloudrun.interfaces.Restorable;
 import com.alkisum.android.cloudrun.model.Route;
 import com.alkisum.android.cloudrun.tasks.Deleter;
 import com.alkisum.android.cloudrun.tasks.Restorer;
+import com.alkisum.android.cloudrun.utils.Deletables;
 import com.alkisum.android.cloudrun.utils.Routes;
 import com.google.gson.Gson;
 
@@ -289,7 +291,9 @@ public class RouteListActivity extends AppCompatActivity {
      * Execute the task to delete the selected routes.
      */
     private void deleteRoutes() {
-        new Deleter(new Integer[]{SUBSCRIBER_ID}, new Route()).execute();
+        Deletable[] routes = Routes.getSelectedRoutes().toArray(
+                new Deletable[0]);
+        new Deleter(new Integer[]{SUBSCRIBER_ID}, new Route()).execute(routes);
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -346,15 +350,15 @@ public class RouteListActivity extends AppCompatActivity {
         // if the deleted entities are restorable, show UNDO action
         if (Restorable.class.isAssignableFrom(
                 event.getDeletable().getClass())) {
-            // cast deletable entities to restorable entities
-            final List<? extends Restorable> routes =
-                    (List<? extends Restorable>) event.getDeletedEntities();
+            // convert deletable entities to restorable entities
+            final Restorable[] routes = Deletables.toRestorables(
+                    event.getDeletedEntities());
             snackbar.setAction(R.string.action_undo,
                     new View.OnClickListener() {
                         @Override
                         public void onClick(final View v) {
                             // restore routes
-                            restoreRoutes(routes.toArray(new Restorable[0]));
+                            restoreRoutes(routes);
                         }
                     });
         }

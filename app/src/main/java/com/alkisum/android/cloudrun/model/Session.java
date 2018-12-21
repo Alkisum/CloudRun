@@ -2,12 +2,12 @@ package com.alkisum.android.cloudrun.model;
 
 import com.alkisum.android.cloudlib.file.json.JsonFile;
 import com.alkisum.android.cloudrun.database.Db;
-import com.alkisum.android.cloudrun.utils.Sessions;
 import com.alkisum.android.cloudrun.interfaces.Deletable;
 import com.alkisum.android.cloudrun.interfaces.Insertable;
 import com.alkisum.android.cloudrun.interfaces.Jsonable;
 import com.alkisum.android.cloudrun.interfaces.Restorable;
 import com.alkisum.android.cloudrun.utils.Format;
+import com.alkisum.android.cloudrun.utils.Sessions;
 
 import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
@@ -214,18 +214,17 @@ public class Session implements Jsonable, Insertable, Deletable, Restorable {
     }
 
     @Override
-    public List<? extends Deletable> deleteSelected() {
+    public Deletable[] deleteEntities(Deletable... deletables) {
         // get DAO
         DataPointDao dataPointDao = Db.getInstance().getDaoSession()
                 .getDataPointDao();
 
         // delete selected sessions and datapoints
-        List<Session> sessions = Sessions.getSelectedSessions();
-        for (Session session : sessions) {
-            dataPointDao.deleteInTx(session.getDataPoints());
-            session.delete();
+        for (Deletable deletable : deletables) {
+            dataPointDao.deleteInTx(((Session) deletable).getDataPoints());
+            ((Session) deletable).delete();
         }
-        return sessions;
+        return deletables;
     }
 
     @Override
@@ -242,7 +241,9 @@ public class Session implements Jsonable, Insertable, Deletable, Restorable {
         }
     }
 
-    /** called by internal mechanisms, do not call yourself. */
+    /**
+     * called by internal mechanisms, do not call yourself.
+     */
     @Generated(hash = 1458438772)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;

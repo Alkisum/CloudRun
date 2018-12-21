@@ -7,8 +7,6 @@ import com.alkisum.android.cloudrun.interfaces.Deletable;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.List;
-
 /**
  * Class deleting the selected entities from the database.
  *
@@ -16,8 +14,7 @@ import java.util.List;
  * @version 4.0
  * @since 2.0
  */
-public class Deleter
-        extends AsyncTask<Void, Void, List<? extends Deletable>> {
+public class Deleter extends AsyncTask<Deletable, Void, Deletable[]> {
 
     /**
      * Subscriber ids allowed to process the events.
@@ -42,14 +39,12 @@ public class Deleter
     }
 
     @Override
-    protected final List<? extends Deletable> doInBackground(
-            final Void... voids) {
-        return deletable.deleteSelected();
+    protected final Deletable[] doInBackground(final Deletable... deletables) {
+        return deletable.deleteEntities(deletables);
     }
 
     @Override
-    protected final void onPostExecute(
-            final List<? extends Deletable> deletables) {
+    protected final void onPostExecute(final Deletable[] deletables) {
         EventBus.getDefault().post(new DeletedEvent(subscriberIds, deletable,
                 deletables));
     }
