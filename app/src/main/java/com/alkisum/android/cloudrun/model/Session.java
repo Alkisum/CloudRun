@@ -241,9 +241,7 @@ public class Session implements Jsonable, Insertable, Deletable, Restorable {
         }
     }
 
-    /**
-     * called by internal mechanisms, do not call yourself.
-     */
+    /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 1458438772)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;

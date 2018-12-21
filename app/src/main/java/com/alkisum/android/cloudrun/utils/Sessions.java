@@ -244,7 +244,7 @@ public final class Sessions {
                 Json.SESSION_DISTANCE)).floatValue());
 
         // insert session
-        daoSession.insert(session);
+        sessionDao.insert(session);
 
         // build datapoints
         List<DataPoint> dataPoints = new ArrayList<>();

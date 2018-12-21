@@ -1,8 +1,12 @@
 package com.alkisum.android.cloudrun.model;
 
+import com.alkisum.android.cloudlib.file.json.JsonFile;
 import com.alkisum.android.cloudrun.database.Db;
 import com.alkisum.android.cloudrun.interfaces.Deletable;
+import com.alkisum.android.cloudrun.interfaces.Insertable;
+import com.alkisum.android.cloudrun.interfaces.Jsonable;
 import com.alkisum.android.cloudrun.interfaces.Restorable;
+import com.alkisum.android.cloudrun.utils.Routes;
 
 import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
@@ -10,11 +14,13 @@ import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.ToMany;
 import org.greenrobot.greendao.annotation.Transient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
 @Entity
-public class Route implements Deletable, Restorable {
+public class Route implements Jsonable, Insertable, Deletable, Restorable {
 
     @Id(autoincrement = true)
     private Long id;
@@ -131,6 +137,35 @@ public class Route implements Deletable, Restorable {
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    @Override
+    public JSONObject buildJson() throws JSONException {
+        return Routes.buildJson(this);
+    }
+
+    @Override
+    public String buildJsonFileName() {
+        String filename = Routes.Json.FILE_PREFIX + this.getName()
+                + JsonFile.FILE_EXT;
+        return filename.replaceAll("[^a-zA-Z0-9.\\-]", "_");
+    }
+
+    @Override
+    public String getFileNameRegex() {
+        return Routes.Json.FILE_REGEX;
+    }
+
+    @Override
+    public void insertFromJson(JSONObject jsonObject) throws JSONException {
+        int version = jsonObject.getInt(Routes.Json.VERSION);
+        switch (version) {
+            case 1:
+                Routes.buildFromJsonVersion1(jsonObject);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
