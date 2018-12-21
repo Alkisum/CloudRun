@@ -463,7 +463,7 @@ public class HistoryActivity extends AppCompatActivity implements
                 progressBar.setVisibility(View.VISIBLE);
                 break;
             case DownloadEvent.NO_FILE:
-                Snackbar.make(fab, R.string.download_no_file_snackbar,
+                Snackbar.make(fab, R.string.session_download_no_file_snackbar,
                         Snackbar.LENGTH_LONG).show();
                 progressBar.setVisibility(View.GONE);
                 break;
@@ -516,7 +516,7 @@ public class HistoryActivity extends AppCompatActivity implements
         switch (event.getResult()) {
             case InsertedEvent.OK:
                 refreshList();
-                Snackbar.make(fab, R.string.download_success_snackbar,
+                Snackbar.make(fab, R.string.session_download_success_snackbar,
                         Snackbar.LENGTH_LONG).show();
                 progressBar.setVisibility(View.GONE);
                 break;

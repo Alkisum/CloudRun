@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,19 +17,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
+import com.alkisum.android.cloudlib.events.JsonFileWriterEvent;
+import com.alkisum.android.cloudlib.events.UploadEvent;
+import com.alkisum.android.cloudlib.net.ConnectDialog;
+import com.alkisum.android.cloudlib.net.ConnectInfo;
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.dialogs.AddMarkerDialog;
 import com.alkisum.android.cloudrun.dialogs.EditMarkerDialog;
 import com.alkisum.android.cloudrun.dialogs.EditRouteDialog;
+import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.DeletedEvent;
 import com.alkisum.android.cloudrun.events.RefreshEvent;
 import com.alkisum.android.cloudrun.events.RestoredEvent;
 import com.alkisum.android.cloudrun.interfaces.Deletable;
+import com.alkisum.android.cloudrun.interfaces.Jsonable;
 import com.alkisum.android.cloudrun.interfaces.Restorable;
 import com.alkisum.android.cloudrun.model.Marker;
 import com.alkisum.android.cloudrun.model.Route;
+import com.alkisum.android.cloudrun.net.Uploader;
 import com.alkisum.android.cloudrun.tasks.Deleter;
 import com.alkisum.android.cloudrun.tasks.Restorer;
 import com.alkisum.android.cloudrun.utils.Deletables;
@@ -44,6 +51,7 @@ import com.google.gson.Gson;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -68,7 +76,8 @@ import butterknife.ButterKnife;
  * @version 4.0
  * @since 4.0
  */
-public class RouteActivity extends AppCompatActivity {
+public class RouteActivity extends AppCompatActivity implements
+        ConnectDialog.ConnectDialogListener {
 
     /**
      * Subscriber id to use when receiving event.
@@ -85,6 +94,11 @@ public class RouteActivity extends AppCompatActivity {
      * RouteListActivity when the route has been deleted.
      */
     static final String ARG_ROUTE_JSON = "arg_route_json";
+
+    /**
+     * Operation id for upload.
+     */
+    private static final int UPLOAD_OPERATION = 1;
 
     /**
      * Route instance.
@@ -156,6 +170,13 @@ public class RouteActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_edit:
                 EditRouteDialog.show(this, route);
+                return true;
+            case R.id.action_upload:
+                ConnectDialog connectDialogUpload =
+                        ConnectDialog.newInstance(UPLOAD_OPERATION);
+                connectDialogUpload.setCallback(this);
+                connectDialogUpload.show(getSupportFragmentManager(),
+                        ConnectDialog.FRAGMENT_TAG);
                 return true;
             case R.id.action_delete:
                 route.setSelected(true);
@@ -233,7 +254,7 @@ public class RouteActivity extends AppCompatActivity {
      */
     private void setMapBounds(final List<GeoPoint> geoPoints) {
         final BoundingBox boundingBox = BoundingBox.fromGeoPoints(geoPoints);
-        final ConstraintLayout layout = findViewById(R.id.route_layout);
+        final RelativeLayout layout = findViewById(R.id.route_layout);
         ViewTreeObserver vto = layout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -413,6 +434,89 @@ public class RouteActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public final void onSubmit(final int operation,
+                               final ConnectInfo connectInfo) {
+        if (operation == UPLOAD_OPERATION) {
+            try {
+                Intent intent = new Intent(this, RouteActivity.class);
+                intent.putExtra(ARG_ROUTE_ID, route.getId());
+                List<Jsonable> routes = new ArrayList<>();
+                routes.add(route);
+                new Uploader(getApplicationContext(), connectInfo, intent,
+                        routes, SUBSCRIBER_ID);
+            } catch (JSONException e) {
+                ErrorDialog.show(this,
+                        getString(R.string.upload_failure_title),
+                        e.getMessage(), null);
+            }
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setIndeterminate(true);
+                progressBar.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    /**
+     * Triggered on JSON file writer event.
+     *
+     * @param event JSON file writer event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final void onJsonFileWriterEvent(final JsonFileWriterEvent event) {
+        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+            return;
+        }
+        switch (event.getResult()) {
+            case JsonFileWriterEvent.OK:
+                progressBar.setVisibility(View.VISIBLE);
+                break;
+            case JsonFileWriterEvent.ERROR:
+                ErrorDialog.show(this,
+                        getString(R.string.upload_writing_failure_title),
+                        event.getException().getMessage(), null);
+                progressBar.setVisibility(View.GONE);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Triggered on upload event.
+     *
+     * @param event Upload event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public final void onUploadEvent(final UploadEvent event) {
+        if (!event.isSubscriberAllowed(SUBSCRIBER_ID)) {
+            return;
+        }
+        switch (event.getResult()) {
+            case UploadEvent.UPLOADING:
+                progressBar.setVisibility(View.VISIBLE);
+                break;
+            case UploadEvent.OK:
+                Snackbar.make(findViewById(R.id.route_layout),
+                        R.string.route_upload_success_snackbar,
+                        Snackbar.LENGTH_LONG).show();
+                progressBar.setVisibility(View.GONE);
+                break;
+            case UploadEvent.ERROR:
+                ErrorDialog.show(this, getString(
+                        R.string.upload_failure_title), event.getMessage(),
+                        null);
+                progressBar.setVisibility(View.GONE);
+                break;
+            default:
+                break;
+        }
+    }
+
     /**
      * Triggered on refresh event.
      *
@@ -480,16 +584,6 @@ public class RouteActivity extends AppCompatActivity {
             return;
         }
         progressBar.setVisibility(View.GONE);
-        refreshMarkers();
-    }
-
-    /**
-     * Triggered on marker updated event.
-     *
-     * @param event Marker updated event
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public final void onMarkerUpdatedEvent(final MarkerUpdatedEvent event) {
         refreshMarkers();
     }
 }

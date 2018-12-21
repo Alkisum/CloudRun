@@ -76,13 +76,13 @@
     <string name="session_label_pace">pace (min/km)</string>
     <string name="session_no_data_available">No data available</string>
     <string name="session_delete_snackbar">Session deleted</string>
+    <string name="session_download_success_snackbar">Sessions downloaded</string>
+    <string name="session_download_no_file_snackbar">No sessions to be downloaded</string>
 
     <!-- General Cloud Operations -->
     <string name="upload_writing_failure_title">File creation failed</string>
     <string name="upload_failure_title">Upload failed</string>
     <string name="download_failure_title">Download failed</string>
-    <string name="download_success_snackbar">Sessions downloaded</string>
-    <string name="download_no_file_snackbar">No sessions to be downloaded</string>
     <string name="download_reading_failure_title">File parsing failed</string>
     <string name="download_insert_failure_title">Insertion into database failed</string>
 
@@ -110,13 +110,14 @@
     <string name="about_title">About CloudRun</string>
     <string name="about_github">https://github.com/Alkisum/CloudRun/</string>
 
-    <!-- Route List -->
+    <!-- Route -->
     <string name="route_title">Routes</string>
     <string name="route_no_route">No routes available</string>
     <string name="route_delete_snackbar">Routes deleted</string>
     <string name="route_add_dialog">Add route</string>
     <string name="route_edit_dialog">Edit route</string>
     <string name="route_hint_name">Name</string>
+    <string name="route_upload_success_snackbar">Route uploaded</string>
 
     <!-- Marker -->
     <string name="marker_add_dialog">Add marker</string>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/route_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.alkisum.android.cloudrun.activities.RouteActivity"
-    android:id="@+id/route_layout">
+    tools:context=".activities.RouteActivity">
 
     <org.osmdroid.views.MapView
         android:id="@+id/map"
@@ -26,4 +26,4 @@
         android:indeterminate="true"
         android:visibility="gone"/>
 
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>
