@@ -12,7 +12,7 @@
         <item
             android:id="@+id/nav_routes"
             android:icon="@drawable/ic_timeline_white_24dp"
-            android:title="@string/route_title"/>
+            android:title="@string/routes_title"/>
     </group>
 
     <group>

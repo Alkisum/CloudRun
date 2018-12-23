@@ -200,6 +200,10 @@ public class Session implements Jsonable, Insertable, Deletable, Restorable {
 
     @Override
     public void insertFromJson(JSONObject jsonObject) throws JSONException {
+        if (!jsonObject.has(Sessions.Json.SESSION)) {
+            // JSON file does not contain any session object
+            return;
+        }
         int version = jsonObject.getInt(Sessions.Json.VERSION);
         switch (version) {
             case 1:

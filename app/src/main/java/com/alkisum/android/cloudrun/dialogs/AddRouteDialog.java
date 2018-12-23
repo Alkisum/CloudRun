@@ -41,7 +41,7 @@ public final class AddRouteDialog {
         builder.setView(view);
 
         // set dialog title
-        builder.setTitle(R.string.route_add_dialog);
+        builder.setTitle(R.string.routes_add_dialog);
 
         // get edit text for route name
         final EditText routeName = view.findViewById(R.id.route_name);

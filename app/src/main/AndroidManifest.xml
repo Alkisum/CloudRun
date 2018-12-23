@@ -54,7 +54,7 @@
         <activity
             android:name=".activities.RouteListActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/route_title"
+            android:label="@string/routes_title"
             android:parentActivityName=".activities.MonitorActivity"/>
         <activity
             android:name=".activities.RouteActivity"

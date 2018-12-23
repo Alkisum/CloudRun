@@ -158,6 +158,10 @@ public class Route implements Jsonable, Insertable, Deletable, Restorable {
 
     @Override
     public void insertFromJson(JSONObject jsonObject) throws JSONException {
+        if (!jsonObject.has(Routes.Json.ROUTE)) {
+            // JSON file does not contain any route object
+            return;
+        }
         int version = jsonObject.getInt(Routes.Json.VERSION);
         switch (version) {
             case 1:

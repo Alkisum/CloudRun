@@ -267,7 +267,7 @@ public final class Routes {
         /**
          * JSON name for route object.
          */
-        static final String ROUTE = "route";
+        public static final String ROUTE = "route";
 
         /**
          * JSON name for route name.
