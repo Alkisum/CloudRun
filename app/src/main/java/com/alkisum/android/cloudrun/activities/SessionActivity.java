@@ -45,6 +45,7 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
 
@@ -209,6 +210,8 @@ public class SessionActivity extends AppCompatActivity implements
     private void initMap() {
         Configuration.getInstance().setUserAgentValue(
                 BuildConfig.APPLICATION_ID);
+        mapView.getZoomController().setVisibility(
+                CustomZoomButtonsController.Visibility.NEVER);
         mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
         mapView.setMultiTouchControls(true);
 

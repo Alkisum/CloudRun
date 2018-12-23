@@ -28,6 +28,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Overlay;
@@ -138,7 +139,8 @@ public class MapActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        mapView.setBuiltInZoomControls(false);
+        mapView.getZoomController().setVisibility(
+                CustomZoomButtonsController.Visibility.NEVER);
         mapView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(final View v, final MotionEvent event) {

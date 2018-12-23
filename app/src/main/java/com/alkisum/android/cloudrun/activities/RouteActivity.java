@@ -57,6 +57,7 @@ import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.MapEventsOverlay;
@@ -199,7 +200,8 @@ public class RouteActivity extends AppCompatActivity implements
         mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
         mapView.setMultiTouchControls(true);
         mapView.getController().setZoom(4d);
-        mapView.setBuiltInZoomControls(false);
+        mapView.getZoomController().setVisibility(
+                CustomZoomButtonsController.Visibility.NEVER);
 
         // add overlay for map events
         mapEventsOverlay = new MapEventsOverlay(mapEventsReceiver);
