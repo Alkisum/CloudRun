@@ -213,7 +213,7 @@ public class LocationUpdatesService extends Service {
     /**
      * BroadcastReceiver for notification actions.
      */
-    private BroadcastReceiver actionReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver actionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
             if (intent.getAction() == null) {

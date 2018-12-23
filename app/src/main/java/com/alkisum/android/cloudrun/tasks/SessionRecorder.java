@@ -32,7 +32,7 @@ public class SessionRecorder {
     /**
      * EventBus instance.
      */
-    private EventBus eventBus;
+    private final EventBus eventBus;
 
     /**
      * Session instance.

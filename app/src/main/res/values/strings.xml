@@ -39,7 +39,6 @@
     <string name="action_undo">Undo</string>
     <string name="action_edit">Edit</string>
     <string name="action_routes">Activate routes</string>
-    <string name="action_start">Start</string>
     <string name="action_resume">Resume</string>
     <string name="action_pause">Pause</string>
     <string name="action_stop">Stop</string>
