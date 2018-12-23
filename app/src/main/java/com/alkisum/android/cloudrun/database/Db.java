@@ -6,6 +6,8 @@ import android.util.Log;
 
 import com.alkisum.android.cloudrun.model.DaoMaster;
 import com.alkisum.android.cloudrun.model.DaoSession;
+import com.alkisum.android.cloudrun.model.MarkerDao;
+import com.alkisum.android.cloudrun.model.RouteDao;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.model.SessionDao;
 
@@ -102,6 +104,7 @@ public final class Db {
                               final int newVersion) {
             Log.i(TAG, "Upgrade database from " + oldVersion
                     + " to " + newVersion);
+
             if (oldVersion < 2) {
                 // Update duration
                 Log.i(TAG, "Add column DURATION in table SESSION");
@@ -115,6 +118,15 @@ public final class Db {
                     session.setDuration(session.getEnd() - session.getStart());
                 }
                 sessionDao.updateInTx(sessions);
+            }
+
+            // migration to schema version 3 has been forgotten and
+            // fixed right away with migration to schema version 4 (app v4.0)
+
+            if (oldVersion < 4) {
+                // create tables route and marker
+                RouteDao.createTable(db, true);
+                MarkerDao.createTable(db, true);
             }
         }
     }
