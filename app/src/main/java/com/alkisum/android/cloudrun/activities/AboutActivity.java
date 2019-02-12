@@ -5,8 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
@@ -14,6 +12,9 @@ import com.alkisum.android.cloudrun.utils.Format;
 import com.alkisum.android.cloudrun.utils.Pref;
 
 import java.util.Date;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 /**
  * Activity listing information about the application.

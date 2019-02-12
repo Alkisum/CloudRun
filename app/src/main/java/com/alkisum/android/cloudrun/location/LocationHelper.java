@@ -14,12 +14,9 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.utils.Markers;
 import com.alkisum.android.cloudrun.dialogs.ErrorDialog;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.DistanceEvent;
@@ -27,6 +24,7 @@ import com.alkisum.android.cloudrun.events.MarkerAlertEvent;
 import com.alkisum.android.cloudrun.events.PaceEvent;
 import com.alkisum.android.cloudrun.events.SpeedEvent;
 import com.alkisum.android.cloudrun.model.Marker;
+import com.alkisum.android.cloudrun.utils.Markers;
 import com.alkisum.android.cloudrun.utils.Pref;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -49,6 +47,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 
 /**
  * Helper class for location operations.

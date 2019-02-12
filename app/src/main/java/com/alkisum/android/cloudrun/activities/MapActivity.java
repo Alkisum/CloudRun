@@ -3,9 +3,6 @@ package com.alkisum.android.cloudrun.activities;
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -13,8 +10,6 @@ import android.view.View;
 
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.utils.Markers;
-import com.alkisum.android.cloudrun.utils.Sessions;
 import com.alkisum.android.cloudrun.events.CoordinateEvent;
 import com.alkisum.android.cloudrun.events.GpsStatusEvent;
 import com.alkisum.android.cloudrun.location.Coordinate;
@@ -22,6 +17,8 @@ import com.alkisum.android.cloudrun.model.DataPoint;
 import com.alkisum.android.cloudrun.model.Marker;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.ui.GpsStatus;
+import com.alkisum.android.cloudrun.utils.Markers;
+import com.alkisum.android.cloudrun.utils.Sessions;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -38,6 +35,9 @@ import org.osmdroid.views.overlay.Polyline;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

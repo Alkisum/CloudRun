@@ -2,7 +2,6 @@ package com.alkisum.android.cloudrun.dialogs;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.EditText;
 
@@ -12,6 +11,8 @@ import com.alkisum.android.cloudrun.model.Marker;
 import com.alkisum.android.cloudrun.utils.Markers;
 
 import org.greenrobot.eventbus.EventBus;
+
+import androidx.appcompat.app.AlertDialog;
 
 /**
  * Dialog to edit an existing marker.

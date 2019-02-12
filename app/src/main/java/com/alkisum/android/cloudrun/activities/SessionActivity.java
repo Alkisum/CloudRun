@@ -2,10 +2,6 @@ package com.alkisum.android.cloudrun.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,6 +27,7 @@ import com.alkisum.android.cloudrun.net.Uploader;
 import com.alkisum.android.cloudrun.tasks.Deleter;
 import com.alkisum.android.cloudrun.utils.Format;
 import com.alkisum.android.cloudrun.utils.Sessions;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
@@ -52,6 +49,9 @@ import org.osmdroid.views.overlay.Polyline;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

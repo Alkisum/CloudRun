@@ -14,17 +14,18 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 
 import com.alkisum.android.cloudrun.R;
 import com.alkisum.android.cloudrun.activities.MonitorActivity;
-import com.alkisum.android.cloudrun.utils.Sessions;
 import com.alkisum.android.cloudrun.events.SessionActionEvent;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.utils.Format;
+import com.alkisum.android.cloudrun.utils.Sessions;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import androidx.core.app.NotificationCompat;
 
 /**
  * Bound and started service that can be promoted to a foreground service.

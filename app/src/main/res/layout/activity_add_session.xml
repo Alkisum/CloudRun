@@ -5,7 +5,7 @@
                 android:layout_height="match_parent"
                 tools:context=".activities.AddSessionActivity">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/add_session_toolbar"
         style="@style/toolbar"/>
 

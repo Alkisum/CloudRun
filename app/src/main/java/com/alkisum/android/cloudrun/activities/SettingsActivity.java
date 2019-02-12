@@ -6,15 +6,16 @@ import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 import com.alkisum.android.cloudlib.utils.CloudPref;
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.utils.Markers;
 import com.alkisum.android.cloudrun.location.LocationHelper;
 import com.alkisum.android.cloudrun.ui.NumberPickerPreference;
+import com.alkisum.android.cloudrun.utils.Markers;
 import com.alkisum.android.cloudrun.utils.Pref;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 /**
  * Activity showing the application settings.

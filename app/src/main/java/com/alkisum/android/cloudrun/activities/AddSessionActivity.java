@@ -1,8 +1,6 @@
 package com.alkisum.android.cloudrun.activities;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -11,10 +9,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.alkisum.android.cloudrun.R;
+import com.alkisum.android.cloudrun.adapters.AddSessionListAdapter;
 import com.alkisum.android.cloudrun.database.Db;
 import com.alkisum.android.cloudrun.dialogs.DistanceDialog;
 import com.alkisum.android.cloudrun.dialogs.DurationDialog;
-import com.alkisum.android.cloudrun.adapters.AddSessionListAdapter;
 import com.alkisum.android.cloudrun.model.Session;
 import com.alkisum.android.cloudrun.model.SessionDao;
 import com.alkisum.android.cloudrun.utils.Format;
@@ -23,6 +21,8 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.Calendar;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -159,7 +159,7 @@ public class AddSessionActivity extends AppCompatActivity implements
                 dateCalendar.get(Calendar.DAY_OF_MONTH)
         );
         dpd.setThemeDark(true);
-        dpd.show(getFragmentManager(), TAG_DATE_PICKER_DIALOG);
+        dpd.show(getSupportFragmentManager(), TAG_DATE_PICKER_DIALOG);
     }
 
     /**
@@ -175,7 +175,7 @@ public class AddSessionActivity extends AppCompatActivity implements
                 true
         );
         tpd.setThemeDark(true);
-        tpd.show(getFragmentManager(), TAG_TIME_PICKER_DIALOG);
+        tpd.show(getSupportFragmentManager(), TAG_TIME_PICKER_DIALOG);
     }
 
     /**
