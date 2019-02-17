@@ -1,15 +1,8 @@
 *.iml
 .gradle
 /local.properties
-.DS_Store
 /build
-/captures
 .idea/
-app/libs/
-app/proguard-rules.pro
-app/src/androidTest/
-app/src/test/
-doc/
 gradle.properties
 gradle/
 gradlew

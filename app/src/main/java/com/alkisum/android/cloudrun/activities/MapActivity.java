@@ -5,8 +5,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 
 import com.alkisum.android.cloudrun.BuildConfig;
 import com.alkisum.android.cloudrun.R;
@@ -34,6 +32,7 @@ import org.osmdroid.views.overlay.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -45,7 +44,7 @@ import butterknife.ButterKnife;
  * Activity showing current location and tracking session on map.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 3.0
  */
 public class MapActivity extends AppCompatActivity {
@@ -116,7 +115,8 @@ public class MapActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         if (getIntent().hasExtra(ARG_SESSION_ID)) {
-            long sessionId = getIntent().getExtras().getLong(ARG_SESSION_ID);
+            long sessionId = Objects.requireNonNull(
+                    getIntent().getExtras()).getLong(ARG_SESSION_ID);
             session = Sessions.getSessionById(sessionId);
         }
 
@@ -141,12 +141,9 @@ public class MapActivity extends AppCompatActivity {
 
         mapView.getZoomController().setVisibility(
                 CustomZoomButtonsController.Visibility.NEVER);
-        mapView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(final View v, final MotionEvent event) {
-                focused = false;
-                return false;
-            }
+        mapView.setOnTouchListener((v, event) -> {
+            focused = false;
+            return false;
         });
 
         this.initMap(initPosition);

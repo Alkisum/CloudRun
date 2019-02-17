@@ -1,7 +1,6 @@
 package com.alkisum.android.cloudrun.activities;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -57,7 +56,7 @@ import butterknife.OnClick;
  * Main activity showing location values.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 1.0
  */
 public class MonitorActivity extends AppCompatActivity
@@ -358,14 +357,7 @@ public class MonitorActivity extends AppCompatActivity
             init();
         } else {
             ErrorDialog.show(this, getString(R.string.permission_title),
-                    errorMessage.toString(),
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(final DialogInterface dialog,
-                                            final int which) {
-                            finish();
-                        }
-                    });
+                    errorMessage.toString(), (dialog, which) -> finish());
         }
     }
 
@@ -450,17 +442,17 @@ public class MonitorActivity extends AppCompatActivity
 
         tiles = new ArrayList<>();
         tiles.add(new Tile(this, this, Pref.TILE_LEFT, leftData,
-                (RelativeLayout) findViewById(R.id.monitor_layout_left),
-                (TextView) findViewById(R.id.monitor_txt_left_value),
-                (TextView) findViewById(R.id.monitor_txt_left_unit)));
+                findViewById(R.id.monitor_layout_left),
+                findViewById(R.id.monitor_txt_left_value),
+                findViewById(R.id.monitor_txt_left_unit)));
         tiles.add(new Tile(this, this, Pref.TILE_RIGHT_TOP, topRightData,
-                (RelativeLayout) findViewById(R.id.monitor_layout_right_top),
-                (TextView) findViewById(R.id.monitor_txt_right_top_value),
-                (TextView) findViewById(R.id.monitor_txt_right_top_unit)));
+                findViewById(R.id.monitor_layout_right_top),
+                findViewById(R.id.monitor_txt_right_top_value),
+                findViewById(R.id.monitor_txt_right_top_unit)));
         tiles.add(new Tile(this, this, Pref.TILE_RIGHT_BOTTOM, bottomRightData,
-                (RelativeLayout) findViewById(R.id.monitor_layout_right_bottom),
-                (TextView) findViewById(R.id.monitor_txt_right_bottom_value),
-                (TextView) findViewById(R.id.monitor_txt_right_bottom_unit)));
+                findViewById(R.id.monitor_layout_right_bottom),
+                findViewById(R.id.monitor_txt_right_bottom_value),
+                findViewById(R.id.monitor_txt_right_bottom_unit)));
     }
 
     @Override
@@ -485,27 +477,24 @@ public class MonitorActivity extends AppCompatActivity
             @NonNull final MenuItem item) {
         drawerLayout.closeDrawer(GravityCompat.START);
         // Start activity a bit later to avoid the lag when closing the drawer
-        drawerLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                int id = item.getItemId();
-                if (id == R.id.nav_history) {
-                    Intent intent = new Intent(MonitorActivity.this,
-                            HistoryActivity.class);
-                    if (sessionRunning) {
-                        intent.putExtra(HistoryActivity.ARG_IGNORE_SESSION_ID,
-                                recorder.getSession().getId());
-                    }
-                    startActivity(intent);
-                } else if (id == R.id.nav_routes) {
-                    Intent intent = new Intent(MonitorActivity.this,
-                            RouteListActivity.class);
-                    startActivity(intent);
-                } else if (id == R.id.nav_settings) {
-                    Intent intent = new Intent(MonitorActivity.this,
-                            SettingsActivity.class);
-                    startActivity(intent);
+        drawerLayout.postDelayed(() -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_history) {
+                Intent intent = new Intent(MonitorActivity.this,
+                        HistoryActivity.class);
+                if (sessionRunning) {
+                    intent.putExtra(HistoryActivity.ARG_IGNORE_SESSION_ID,
+                            recorder.getSession().getId());
                 }
+                startActivity(intent);
+            } else if (id == R.id.nav_routes) {
+                Intent intent = new Intent(MonitorActivity.this,
+                        RouteListActivity.class);
+                startActivity(intent);
+            } else if (id == R.id.nav_settings) {
+                Intent intent = new Intent(MonitorActivity.this,
+                        SettingsActivity.class);
+                startActivity(intent);
             }
         }, 300);
 

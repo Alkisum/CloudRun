@@ -20,7 +20,7 @@ import java.util.List;
  * Utility class for session operations.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 1.1
  */
 public final class Sessions {
@@ -105,7 +105,7 @@ public final class Sessions {
         List<DataPoint> dataPoints = session.getDataPoints();
 
         // Initialize end time and total distance
-        Long end = session.getStart();
+        long end = session.getStart();
 
         if (!dataPoints.isEmpty()) {
             // Get end from the last datapoint recorded during the session

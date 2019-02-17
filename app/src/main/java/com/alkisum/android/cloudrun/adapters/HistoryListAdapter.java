@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
  * Adapter for History ListView.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 1.0
  */
 public class HistoryListAdapter extends BaseAdapter {
@@ -222,12 +222,8 @@ public class HistoryListAdapter extends BaseAdapter {
         holder.checkBox.setChecked(session.getSelected());
         if (editMode) {
             holder.checkBox.setVisibility(View.VISIBLE);
-            holder.checkBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View view) {
-                    session.setSelected(holder.checkBox.isChecked());
-                }
-            });
+            holder.checkBox.setOnClickListener(
+                    view1 -> session.setSelected(holder.checkBox.isChecked()));
         } else {
             holder.checkBox.setVisibility(View.GONE);
         }

@@ -3,12 +3,13 @@ package com.alkisum.android.cloudrun.dialogs;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.NumberPicker;
 
 import com.alkisum.android.cloudrun.R;
+
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -17,7 +18,7 @@ import androidx.fragment.app.DialogFragment;
  * Dialog to set the duration.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 2.0
  */
 
@@ -68,7 +69,7 @@ public class DurationDialog extends DialogFragment {
     }
 
     @Override
-    public final void onAttach(final Context context) {
+    public final void onAttach(@NonNull final Context context) {
         super.onAttach(context);
         try {
             callback = (DurationDialogListener) context;
@@ -112,24 +113,13 @@ public class DurationDialog extends DialogFragment {
         builder.setView(view)
                 .setTitle(R.string.duration_title)
                 .setPositiveButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(final DialogInterface dialog,
-                                                final int id) {
-                                callback.onDurationSubmit(
-                                        nbHour.getValue(),
-                                        nbMinute.getValue(),
-                                        nbSecond.getValue());
-
-                            }
-                        })
+                        (dialog, id) -> callback.onDurationSubmit(
+                                nbHour.getValue(),
+                                nbMinute.getValue(),
+                                nbSecond.getValue()))
                 .setNegativeButton(android.R.string.cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(final DialogInterface dialog,
-                                                final int id) {
-                                DurationDialog.this.getDialog().cancel();
-                            }
-                        });
+                        (dialog, id) -> Objects.requireNonNull(
+                                DurationDialog.this.getDialog()).cancel());
         return builder.create();
     }
 

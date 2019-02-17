@@ -1,11 +1,9 @@
 package com.alkisum.android.cloudrun.ui;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -16,7 +14,7 @@ import com.alkisum.android.cloudrun.dialogs.TileDialog;
  * Layout containing a value and a unit TextView.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.1
  * @since 1.3
  */
 public class Tile {
@@ -101,28 +99,16 @@ public class Tile {
         this.data = data;
         this.prefKey = prefKey;
         this.layout = layout;
-        this.layout.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(final View v) {
-                Tile.this.callback.onTileLongClicked();
-                // Dialog's checked item is set according to the data constant
-                TileDialog.build(Tile.this.context, Tile.this.data,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(final DialogInterface dialog,
-                                                final int which) {
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        changeData(which);
-                                        resetUnits();
-                                        dialog.dismiss();
-                                    }
-                                }, 500);
-                            }
-                        }).show();
-                return false;
-            }
+        this.layout.setOnLongClickListener(v -> {
+            Tile.this.callback.onTileLongClicked();
+            // Dialog's checked item is set according to the data constant
+            TileDialog.build(Tile.this.context, Tile.this.data,
+                    (dialog, which) -> new Handler().postDelayed(() -> {
+                        changeData(which);
+                        resetUnits();
+                        dialog.dismiss();
+                    }, 500)).show();
+            return false;
         });
         this.value = value;
         this.unit = unit;

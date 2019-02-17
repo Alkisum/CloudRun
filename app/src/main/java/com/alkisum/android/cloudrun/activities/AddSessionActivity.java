@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -30,7 +29,7 @@ import butterknife.ButterKnife;
  * Activity to add a session manually to the database.
  *
  * @author Alkisum
- * @version 3.0
+ * @version 4.1
  * @since 2.0
  */
 public class AddSessionActivity extends AppCompatActivity implements
@@ -121,28 +120,22 @@ public class AddSessionActivity extends AppCompatActivity implements
      * ClickListener for the ListView items.
      */
     private final AdapterView.OnItemClickListener onItemClickListener =
-            new AdapterView.OnItemClickListener() {
-
-                @Override
-                public void onItemClick(final AdapterView<?> adapterView,
-                                        final View view, final int position,
-                                        final long id) {
-                    switch (position) {
-                        case AddSessionListAdapter.DATE:
-                            showDatePickerDialog();
-                            break;
-                        case AddSessionListAdapter.TIME:
-                            showTimePickerDialog();
-                            break;
-                        case AddSessionListAdapter.DURATION:
-                            showDurationDialog();
-                            break;
-                        case AddSessionListAdapter.DISTANCE:
-                            showDistanceDialog();
-                            break;
-                        default:
-                            break;
-                    }
+            (adapterView, view, position, id) -> {
+                switch (position) {
+                    case AddSessionListAdapter.DATE:
+                        showDatePickerDialog();
+                        break;
+                    case AddSessionListAdapter.TIME:
+                        showTimePickerDialog();
+                        break;
+                    case AddSessionListAdapter.DURATION:
+                        showDurationDialog();
+                        break;
+                    case AddSessionListAdapter.DISTANCE:
+                        showDistanceDialog();
+                        break;
+                    default:
+                        break;
                 }
             };
 

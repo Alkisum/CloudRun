@@ -7,7 +7,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -55,7 +54,7 @@ import butterknife.OnClick;
  * Activity listing the history of sessions.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 1.0
  */
 public class HistoryActivity extends AppCompatActivity implements
@@ -201,12 +200,7 @@ public class HistoryActivity extends AppCompatActivity implements
                 Snackbar.make(fab, R.string.session_delete_snackbar,
                         Snackbar.LENGTH_LONG)
                         .setAction(R.string.action_undo,
-                                new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(final View v) {
-                                        restoreSessions(session);
-                                    }
-                                }).show();
+                                v -> restoreSessions(session)).show();
             }
         }
     }
@@ -217,43 +211,30 @@ public class HistoryActivity extends AppCompatActivity implements
     private void setGui() {
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                if (isEditMode()) {
-                    disableEditMode();
-                } else {
-                    finish();
-                }
+        toolbar.setNavigationOnClickListener(v -> {
+            if (isEditMode()) {
+                disableEditMode();
+            } else {
+                finish();
             }
         });
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(final AdapterView<?> adapterView,
-                                    final View view, final int position,
-                                    final long id) {
-                if (listAdapter.isEditMode()) {
-                    listAdapter.changeSessionSelectedState(position);
-                    listAdapter.notifyDataSetInvalidated();
-                } else {
-                    Intent intent = new Intent(HistoryActivity.this,
-                            SessionActivity.class);
-                    intent.putExtra(SessionActivity.ARG_SESSION_ID, id);
-                    startActivityForResult(intent, SESSION_REQUEST_CODE);
-                }
+        listView.setOnItemClickListener((adapterView, view, position, id) -> {
+            if (listAdapter.isEditMode()) {
+                listAdapter.changeSessionSelectedState(position);
+                listAdapter.notifyDataSetInvalidated();
+            } else {
+                Intent intent = new Intent(HistoryActivity.this,
+                        SessionActivity.class);
+                intent.putExtra(SessionActivity.ARG_SESSION_ID, id);
+                startActivityForResult(intent, SESSION_REQUEST_CODE);
             }
         });
 
         listView.setOnItemLongClickListener(
-                new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(
-                            final AdapterView<?> adapterView, final View view,
-                            final int i, final long l) {
-                        enableEditMode(i);
-                        return true;
-                    }
+                (adapterView, view, i, l) -> {
+                    enableEditMode(i);
+                    return true;
                 });
 
         List<Session> sessions = Sessions.loadSessions(ignoreSessionId);
@@ -266,12 +247,9 @@ public class HistoryActivity extends AppCompatActivity implements
         listView.setAdapter(listAdapter);
 
         swipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        refreshList();
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
+                () -> {
+                    refreshList();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
         );
     }
@@ -436,12 +414,9 @@ public class HistoryActivity extends AppCompatActivity implements
             }
         }
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setIndeterminate(true);
-                progressBar.setVisibility(View.VISIBLE);
-            }
+        runOnUiThread(() -> {
+            progressBar.setIndeterminate(true);
+            progressBar.setVisibility(View.VISIBLE);
         });
     }
 
@@ -612,12 +587,9 @@ public class HistoryActivity extends AppCompatActivity implements
             final Restorable[] sessions = Deletables.toRestorables(
                     event.getDeletedEntities());
             snackbar.setAction(R.string.action_undo,
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(final View v) {
-                            // restore sessions
-                            restoreSessions(sessions);
-                        }
+                    v -> {
+                        // restore sessions
+                        restoreSessions(sessions);
                     });
         }
         snackbar.show();

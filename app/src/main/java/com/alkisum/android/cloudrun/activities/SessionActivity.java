@@ -59,7 +59,7 @@ import butterknife.ButterKnife;
  * Activity showing session information.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 2.0
  */
 public class SessionActivity extends AppCompatActivity implements
@@ -281,12 +281,9 @@ public class SessionActivity extends AppCompatActivity implements
             }
         }
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setIndeterminate(true);
-                progressBar.setVisibility(View.VISIBLE);
-            }
+        runOnUiThread(() -> {
+            progressBar.setIndeterminate(true);
+            progressBar.setVisibility(View.VISIBLE);
         });
     }
 

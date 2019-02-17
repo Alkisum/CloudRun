@@ -7,7 +7,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -57,7 +56,7 @@ import butterknife.OnClick;
  * Activity listing available routes.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 4.0
  */
 public class RouteListActivity extends AppCompatActivity implements
@@ -157,43 +156,30 @@ public class RouteListActivity extends AppCompatActivity implements
     private void setGui() {
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                if (isEditMode()) {
-                    disableEditMode();
-                } else {
-                    finish();
-                }
+        toolbar.setNavigationOnClickListener(v -> {
+            if (isEditMode()) {
+                disableEditMode();
+            } else {
+                finish();
             }
         });
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(final AdapterView<?> adapterView,
-                                    final View view, final int position,
-                                    final long id) {
-                if (listAdapter.isEditMode()) {
-                    listAdapter.changeRouteSelectedState(position);
-                    listAdapter.notifyDataSetInvalidated();
-                } else {
-                    Intent intent = new Intent(RouteListActivity.this,
-                            RouteActivity.class);
-                    intent.putExtra(RouteActivity.ARG_ROUTE_ID, id);
-                    startActivityForResult(intent, ROUTE_REQUEST_CODE);
-                }
+        listView.setOnItemClickListener((adapterView, view, position, id) -> {
+            if (listAdapter.isEditMode()) {
+                listAdapter.changeRouteSelectedState(position);
+                listAdapter.notifyDataSetInvalidated();
+            } else {
+                Intent intent = new Intent(RouteListActivity.this,
+                        RouteActivity.class);
+                intent.putExtra(RouteActivity.ARG_ROUTE_ID, id);
+                startActivityForResult(intent, ROUTE_REQUEST_CODE);
             }
         });
 
         listView.setOnItemLongClickListener(
-                new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(
-                            final AdapterView<?> adapterView, final View view,
-                            final int i, final long l) {
-                        enableEditMode(i);
-                        return true;
-                    }
+                (adapterView, view, i, l) -> {
+                    enableEditMode(i);
+                    return true;
                 });
 
         List<Route> routes = Routes.loadRoutes();
@@ -205,12 +191,9 @@ public class RouteListActivity extends AppCompatActivity implements
         listView.setAdapter(listAdapter);
 
         swipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        refreshList();
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
+                () -> {
+                    refreshList();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
         );
     }
@@ -279,12 +262,7 @@ public class RouteListActivity extends AppCompatActivity implements
                 Snackbar.make(fab, R.string.route_delete_snackbar,
                         Snackbar.LENGTH_LONG)
                         .setAction(R.string.action_undo,
-                                new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(final View v) {
-                                        restoreRoutes(route);
-                                    }
-                                }).show();
+                                v -> restoreRoutes(route)).show();
             }
         }
     }
@@ -394,12 +372,9 @@ public class RouteListActivity extends AppCompatActivity implements
             }
         }
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setIndeterminate(true);
-                progressBar.setVisibility(View.VISIBLE);
-            }
+        runOnUiThread(() -> {
+            progressBar.setIndeterminate(true);
+            progressBar.setVisibility(View.VISIBLE);
         });
     }
 
@@ -569,14 +544,10 @@ public class RouteListActivity extends AppCompatActivity implements
             // convert deletable entities to restorable entities
             final Restorable[] routes = Deletables.toRestorables(
                     event.getDeletedEntities());
-            snackbar.setAction(R.string.action_undo,
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(final View v) {
-                            // restore routes
-                            restoreRoutes(routes);
-                        }
-                    });
+            snackbar.setAction(R.string.action_undo, v -> {
+                // restore routes
+                restoreRoutes(routes);
+            });
         }
         snackbar.show();
     }

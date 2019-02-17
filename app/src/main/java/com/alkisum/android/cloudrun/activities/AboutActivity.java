@@ -20,7 +20,7 @@ import androidx.appcompat.widget.Toolbar;
  * Activity listing information about the application.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 1.2
  */
 public class AboutActivity extends AppCompatActivity {
@@ -64,16 +64,11 @@ public class AboutActivity extends AppCompatActivity {
             // Github
             Preference githubPreference = findPreference(Pref.GITHUB);
             githubPreference.setOnPreferenceClickListener(
-                    new Preference.OnPreferenceClickListener() {
-                        @Override
-                        public boolean onPreferenceClick(
-                                final Preference preference) {
-                            Intent intent = new Intent(Intent.ACTION_VIEW,
-                                    Uri.parse(getString(
-                                            R.string.about_github)));
-                            startActivity(intent);
-                            return false;
-                        }
+                    preference -> {
+                        Intent intent = new Intent(Intent.ACTION_VIEW,
+                                Uri.parse(getString(R.string.about_github)));
+                        startActivity(intent);
+                        return false;
                     });
         }
     }

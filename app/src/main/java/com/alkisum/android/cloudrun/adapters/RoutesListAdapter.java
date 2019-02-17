@@ -20,7 +20,7 @@ import butterknife.ButterKnife;
  * Adapter for Routes ListView.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 4.0
  */
 public class RoutesListAdapter extends BaseAdapter {
@@ -145,12 +145,8 @@ public class RoutesListAdapter extends BaseAdapter {
         holder.checkBox.setChecked(route.getSelected());
         if (editMode) {
             holder.checkBox.setVisibility(View.VISIBLE);
-            holder.checkBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View view) {
-                    route.setSelected(holder.checkBox.isChecked());
-                }
-            });
+            holder.checkBox.setOnClickListener(view1 -> route.setSelected(
+                    holder.checkBox.isChecked()));
         } else {
             holder.checkBox.setVisibility(View.GONE);
         }

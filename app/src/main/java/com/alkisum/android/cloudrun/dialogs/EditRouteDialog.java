@@ -1,7 +1,6 @@
 package com.alkisum.android.cloudrun.dialogs;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.view.View;
 import android.widget.EditText;
 
@@ -18,7 +17,7 @@ import androidx.appcompat.app.AlertDialog;
  * Dialog to edit an existing route.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 4.0
  */
 public final class EditRouteDialog {
@@ -52,26 +51,15 @@ public final class EditRouteDialog {
 
         // positive button
         builder.setPositiveButton(android.R.string.ok,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog,
-                                        final int which) {
-                        Routes.updateRoute(route,
-                                routeName.getText().toString());
-                        EventBus.getDefault().post(new RefreshEvent());
-                        dialog.dismiss();
-                    }
+                (dialog, which) -> {
+                    Routes.updateRoute(route, routeName.getText().toString());
+                    EventBus.getDefault().post(new RefreshEvent());
+                    dialog.dismiss();
                 });
 
         // negative button
         builder.setNegativeButton(android.R.string.cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog,
-                                        final int which) {
-                        dialog.cancel();
-                    }
-                });
+                (dialog, which) -> dialog.cancel());
 
         // show dialog
         builder.show();

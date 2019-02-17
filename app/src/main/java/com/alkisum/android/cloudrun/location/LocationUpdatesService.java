@@ -31,7 +31,7 @@ import androidx.core.app.NotificationCompat;
  * Bound and started service that can be promoted to a foreground service.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 3.1
  */
 public class LocationUpdatesService extends Service {
@@ -94,6 +94,11 @@ public class LocationUpdatesService extends Service {
     private NotificationCompat.Action resumeAction;
 
     /**
+     * Notification action to stop session.
+     */
+    private NotificationCompat.Action stopAction;
+
+    /**
      * Flag set to true when the blinking mode is enabled (session on pause),
      * false otherwise.
      */
@@ -112,6 +117,8 @@ public class LocationUpdatesService extends Service {
         handlerThread.start();
         serviceHandler = new Handler(handlerThread.getLooper());
         initNotification();
+        notificationBuilder.addAction(pauseAction);
+        notificationBuilder.addAction(stopAction);
         eventBus = EventBus.getDefault();
         eventBus.register(this);
     }
@@ -208,7 +215,7 @@ public class LocationUpdatesService extends Service {
         this.addIntentFilterActions();
 
         // add actions to notification builder
-        this.addNotificationActions();
+        this.createNotificationActions();
     }
 
     /**
@@ -238,9 +245,9 @@ public class LocationUpdatesService extends Service {
     }
 
     /**
-     * Create and add actions to notification builder.
+     * Create notification actions.
      */
-    private void addNotificationActions() {
+    private void createNotificationActions() {
         // create pause action
         pauseAction = new NotificationCompat.Action(
                 R.drawable.ic_pause_white_48dp,
@@ -256,15 +263,11 @@ public class LocationUpdatesService extends Service {
                         this, 0, new Intent(SessionActionEvent.RESUME), 0));
 
         // create stop action
-        NotificationCompat.Action stopAction = new NotificationCompat.Action(
+        stopAction = new NotificationCompat.Action(
                 R.drawable.ic_stop_white_48dp,
                 getString(R.string.action_stop),
                 PendingIntent.getBroadcast(
                         this, 0, new Intent(SessionActionEvent.STOP), 0));
-
-        // add actions to notification builder
-        notificationBuilder.addAction(pauseAction);
-        notificationBuilder.addAction(stopAction);
     }
 
     /**
@@ -310,16 +313,28 @@ public class LocationUpdatesService extends Service {
     public final void onSessionActionEvent(final SessionActionEvent event) {
         switch (event.getAction()) {
             case SessionActionEvent.START:
-                // init pause/resume states
-                notificationBuilder.mActions.set(0, pauseAction);
-                this.setBlink(false);
-                break;
-            case SessionActionEvent.RESUME:
-                // set action to pause
-                notificationBuilder.mActions.set(0, pauseAction);
+                // set actions
+                initNotification();
+                notificationBuilder.addAction(pauseAction);
+                notificationBuilder.addAction(stopAction);
 
                 // deactivate blinking
                 this.setBlink(false);
+
+                // update notification
+                updateNotification();
+                break;
+            case SessionActionEvent.RESUME:
+                // set actions
+                initNotification();
+                notificationBuilder.addAction(pauseAction);
+                notificationBuilder.addAction(stopAction);
+
+                // deactivate blinking
+                this.setBlink(false);
+
+                // update notification
+                updateNotification();
 
                 // push new notification
                 if (notificationUpdateOn) {
@@ -328,11 +343,16 @@ public class LocationUpdatesService extends Service {
                 }
                 break;
             case SessionActionEvent.PAUSE:
-                // set action to resume
-                notificationBuilder.mActions.set(0, resumeAction);
+                // set actions
+                initNotification();
+                notificationBuilder.addAction(resumeAction);
+                notificationBuilder.addAction(stopAction);
 
                 // activate blinking
                 this.setBlink(true);
+
+                // update notification
+                updateNotification();
 
                 // push new notification
                 if (notificationUpdateOn) {

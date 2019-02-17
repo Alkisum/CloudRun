@@ -21,7 +21,7 @@ import androidx.appcompat.widget.Toolbar;
  * Activity showing the application settings.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 1.1
  */
 public class SettingsActivity extends AppCompatActivity {
@@ -79,14 +79,10 @@ public class SettingsActivity extends AppCompatActivity {
             // about
             Preference aboutPreference = findPreference(Pref.ABOUT);
             aboutPreference.setOnPreferenceClickListener(
-                    new Preference.OnPreferenceClickListener() {
-                        @Override
-                        public boolean onPreferenceClick(
-                                final Preference preference) {
-                            startActivity(new Intent(getActivity(),
-                                    AboutActivity.class));
-                            return false;
-                        }
+                    preference -> {
+                        startActivity(new Intent(getActivity(),
+                                AboutActivity.class));
+                        return false;
                     });
         }
 

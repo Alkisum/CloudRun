@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.ServiceConnection;
@@ -36,7 +35,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import org.greenrobot.eventbus.EventBus;
@@ -48,14 +46,13 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 /**
  * Helper class for location operations.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 3.1
  */
 public class LocationHelper {
@@ -218,20 +215,15 @@ public class LocationHelper {
         Task<LocationSettingsResponse> result =
                 LocationServices.getSettingsClient(activity.get())
                         .checkLocationSettings(builder.build());
-        result.addOnCompleteListener(
-                new OnCompleteListener<LocationSettingsResponse>() {
-                    @Override
-                    public void onComplete(@NonNull final Task
-                            <LocationSettingsResponse> task) {
-                        try {
-                            task.getResult(ApiException.class);
-                            // Location on: start location updates
-                            requestLocationUpdates();
-                        } catch (ApiException exception) {
-                            handleLocationSettingsResponse(exception);
-                        }
-                    }
-                });
+        result.addOnCompleteListener(task -> {
+            try {
+                task.getResult(ApiException.class);
+                // Location on: start location updates
+                requestLocationUpdates();
+            } catch (ApiException exception) {
+                handleLocationSettingsResponse(exception);
+            }
+        });
     }
 
     /**
@@ -342,15 +334,11 @@ public class LocationHelper {
         ErrorDialog.show(activity.get(),
                 activity.get().getString(R.string.location_required_title),
                 activity.get().getString(R.string.location_required_message),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog,
-                                        final int which) {
-                        Intent intent = new Intent(
-                                Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        activity.get().startActivityForResult(intent,
-                                REQUEST_LOCATION_MANUAL);
-                    }
+                (dialog, which) -> {
+                    Intent intent = new Intent(
+                            Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    activity.get().startActivityForResult(intent,
+                            REQUEST_LOCATION_MANUAL);
                 });
     }
 

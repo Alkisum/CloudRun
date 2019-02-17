@@ -3,12 +3,13 @@ package com.alkisum.android.cloudrun.dialogs;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.NumberPicker;
 
 import com.alkisum.android.cloudrun.R;
+
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -17,7 +18,7 @@ import androidx.fragment.app.DialogFragment;
  * Dialog to set the distance.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 2.0
  */
 
@@ -53,7 +54,7 @@ public class DistanceDialog extends DialogFragment {
     }
 
     @Override
-    public final void onAttach(final Context context) {
+    public final void onAttach(@NonNull final Context context) {
         super.onAttach(context);
         try {
             callback = (DistanceDialogListener) context;
@@ -92,24 +93,16 @@ public class DistanceDialog extends DialogFragment {
         builder.setView(view)
                 .setTitle(R.string.distance_title)
                 .setPositiveButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(final DialogInterface dialog,
-                                                final int id) {
-                                float result = (nbInteger.getValue()
-                                        + nbFractional.getValue() / 100f)
-                                        * 1000;
-                                callback.onDistanceSubmit(result);
+                        (dialog, id) -> {
+                            float result = (nbInteger.getValue()
+                                    + nbFractional.getValue() / 100f)
+                                    * 1000;
+                            callback.onDistanceSubmit(result);
 
-                            }
                         })
                 .setNegativeButton(android.R.string.cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(final DialogInterface dialog,
-                                                final int id) {
-                                DistanceDialog.this.getDialog().cancel();
-                            }
-                        });
+                        (dialog, id) -> Objects.requireNonNull(
+                                DistanceDialog.this.getDialog()).cancel());
         return builder.create();
     }
 

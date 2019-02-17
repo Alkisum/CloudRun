@@ -12,12 +12,13 @@ import com.alkisum.android.cloudrun.model.Route;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Utility class for marker operations.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 4.0
  */
 public final class Markers {
@@ -173,7 +174,7 @@ public final class Markers {
         String s = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(Pref.DISTANCE_TO_MARKER, DISTANCE_TO_MARKER_DEFAULT);
         try {
-            return Integer.parseInt(s);
+            return Integer.parseInt(Objects.requireNonNull(s));
         } catch (NumberFormatException e) {
             return Integer.parseInt(DISTANCE_TO_MARKER_DEFAULT);
         }

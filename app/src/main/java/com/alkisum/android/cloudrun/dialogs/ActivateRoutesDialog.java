@@ -2,13 +2,12 @@ package com.alkisum.android.cloudrun.dialogs;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.preference.PreferenceManager;
 
 import com.alkisum.android.cloudrun.R;
-import com.alkisum.android.cloudrun.utils.Routes;
 import com.alkisum.android.cloudrun.model.Route;
 import com.alkisum.android.cloudrun.utils.Pref;
+import com.alkisum.android.cloudrun.utils.Routes;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.Set;
  * Dialog showing list of routes that can be activated.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 4.0
  */
 public final class ActivateRoutesDialog {
@@ -68,29 +67,19 @@ public final class ActivateRoutesDialog {
         new AlertDialog.Builder(context)
                 .setTitle(context.getString(R.string.action_routes))
                 .setMultiChoiceItems(items, checkedItems,
-                        new DialogInterface.OnMultiChoiceClickListener() {
-
-                            @Override
-                            public void onClick(final DialogInterface dialog,
-                                                final int which,
-                                                final boolean isChecked) {
-                                String routeId = routes.get(which).getId()
-                                        .toString();
-                                if (isChecked) {
-                                    activeRoutes.add(routeId);
-                                } else {
-                                    activeRoutes.remove(routeId);
-                                }
+                        (dialog, which, isChecked) -> {
+                            String routeId = routes.get(which).getId()
+                                    .toString();
+                            if (isChecked) {
+                                activeRoutes.add(routeId);
+                            } else {
+                                activeRoutes.remove(routeId);
                             }
                         })
                 .setPositiveButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(final DialogInterface dialog,
-                                                final int which) {
-                                Routes.cleanRoutes(activeRoutes);
-                                Routes.saveActiveRoutes(context, activeRoutes);
-                            }
+                        (dialog, which) -> {
+                            Routes.cleanRoutes(activeRoutes);
+                            Routes.saveActiveRoutes(context, activeRoutes);
                         })
                 .setNegativeButton(android.R.string.cancel, null).show();
     }

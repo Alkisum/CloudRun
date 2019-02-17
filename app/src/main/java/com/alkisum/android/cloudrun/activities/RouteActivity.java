@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,7 +39,6 @@ import com.alkisum.android.cloudrun.utils.Markers;
 import com.alkisum.android.cloudrun.utils.Routes;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 
@@ -74,7 +72,7 @@ import butterknife.ButterKnife;
  * Activity to manage markers.
  *
  * @author Alkisum
- * @version 4.0
+ * @version 4.1
  * @since 4.0
  */
 public class RouteActivity extends AppCompatActivity implements
@@ -285,18 +283,14 @@ public class RouteActivity extends AppCompatActivity implements
                 == PackageManager.PERMISSION_GRANTED) {
             // get last location
             fusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this,
-                            new OnSuccessListener<Location>() {
-                                @Override
-                                public void onSuccess(final Location location) {
-                                    // check if location is valid
-                                    if (location != null) {
-                                        // zoom on last location
-                                        centerMap(location.getLatitude(),
-                                                location.getLongitude());
-                                    }
-                                }
-                            });
+                    .addOnSuccessListener(this, location -> {
+                        // check if location is valid
+                        if (location != null) {
+                            // zoom on last location
+                            centerMap(location.getLatitude(),
+                                    location.getLongitude());
+                        }
+                    });
         }
     }
 
@@ -454,12 +448,9 @@ public class RouteActivity extends AppCompatActivity implements
             }
         }
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setIndeterminate(true);
-                progressBar.setVisibility(View.VISIBLE);
-            }
+        runOnUiThread(() -> {
+            progressBar.setIndeterminate(true);
+            progressBar.setVisibility(View.VISIBLE);
         });
     }
 
@@ -564,12 +555,7 @@ public class RouteActivity extends AppCompatActivity implements
                 final Restorable[] markers = Deletables.toRestorables(
                         event.getDeletedEntities());
                 snackbar.setAction(R.string.action_undo,
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(final View v) {
-                                restoreMarkers(markers);
-                            }
-                        });
+                        v -> restoreMarkers(markers));
             }
             snackbar.show();
         }
